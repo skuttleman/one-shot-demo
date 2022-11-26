@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using OSCore.Events.Brains;
@@ -15,7 +16,10 @@ namespace OSCore.Interfaces {
         public void OnMessage(IMessage message);
         public void OnMessageSync(IMessage message);
     }
-    public interface IControllerBrainFactory : IGameSystemComponent {
-        IControllerBrain Create(Transform transform, ISet<string> tags);
+    public interface IControllerBrainManager : IGameSystemComponent {
+        // TODO - proper identifier
+        public IControllerBrain Ensure(Transform transform, ISet<string> tags);
+        public void OnMessage(ISet<string> tags, IMessage message);
+        public void OnMessageSync(ISet<string> tags, IMessage message);
     }
 }

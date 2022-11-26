@@ -9,34 +9,49 @@ using System;
 using OSCore.Events.Brains;
 
 namespace OSBE.Brains {
-    public class ControllerBrainFactory : IControllerBrainFactory {
-        ISet<IControllerBrain> brains;
+    public class ControllerBrainFactory : IControllerBrainManager {
+        readonly IDictionary<ISet<string>, IControllerBrain> brains;
 
         public ControllerBrainFactory() {
-            brains = new HashSet<IControllerBrain>();
+            brains = new Dictionary<ISet<string>, IControllerBrain>();
         }
 
-        public IControllerBrain Create(Transform transform, ISet<string> tags) {
+        public IControllerBrain Ensure(Transform transform, ISet<string> tags) {
+            IControllerBrain brain = brains.Get(tags);
+
+            if (brain is null) {
+                brain = Create(transform, tags);
+                brains[tags] = brain;
+            }
+
+            return brain;
+        }
+
+        public void Update(IGameSystem session) =>
+            brains.ForEach(brain => brain.Value.Update(session));
+
+        public void OnMessage(ISet<string> tags, IMessage message) =>
+            brains.Get(tags)?.OnMessage(message);
+
+        public void OnMessageSync(ISet<string> tags, IMessage message) =>
+            brains.Get(tags)?.OnMessageSync(message);
+
+        IControllerBrain Create(Transform transform, ISet<string> tags) {
             if (tags.Contains("player")) {
                 IControllerBrain brain = new PlayerControllerBrain(transform);
-                brains.Add(brain);
                 return brain;
             }
             return default;
-        }
-
-        public void Update(IGameSystem session) {
-            brains.ForEach(brain => brain.Update(session));
         }
     }
 
     public abstract class AControllerBrain<M> : IControllerBrain
         where M : IMessage {
 
-        static string EX_MSG = "This controller only accepts message of type " + typeof(M);
-
-        ConcurrentQueue<M> requests;
-        ConcurrentQueue<Action> responses;
+        static readonly string EX_MSG =
+            "This controller only accepts message of type " + typeof(M);
+        readonly ConcurrentQueue<M> requests;
+        readonly ConcurrentQueue<Action> responses;
 
         public AControllerBrain() {
             requests = new();

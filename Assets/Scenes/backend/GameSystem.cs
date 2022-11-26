@@ -29,7 +29,7 @@ namespace OSBE {
 
         void Init() {
             components = new Dictionary<Type, IGameSystemComponent> {
-                { typeof(IControllerBrainFactory), new ControllerBrainFactory() }
+                { typeof(IControllerBrainManager), new ControllerBrainFactory() }
             };
             controller.Init(this);
         }

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,17 +14,10 @@ namespace OSFE {
         void Start() {
             controller = FindObjectOfType<GameController>();
             brain = controller.Get<IControllerBrainFactory>().Create(transform, Sets.Of("player"));
-            brain.OnMessageSync(new PlayerBrainMessage.StringMessage("A [STRING] message for you"));
-        }
-
-        // Update is called once per frame
-        void Update() {
-
-
         }
 
         public void OnInputMove(InputValue value) {
-            //Debug.Log("I*NPU MOV");
+            brain.OnMessageSync(Messages.Move(value.Get<Vector2>()));
         }
     }
 }
