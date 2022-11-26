@@ -13,6 +13,51 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "InputLook",
+                    "type": "Value",
+                    "id": "1132e764-3f36-45aa-b26f-40773f98ad7c",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "InputStance",
+                    "type": "Button",
+                    "id": "2e524a64-639d-4826-a113-7e61d939c515",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "InputScope",
+                    "type": "Value",
+                    "id": "83d0a9d5-ad81-4ec4-be49-76feaf6e334a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "InputAim",
+                    "type": "Value",
+                    "id": "5fd4ee58-4f9e-4684-8846-f287c2ed4b75",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "InputAttack",
+                    "type": "Value",
+                    "id": "92f6104d-f67d-442a-8f68-cad9807d1036",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -24,6 +69,61 @@
                     "processors": "",
                     "groups": "",
                     "action": "InputMove",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "43e93b13-c161-46d1-acf8-b02cf1f03a95",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InputLook",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "70197f90-e150-4dcc-967a-c0a7f258a173",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "Hold,Tap",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InputStance",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "38a8d67d-bec6-4e4d-ba56-bf76871c8ebb",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InputScope",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4a74087b-3d94-4fee-9e05-98517972bc1b",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InputAim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5ee697d8-0220-4b07-9f49-c8c90ee70287",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InputAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
