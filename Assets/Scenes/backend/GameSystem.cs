@@ -12,8 +12,10 @@ namespace OSBE {
         IDictionary<Type, IGameSystemComponent> components;
         GameController controller;
 
-        public T Get<T>() where T : IGameSystemComponent {
-            return (T) components.Get(typeof(T));
+        public IGameSystem With<T>(Action<T> action) where T : IGameSystemComponent {
+            T component = (T)components.Get(typeof(T));
+            if (component is not null) action(component);
+            return this;
         }
 
         void Awake() {

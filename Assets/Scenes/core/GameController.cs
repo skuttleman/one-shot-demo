@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using OSCore.Interfaces;
 using UnityEngine;
@@ -14,7 +14,10 @@ namespace OSCore {
             this.system = system;
         }
 
-        public T Get<T>() where T : IGameSystemComponent => system.Get<T>();
+        public IGameSystem With<T>(Action<T> action) where T : IGameSystemComponent {
+            system.With(action);
+            return this;
+        }
 
         void Awake() {
             if (FindObjectsOfType<GameController>().Length > 1) {

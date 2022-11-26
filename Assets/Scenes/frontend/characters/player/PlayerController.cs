@@ -8,16 +8,18 @@ using OSCore.Events.Brains.Player;
 
 namespace OSFE {
     public class PlayerController : MonoBehaviour {
-        GameController controller;
-        IControllerBrain brain;
+        IGameSystem controller;
 
         void Start() {
             controller = FindObjectOfType<GameController>();
-            brain = controller.Get<IControllerBrainFactory>().Create(transform, Sets.Of("player"));
         }
 
-        public void OnInputMove(InputValue value) {
-            brain.OnMessageSync(Messages.Move(value.Get<Vector2>()));
-        }
+        public void OnInputMove(InputValue value) =>
+            SendMessage(new InputEvent.MovementInput(value.Get<Vector2>()));
+
+        void SendMessage(IPlayerEvent message) =>
+            controller.With<IControllerBrainManager>(mngr =>
+                mngr.Ensure(transform, Sets.Of("player"))
+                    .OnMessageSync(message));
     }
 }

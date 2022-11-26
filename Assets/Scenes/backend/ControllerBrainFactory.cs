@@ -1,11 +1,10 @@
-using System.Collections;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using OSCore.Interfaces;
 using UnityEngine;
 using OSCore.Utils;
-using System;
 using OSCore.Events.Brains;
 
 namespace OSBE.Brains {
@@ -27,13 +26,14 @@ namespace OSBE.Brains {
             return brain;
         }
 
-        public void Update(IGameSystem session) =>
+        public void Update(IGameSystem session) {
             brains.ForEach(brain => brain.Value.Update(session));
+        }
 
-        public void OnMessage(ISet<string> tags, IMessage message) =>
+        public void OnMessage(ISet<string> tags, IEvent message) =>
             brains.Get(tags)?.OnMessage(message);
 
-        public void OnMessageSync(ISet<string> tags, IMessage message) =>
+        public void OnMessageSync(ISet<string> tags, IEvent message) =>
             brains.Get(tags)?.OnMessageSync(message);
 
         IControllerBrain Create(Transform transform, ISet<string> tags) {
@@ -46,10 +46,8 @@ namespace OSBE.Brains {
     }
 
     public abstract class AControllerBrain<M> : IControllerBrain
-        where M : IMessage {
+        where M : IEvent {
 
-        static readonly string EX_MSG =
-            "This controller only accepts message of type " + typeof(M);
         readonly ConcurrentQueue<M> requests;
         readonly ConcurrentQueue<Action> responses;
 
@@ -62,22 +60,19 @@ namespace OSBE.Brains {
             }).Start();
         }
 
-        public void OnMessage(IMessage message) =>
+        public void OnMessage(IEvent message) =>
             OnMessageImpl(message, requests.Enqueue);
 
-        public void OnMessageSync(IMessage message) =>
+        public void OnMessageSync(IEvent message) =>
             OnMessageImpl(message, msg => ProcessMessage(msg)());
 
-        public void Update(IGameSystem session) {
+        public virtual void Update(IGameSystem session) {
             while (responses.TryDequeue(out Action action))
                 action();
         }
 
-        void OnMessageImpl(IMessage message, Action<M> action) {
-            if (message.GetType().IsSubclassOf(typeof(M)))
-                action((M)message);
-            else throw new InvalidOperationException(EX_MSG);
-        }
+        void OnMessageImpl(IEvent message, Action<M> action) =>
+            action((M)message);
 
         internal abstract Action ProcessMessage(M message);
     }
