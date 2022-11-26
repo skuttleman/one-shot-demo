@@ -1,0 +1,4 @@
+{:paths ["bin/bb"]
+ :deps  {babashka/process {:mvn/version "0.0.1"}}
+ :tasks {:requires ([one-shot.core :as one-shot])
+         go        (apply one-shot/-main *command-line-args*)}}
