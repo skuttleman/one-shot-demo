@@ -36,7 +36,7 @@
                     "name": "InputScope",
                     "type": "Value",
                     "id": "83d0a9d5-ad81-4ec4-be49-76feaf6e334a",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -52,12 +52,12 @@
                 },
                 {
                     "name": "InputAttack",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "92f6104d-f67d-442a-8f68-cad9807d1036",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": true
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [

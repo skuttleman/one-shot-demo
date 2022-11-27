@@ -13,13 +13,12 @@ public class PlayerCfgSO : ScriptableObject
     [Header("Misc")]
     public float aimFactor;
     public float scopeFactor;
-    public float stanceChangeButtonHeldThreshold;
-    public float torqueThreshold;
+    public float stanceChangeHeldThreshold;
 
+    [Serializable]
     public struct MoveConfig {
         public float moveSpeed;
         public float rotationSpeed;
-        public float maxAnimSpeed;
-        public float maxVelocity;
+        public float animFactor;
     }
 }

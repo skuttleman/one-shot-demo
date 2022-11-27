@@ -5,6 +5,10 @@ using OSCore.Events.Brains;
 using UnityEngine;
 
 namespace OSCore.Interfaces {
+    public enum EControllerBrainTag {
+        PLAYER
+    }
+
     public interface IGameSystem {
         public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent;
     }
@@ -18,7 +22,7 @@ namespace OSCore.Interfaces {
 
     public interface IControllerBrainManager : IGameSystemComponent {
         // TODO - proper identifier
-        public IControllerBrain Ensure(Transform transform, ISet<string> tags);
-        public void OnMessage(ISet<string> tags, IEvent message);
+        public IControllerBrain Ensure(Transform transform, EControllerBrainTag tag);
+        public void OnMessage(EControllerBrainTag tag, IEvent message);
     }
 }

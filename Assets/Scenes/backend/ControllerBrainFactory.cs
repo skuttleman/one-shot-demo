@@ -9,41 +9,32 @@ using OSCore.Events.Brains;
 
 namespace OSBE.Brains {
     public class ControllerBrainFactory : IControllerBrainManager {
-        readonly IDictionary<ISet<string>, IControllerBrain> brains;
+        readonly IDictionary<EControllerBrainTag, IControllerBrain> brains;
 
         public ControllerBrainFactory() {
-            brains = new Dictionary<ISet<string>, IControllerBrain>();
+            brains = new Dictionary<EControllerBrainTag, IControllerBrain>();
         }
 
-        public IControllerBrain Ensure(Transform transform, ISet<string> tags) {
-            IControllerBrain brain = brains.Get(tags);
+        public IControllerBrain Ensure(Transform transform, EControllerBrainTag tag) {
+            if (brains.ContainsKey(tag))
+                return brains[tag];
 
-            if (brain is null) {
-                brain = Create(transform, tags);
-                brains[tags] = brain;
-            }
-
+            Debug.Log("CREATING BRAIN");
+            IControllerBrain brain = Create(transform, tag);
+            brains[tag] = brain;
             return brain;
         }
 
-        public void Update(IGameSystem session) {
+        public void Update(IGameSystem session) =>
             brains.ForEach(brain => brain.Value.Update(session));
-        }
 
-        public void OnMessage(ISet<string> tags, IEvent message) =>
-            brains.Get(tags)?.OnMessage(message);
+        public void OnMessage(EControllerBrainTag tag, IEvent message) =>
+                    brains.Get(tag)?.OnMessage(message);
 
-        IControllerBrain Create(Transform transform, ISet<string> tags) {
-            if (tags.Contains("player")) {
-                IControllerBrain brain = new PlayerControllerBrain(transform);
-                return brain;
-            }
-            return default;
-        }
-    }
-
-    public abstract class AControllerBrain<M> {
+        IControllerBrain Create(Transform transform, EControllerBrainTag tag) =>
+            tag switch {
+                EControllerBrainTag.PLAYER => new PlayerControllerBrain(transform),
+                _ => default
+            };
     }
 }
-
-

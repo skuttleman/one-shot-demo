@@ -11,11 +11,11 @@ using static OSCore.Events.Brains.Player.InputEvent;
 
 namespace OSBE.Brains {
     public class PlayerControllerBrain : IControllerBrain {
-        //static readonly string ANIM_STANCE = "stance";
-        //static readonly string ANIM_MOVE = "isMoving";
-        //static readonly string ANIM_SCOPE = "isScoping";
-        //static readonly string ANIM_AIM = "isAiming";
-        //static readonly string ANIM_ATTACK = "attack";
+        static readonly string ANIM_STANCE = "stance";
+        static readonly string ANIM_MOVE = "isMoving";
+        static readonly string ANIM_SCOPE = "isScoping";
+        static readonly string ANIM_AIM = "isAiming";
+        static readonly string ANIM_ATTACK = "attack";
 
         // movement state
         PlayerCfgSO cfg;
@@ -27,7 +27,6 @@ namespace OSBE.Brains {
         PlayerAttackMode attackMode;
         bool isMoving = false;
         bool isScoping = false;
-        bool isLooking = false;
 
         public PlayerControllerBrain(Transform transform) {
             cfg = AssetDatabase.LoadAssetAtPath<PlayerCfgSO>("Assets/Config/PlayerMovementCfg.asset");
@@ -36,8 +35,14 @@ namespace OSBE.Brains {
         }
 
         public void Update(IGameSystem session) {
-            RotatePlayer();
-            MovePlayer();
+            PlayerCfgSO.MoveConfig moveCfg = stance switch {
+                PlayerStance.CROUCHING => cfg.crouching,
+                PlayerStance.CRAWLING => cfg.crawling,
+                _ => cfg.standing
+            };
+
+            RotatePlayer(moveCfg);
+            MovePlayer(moveCfg);
         }
 
         public void OnMessage(IEvent e) {
@@ -53,45 +58,50 @@ namespace OSBE.Brains {
                 case MovementChanged ev: Handle(ev); break;
                 case ScopingChanged ev: Handle(ev); break;
                 case PlayerStep ev: Handle(ev); break;
-                default: Debug.LogError("unhandled event " + e); break;
+                default: Debug.LogWarning("unhandled event " + e); break;
             }
         }
 
-        void RotatePlayer() {
+        void RotatePlayer(PlayerCfgSO.MoveConfig moveCfg) {
             float rotationZ;
-            if (isLooking) rotationZ = Vectors.AngleTo(Vector2.zero, facing);
+            if (Vectors.NonZero(facing)) rotationZ = Vectors.AngleTo(Vector2.zero, facing);
             else if (Vectors.NonZero(movement)) rotationZ = Vectors.AngleTo(Vector2.zero, movement);
             else return;
 
-            //Vector3 torque = cfg.RotationTorque(
-            //    stance,
-            //    rb.rotation.eulerAngles.z,
-            //    rotationZ);
-            //if (torque != Vector3.zero)
-            //    rb.AddRelativeTorque(torque);
+            target.rotation = Quaternion.Lerp(
+                target.rotation,
+                Quaternion.Euler(0f, 0f, rotationZ),
+                moveCfg.rotationSpeed * Time.deltaTime);
         }
 
-        void MovePlayer() {
+        void MovePlayer(PlayerCfgSO.MoveConfig moveCfg) {
             if (PBUtils.IsMovable(stance, attackMode, isScoping)) {
-                //    anim.speed = cfg.AnimationSpeed(stance, movement);
-                //    float force = cfg.MovementForce(
-                //        stance,
-                //        movement,
-                //        IsAiming(),
-                //        isScoping);
-                //    if (Maths.NonZero(force))
-                //        rb.AddForce(movement.normalized * force);
-                //}
+                float speed = moveCfg.moveSpeed;
+
+                if (PBUtils.IsAiming(attackMode)) speed *= cfg.aimFactor;
+                else if (isScoping) speed *= cfg.scopeFactor;
+                float movementSpeed = Mathf.Max(
+                    Mathf.Abs(movement.x),
+                    Mathf.Abs(movement.y));
+                anim.speed = movementSpeed * speed * moveCfg.animFactor;
+
+                if (Vectors.NonZero(movement))
+                    target.position += speed * Time.deltaTime * Vectors.Upgrade(movement);
             }
         }
 
-        void Handle(LookInput ev) {
+        /*
+         *
+         * Input Event Handlers
+         *
+         */
+
+        void Handle(LookInput ev) =>
             facing = ev.direction;
-        }
 
         void Handle(MovementInput ev) {
             movement = ev.direction;
-            //anim.SetBool(ANIM_MOVE, Vectors.NonZero(movement));
+            anim.SetBool(ANIM_MOVE, Vectors.NonZero(movement));
         }
 
         void Handle(StanceInput ev) {
@@ -102,48 +112,44 @@ namespace OSBE.Brains {
 
             if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isScoping)) {
                 stance = nextStance;
-                //anim.SetInteger(ANIM_STANCE, (int)nextStance);
+                anim.SetInteger(ANIM_STANCE, (int)nextStance);
             }
         }
 
-        void Handle(AimInput ev) {
-            //anim.SetBool(ANIM_AIM, ev.isAiming);
-        }
+        void Handle(ScopeInput ev) =>
+            anim.SetBool(ANIM_SCOPE, ev.isScoping);
+
+        void Handle(AimInput ev) =>
+            anim.SetBool(ANIM_AIM, ev.isAiming);
 
         void Handle(AttackInput ev) {
-            //if (ev.isAttacking && PBUtils.CanAttack(attackMode))
-            //    anim.SetTrigger(ANIM_ATTACK);
+            if (ev.isAttacking && PBUtils.CanAttack(attackMode))
+                anim.SetTrigger(ANIM_ATTACK);
         }
 
+        /*
+         *
+         * Animation Event Handlers
+         *
+         */
 
-        void Handle(ScopeInput ev) {
-            //anim.SetBool(ANIM_SCOPE, ev.isScoping);
-        }
-
-
-        void Handle(StanceChanged ev) {
+        void Handle(StanceChanged ev) =>
             stance = ev.stance;
-        }
 
-
-        void Handle(AttackModeChanged ev) {
+        void Handle(AttackModeChanged ev) =>
             attackMode = ev.mode;
-        }
 
+        void Handle(MovementChanged ev) =>
+            isMoving = ev.isMoving;
 
-        void Handle(MovementChanged ev) {
-            isMoving = Maths.NonZero(ev.speed);
-        }
-
-        void Handle(ScopingChanged ev) {
+        void Handle(ScopingChanged ev) =>
             isScoping = ev.isScoping;
-        }
 
         void Handle(PlayerStep ev) { }
 
         static class PBUtils {
             public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {
-                bool held = stanceDuration >= cfg.stanceChangeButtonHeldThreshold;
+                bool held = stanceDuration >= cfg.stanceChangeHeldThreshold;
 
                 if (held && stance == PlayerStance.CRAWLING)
                     return PlayerStance.STANDING;

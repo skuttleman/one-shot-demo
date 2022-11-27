@@ -32,7 +32,7 @@ namespace OSCore.Events {
             public record AnimationEmittedEvent : IPlayerEvent {
                 public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
                 public record AttackModeChanged(PlayerAttackMode mode) : AnimationEmittedEvent();
-                public record MovementChanged(float speed) : AnimationEmittedEvent();
+                public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
                 public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
                 public record PlayerStep() : AnimationEmittedEvent();
 
