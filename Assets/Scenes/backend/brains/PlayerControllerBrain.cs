@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using OSCore.Events.Brains;
 using OSCore.Events.Brains.Player;
 using OSCore.Interfaces;
 using OSCore.Utils;
@@ -9,12 +10,12 @@ using static OSCore.Events.Brains.Player.AnimationEmittedEvent;
 using static OSCore.Events.Brains.Player.InputEvent;
 
 namespace OSBE.Brains {
-    public class PlayerControllerBrain : AControllerBrain<IPlayerEvent> {
-        static readonly string ANIM_MOVE = "isMoving";
-        static readonly string ANIM_STANCE = "stance";
-        static readonly string ANIM_AIM = "isAiming";
-        static readonly string ANIM_SCOPE = "isScoping";
-        static readonly string ANIM_ATTACK = "attack";
+    public class PlayerControllerBrain : IControllerBrain {
+        //static readonly string ANIM_STANCE = "stance";
+        //static readonly string ANIM_MOVE = "isMoving";
+        //static readonly string ANIM_SCOPE = "isScoping";
+        //static readonly string ANIM_AIM = "isAiming";
+        //static readonly string ANIM_ATTACK = "attack";
 
         // movement state
         PlayerCfgSO cfg;
@@ -34,77 +35,25 @@ namespace OSBE.Brains {
             anim = target.gameObject.GetComponentInChildren<Animator>();
         }
 
-        public override void Update(IGameSystem session) {
-            base.Update(session);
+        public void Update(IGameSystem session) {
             RotatePlayer();
             MovePlayer();
         }
 
-        internal override Action ProcessMessage(IPlayerEvent message) =>
-            message switch {
-                InputEvent e => () => Handle(e),
-                AnimationEmittedEvent e => () => Handle(e),
-                IPlayerEvent msg => () => Debug.LogError("Don't know how to process" + msg),
-            };
-
-        public void Handle(InputEvent e) {
+        public void OnMessage(IEvent e) {
             switch (e) {
-                case LookInput ev:
-                    facing = ev.direction;
-                    break;
-
-                case MovementInput ev:
-                    movement = ev.direction;
-                    //anim.SetBool(ANIM_MOVE, Vectors.NonZero(movement));
-                    break;
-
-                case StanceInput ev:
-                    PlayerStance nextStance = PBUtils.NextStance(
-                        cfg,
-                        stance,
-                        ev.holdDuration);
-
-                    if (PBUtils.IsMovable(nextStance, attackMode, isScoping)) {
-                        stance = nextStance;
-                        //anim.SetInteger(ANIM_STANCE, (int)nextStance);
-                    }
-                    break;
-
-                case AimInput ev:
-                    //anim.SetBool(ANIM_AIM, ev.isAiming);
-                    break;
-
-                case AttackInput ev:
-                    //if (ev.isAttacking && PBUtils.CanAttack(attackMode))
-                    //    anim.SetTrigger(ANIM_ATTACK);
-                    break;
-
-                case ScopeInput ev:
-                    //anim.SetBool(ANIM_SCOPE, ev.isScoping);
-                    break;
-            }
-        }
-
-        public void Handle(AnimationEmittedEvent e) {
-            switch (e) {
-                case StanceChanged ev:
-                    stance = ev.stance;
-                    break;
-
-                case AttackModeChanged ev:
-                    attackMode = ev.mode;
-                    break;
-
-                case MovementChanged ev:
-                    isMoving = Maths.NonZero(ev.speed);
-                    break;
-
-                case ScopingChanged ev:
-                    isScoping = ev.isScoping;
-                    break;
-
-                case PlayerStep:
-                    break;
+                case LookInput ev: Handle(ev); break;
+                case MovementInput ev: Handle(ev); break;
+                case StanceInput ev: Handle(ev); break;
+                case AimInput ev: Handle(ev); break;
+                case AttackInput ev: Handle(ev); break;
+                case ScopeInput ev: Handle(ev); break;
+                case StanceChanged ev: Handle(ev); break;
+                case AttackModeChanged ev: Handle(ev); break;
+                case MovementChanged ev: Handle(ev); break;
+                case ScopingChanged ev: Handle(ev); break;
+                case PlayerStep ev: Handle(ev); break;
+                default: Debug.LogError("unhandled event " + e); break;
             }
         }
 
@@ -136,7 +85,63 @@ namespace OSBE.Brains {
             }
         }
 
-        public static class PBUtils {
+        void Handle(LookInput ev) {
+            facing = ev.direction;
+        }
+
+        void Handle(MovementInput ev) {
+            movement = ev.direction;
+            //anim.SetBool(ANIM_MOVE, Vectors.NonZero(movement));
+        }
+
+        void Handle(StanceInput ev) {
+            PlayerStance nextStance = PBUtils.NextStance(
+                cfg,
+                stance,
+                ev.holdDuration);
+
+            if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isScoping)) {
+                stance = nextStance;
+                //anim.SetInteger(ANIM_STANCE, (int)nextStance);
+            }
+        }
+
+        void Handle(AimInput ev) {
+            //anim.SetBool(ANIM_AIM, ev.isAiming);
+        }
+
+        void Handle(AttackInput ev) {
+            //if (ev.isAttacking && PBUtils.CanAttack(attackMode))
+            //    anim.SetTrigger(ANIM_ATTACK);
+        }
+
+
+        void Handle(ScopeInput ev) {
+            //anim.SetBool(ANIM_SCOPE, ev.isScoping);
+        }
+
+
+        void Handle(StanceChanged ev) {
+            stance = ev.stance;
+        }
+
+
+        void Handle(AttackModeChanged ev) {
+            attackMode = ev.mode;
+        }
+
+
+        void Handle(MovementChanged ev) {
+            isMoving = Maths.NonZero(ev.speed);
+        }
+
+        void Handle(ScopingChanged ev) {
+            isScoping = ev.isScoping;
+        }
+
+        void Handle(PlayerStep ev) { }
+
+        static class PBUtils {
             public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {
                 bool held = stanceDuration >= cfg.stanceChangeButtonHeldThreshold;
 

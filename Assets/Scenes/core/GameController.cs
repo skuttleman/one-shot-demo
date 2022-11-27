@@ -14,8 +14,8 @@ namespace OSCore {
             this.system = system;
         }
 
-        public IGameSystem With<T>(Action<T> action) where T : IGameSystemComponent {
-            system.With(action);
+        public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent {
+            system.Send(action);
             return this;
         }
 
@@ -26,6 +26,5 @@ namespace OSCore {
             }
             DontDestroyOnLoad(gameObject);
         }
-
     }
 }

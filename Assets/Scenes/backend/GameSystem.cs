@@ -12,7 +12,7 @@ namespace OSBE {
         IDictionary<Type, IGameSystemComponent> components;
         GameController controller;
 
-        public IGameSystem With<T>(Action<T> action) where T : IGameSystemComponent {
+        public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent {
             T component = (T)components.Get(typeof(T));
             if (component is not null) action(component);
             return this;
@@ -24,9 +24,15 @@ namespace OSBE {
                 return;
             }
             DontDestroyOnLoad(gameObject);
+        }
 
+        void OnEnable() {
             controller = FindObjectOfType<GameController>();
             Init();
+        }
+
+        void Update() {
+            components?.ForEach(component => component.Value.Update(this));
         }
 
         void Init() {
@@ -34,10 +40,6 @@ namespace OSBE {
                 { typeof(IControllerBrainManager), new ControllerBrainFactory() }
             };
             controller.Init(this);
-        }
-
-        void Update() {
-            components?.ForEach(component => component.Value.Update(this));
         }
     }
 }

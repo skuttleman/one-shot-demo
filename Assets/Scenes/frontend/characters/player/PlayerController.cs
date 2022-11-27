@@ -33,8 +33,8 @@ namespace OSFE {
             SendMessage(new InputEvent.AttackInput(value.isPressed));
 
         void SendMessage(IPlayerEvent message) =>
-            controller.With<IControllerBrainManager>(mngr =>
+            controller.Send<IControllerBrainManager>(mngr =>
                 mngr.Ensure(transform, Sets.Of("player"))
-                    .OnMessageSync(message));
+                    .OnMessage(message));
     }
 }
