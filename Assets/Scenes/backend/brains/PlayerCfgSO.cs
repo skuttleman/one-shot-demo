@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "cfg/player")]
-public class PlayerCfgSO : ScriptableObject
-{
+public class PlayerCfgSO : ScriptableObject {
+    [Header("Input")]
+    public float stanceChangeHeldThreshold;
+    public float punchingSpeed;
+    public float firingSpeed;
+
     [Header("Movement")]
     public MoveConfig standing;
     public MoveConfig crouching;
     public MoveConfig crawling;
-
-    [Header("Misc")]
     public float aimFactor;
     public float scopeFactor;
-    public float stanceChangeHeldThreshold;
 
     [Serializable]
     public struct MoveConfig {

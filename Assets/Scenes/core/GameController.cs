@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OSCore.Interfaces;
+using OSCore.Interfaces.OSCore.Interfaces.Brains;
 using UnityEngine;
 
 namespace System.Runtime.CompilerServices { public class IsExternalInit { } }
@@ -18,6 +18,9 @@ namespace OSCore {
             system.Send(action);
             return this;
         }
+
+        public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent =>
+            system.Send(action);
 
         void Awake() {
             if (FindObjectsOfType<GameController>().Length > 1) {

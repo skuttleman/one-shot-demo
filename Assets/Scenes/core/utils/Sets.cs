@@ -8,9 +8,12 @@ namespace OSCore.Utils {
             return false;
         }
 
-        public static ISet<T> Of<T>(params T[] items) {
+        public static ISet<T> Of<T>(params T[] items) =>
+            Of(items);
+
+        public static ISet<T> Of<T>(IEnumerable<T> coll) {
             ISet<T> set = new HashSet<T>();
-            foreach (T item in items) set.Add(item);
+            foreach (T item in coll) set.Add(item);
             return set;
         }
     }

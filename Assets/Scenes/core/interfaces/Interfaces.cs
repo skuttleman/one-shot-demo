@@ -5,24 +5,27 @@ using OSCore.Events.Brains;
 using UnityEngine;
 
 namespace OSCore.Interfaces {
-    public enum EControllerBrainTag {
-        PLAYER
-    }
+    namespace OSCore.Interfaces.Brains {
+        public enum EControllerBrainTag {
+            PLAYER
+        }
 
-    public interface IGameSystem {
-        public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent;
-    }
-    public interface IGameSystemComponent {
-        public void Update(IGameSystem session);
-    }
+        public interface IGameSystem {
+            public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent;
+            public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent;
+        }
+        public interface IGameSystemComponent {
+            public void Update();
+            public void OnDestroy() {}
+        }
 
-    public interface IControllerBrain : IGameSystemComponent {
-        public void OnMessage(IEvent message);
-    }
+        public interface IControllerBrain : IGameSystemComponent {
+            public void OnMessage(IEvent message);
+        }
 
-    public interface IControllerBrainManager : IGameSystemComponent {
-        // TODO - proper identifier
-        public IControllerBrain Ensure(Transform transform, EControllerBrainTag tag);
-        public void OnMessage(EControllerBrainTag tag, IEvent message);
+        public interface IControllerBrainManager : IGameSystemComponent {
+            public IControllerBrain Ensure(Transform target, EControllerBrainTag tag);
+            public void OnMessage(EControllerBrainTag tag, IEvent message);
+        }
     }
 }

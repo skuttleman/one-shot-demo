@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using OSBE.Async.Core;
 using OSCore.Events.Brains;
 using OSCore.Events.Brains.Player;
-using OSCore.Interfaces;
+using OSCore.Interfaces.OSCore.Interfaces.Brains;
 using OSCore.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -15,12 +16,14 @@ namespace OSBE.Brains {
         static readonly string ANIM_MOVE = "isMoving";
         static readonly string ANIM_SCOPE = "isScoping";
         static readonly string ANIM_AIM = "isAiming";
-        static readonly string ANIM_ATTACK = "attack";
+        static readonly string ANIM_ATTACK = "isAttacking";
+
+        readonly PlayerCfgSO cfg;
+        IGameSystem system;
+        readonly Transform target;
+        readonly Animator anim;
 
         // movement state
-        PlayerCfgSO cfg;
-        Transform target;
-        Animator anim;
         Vector2 movement = Vector2.zero;
         Vector2 facing = Vector2.zero;
         PlayerStance stance;
@@ -28,13 +31,14 @@ namespace OSBE.Brains {
         bool isMoving = false;
         bool isScoping = false;
 
-        public PlayerControllerBrain(Transform transform) {
+        public PlayerControllerBrain(IGameSystem system, Transform target) {
             cfg = AssetDatabase.LoadAssetAtPath<PlayerCfgSO>("Assets/Config/PlayerMovementCfg.asset");
-            target = transform;
+            this.system = system;
+            this.target = target;
             anim = target.gameObject.GetComponentInChildren<Animator>();
         }
 
-        public void Update(IGameSystem session) {
+        public void Update() {
             PlayerCfgSO.MoveConfig moveCfg = stance switch {
                 PlayerStance.CROUCHING => cfg.crouching,
                 PlayerStance.CRAWLING => cfg.crawling,
@@ -123,8 +127,18 @@ namespace OSBE.Brains {
             anim.SetBool(ANIM_AIM, ev.isAiming);
 
         void Handle(AttackInput ev) {
-            if (ev.isAttacking && PBUtils.CanAttack(attackMode))
-                anim.SetTrigger(ANIM_ATTACK);
+            if (ev.isAttacking && PBUtils.CanAttack(attackMode)) {
+                float attackSpeed = attackMode == PlayerAttackMode.HAND
+                    ? cfg.punchingSpeed
+                    : cfg.firingSpeed;
+
+                system.Send<PromiseFactory, IPromise<dynamic>>(promises => {
+                    anim.SetBool(ANIM_ATTACK, true);
+                    return promises
+                        .Await(attackSpeed)
+                        .Then(() => anim.SetBool(ANIM_ATTACK, false));
+                    });
+            }
         }
 
         /*
@@ -145,7 +159,7 @@ namespace OSBE.Brains {
         void Handle(ScopingChanged ev) =>
             isScoping = ev.isScoping;
 
-        void Handle(PlayerStep ev) { }
+        void Handle(PlayerStep _) { }
 
         static class PBUtils {
             public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {

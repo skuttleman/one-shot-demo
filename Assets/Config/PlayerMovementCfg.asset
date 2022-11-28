@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c3b44c4a478c4b00a5d77c3b1530611, type: 3}
   m_Name: PlayerMovementCfg
   m_EditorClassIdentifier: 
+  stanceChangeHeldThreshold: 0.35
+  punchingSpeed: 0.175
+  firingSpeed: 0.09
   standing:
     moveSpeed: 5.5
     rotationSpeed: 15
@@ -26,4 +29,3 @@ MonoBehaviour:
     animFactor: 0.3
   aimFactor: 0.9
   scopeFactor: 0.75
-  stanceChangeHeldThreshold: 0.35
