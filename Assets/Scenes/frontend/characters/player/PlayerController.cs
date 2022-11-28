@@ -7,6 +7,7 @@ using OSCore.Utils;
 using OSCore.Events.Brains.Player;
 using OSCore.Interfaces.Brains;
 using OSCore.Interfaces;
+using OSCore.Data.Enums;
 
 namespace OSFE {
     public class PlayerController : MonoBehaviour {

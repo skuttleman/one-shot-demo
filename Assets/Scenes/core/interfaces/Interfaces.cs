@@ -10,6 +10,7 @@ namespace OSCore.Interfaces {
         public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent;
         public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent;
     }
+
     public interface IGameSystemComponent {
         public void Update();
         public void OnDestroy() { }
@@ -24,9 +25,17 @@ namespace OSCore.Interfaces {
         }
     }
 
+    namespace Events {
+        public interface IPubSub {
+            void Publish<T>(T item) where T : IEvent;
+            long Subscribe<T>(Action<IEvent> action) where T : IEvent;
+            void Unsubscribe(long id);
+        }
+    }
+
     namespace Brains {
         public enum EControllerBrainTag {
-            PLAYER
+            PLAYER, CAMERA
         }
 
         public interface IControllerBrain : IGameSystemComponent {

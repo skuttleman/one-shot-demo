@@ -1,21 +1,17 @@
 using System;
 using System.Collections.Generic;
+using OSCore.Data.Enums;
 using UnityEngine;
 
 namespace OSCore.Events {
     namespace Brains {
         public interface IEvent { }
 
+        public record InitEvent<T>(T cfg) : IEvent
+            where T : ScriptableObject;
+
         namespace Player {
             public interface IPlayerEvent : IEvent { }
-
-            public enum PlayerStance {
-                STANDING, CROUCHING, CRAWLING
-            }
-
-            public enum PlayerAttackMode {
-                NONE, HAND, WEAPON, PUNCHING, FIRING
-            }
 
             public record InputEvent : IPlayerEvent {
                 public record MovementInput(Vector2 direction) : InputEvent();

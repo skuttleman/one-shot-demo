@@ -34,6 +34,7 @@ namespace OSBE.Brains {
         IControllerBrain Create(Transform target, EControllerBrainTag tag) =>
             tag switch {
                 EControllerBrainTag.PLAYER => new PlayerControllerBrain(system, target),
+                EControllerBrainTag.CAMERA => new CameraControllerBrain(system, target),
                 _ => default
             };
 

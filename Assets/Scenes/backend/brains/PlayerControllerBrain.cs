@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using OSBE.Async.Core;
+using OSCore;
+using OSCore.Data.Enums;
 using OSCore.Events.Brains;
-using OSCore.Events.Brains.Player;
 using OSCore.Interfaces;
 using OSCore.Interfaces.Brains;
 using OSCore.Utils;

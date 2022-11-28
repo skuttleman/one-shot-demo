@@ -10,6 +10,8 @@ using OSBE.Async.Core;
 using OSBE.Tags;
 using OSCore.Interfaces;
 using OSCore.Interfaces.Tagging;
+using OSCore.Interfaces.Events;
+using OSBE.Async;
 
 namespace OSBE {
     public class GameSystem : MonoBehaviour, IGameSystem {
@@ -59,7 +61,8 @@ namespace OSBE {
             components = new Dictionary<Type, IGameSystemComponent> {
                 { typeof(IControllerBrainManager), new ControllerBrainManager(this) },
                 { typeof(PromiseFactory) , new PromiseFactory() },
-                { typeof(ITagRegistry), new TagRegistry() }
+                { typeof(ITagRegistry), new TagRegistry() },
+                { typeof(IPubSub), new DictionaryPubSub() }
             };
 
             controller.Init(this);

@@ -3029,6 +3029,7 @@ GameObject:
   - component: {fileID: 661398229}
   - component: {fileID: 661398230}
   - component: {fileID: 661398231}
+  - component: {fileID: 661398232}
   m_Layer: 0
   m_Name: crouch cam
   m_TagString: Untagged
@@ -3103,6 +3104,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cfg: {fileID: 11400000, guid: 0f2ede1f7306f4936949561c9e87376c, type: 2}
+--- !u!114 &661398232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 661398228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Offset: {x: 0, y: 0, z: 0}
+  m_ApplyAfter: 1
+  m_PreserveComposition: 0
 --- !u!1 &669848494
 GameObject:
   m_ObjectHideFlags: 0
@@ -4963,6 +4979,7 @@ GameObject:
   - component: {fileID: 867155829}
   - component: {fileID: 867155830}
   - component: {fileID: 867155831}
+  - component: {fileID: 867155832}
   m_Layer: 0
   m_Name: crawl cam
   m_TagString: Untagged
@@ -5037,6 +5054,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cfg: {fileID: 11400000, guid: 7d43594e852eb4e26aaecc622deb276a, type: 2}
+--- !u!114 &867155832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 867155828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Offset: {x: 0, y: 0, z: 0}
+  m_ApplyAfter: 1
+  m_PreserveComposition: 0
 --- !u!1 &908481137
 GameObject:
   m_ObjectHideFlags: 0
@@ -6322,6 +6354,7 @@ GameObject:
   - component: {fileID: 2048918908}
   - component: {fileID: 2048918909}
   - component: {fileID: 2048918910}
+  - component: {fileID: 2048918911}
   m_Layer: 0
   m_Name: stand cam
   m_TagString: Untagged
@@ -6396,6 +6429,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cfg: {fileID: 11400000, guid: 84d41315426174769afb8007485d1def, type: 2}
+--- !u!114 &2048918911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2048918907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Offset: {x: 0, y: 0, z: 0}
+  m_ApplyAfter: 1
+  m_PreserveComposition: 0
 --- !u!1 &2057467436
 GameObject:
   m_ObjectHideFlags: 0
