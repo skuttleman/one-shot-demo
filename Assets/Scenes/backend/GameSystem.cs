@@ -4,11 +4,12 @@ using OSCore;
 using UnityEngine;
 using OSCore.Utils;
 using OSBE.Brains;
-using OSCore.Interfaces.OSCore.Interfaces.Brains;
-using System.Threading.Tasks;
-using System.Threading;
+using OSCore.Interfaces.Brains;
 using System.Collections.Concurrent;
 using OSBE.Async.Core;
+using OSBE.Tags;
+using OSCore.Interfaces;
+using OSCore.Interfaces.Tagging;
 
 namespace OSBE {
     public class GameSystem : MonoBehaviour, IGameSystem {
@@ -57,7 +58,8 @@ namespace OSBE {
         void Init() {
             components = new Dictionary<Type, IGameSystemComponent> {
                 { typeof(IControllerBrainManager), new ControllerBrainManager(this) },
-                { typeof(PromiseFactory) , new PromiseFactory() }
+                { typeof(PromiseFactory) , new PromiseFactory() },
+                { typeof(ITagRegistry), new TagRegistry() }
             };
 
             controller.Init(this);

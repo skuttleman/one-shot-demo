@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OSCore.Interfaces.OSCore.Interfaces.Brains;
+using OSCore.Interfaces;
 using UnityEngine;
 
 namespace System.Runtime.CompilerServices { public class IsExternalInit { } }

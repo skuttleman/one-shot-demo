@@ -1,10 +1,12 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using OSCore;
 using OSCore.Utils;
 using OSCore.Events.Brains.Player;
-using OSCore.Interfaces.OSCore.Interfaces.Brains;
+using OSCore.Interfaces.Brains;
+using OSCore.Interfaces;
 
 namespace OSFE {
     public class PlayerController : MonoBehaviour {

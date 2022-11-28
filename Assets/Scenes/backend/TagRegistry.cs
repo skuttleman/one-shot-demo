@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using OSCore.Data.Enums;
+using OSCore.Interfaces.Tagging;
+using OSCore.Utils;
+using UnityEngine;
+
+namespace OSBE.Tags {
+    public class TagRegistry : ITagRegistry {
+        readonly IDictionary<IdTag, GameObject> uniqueTags;
+        readonly IDictionary<IdTag, ISet<GameObject>> tags;
+
+        public TagRegistry() {
+            uniqueTags = new Dictionary<IdTag, GameObject>();
+            tags = new Dictionary<IdTag, ISet<GameObject>>();
+        }
+
+        public ISet<GameObject> Get(IdTag tag) =>
+            tags.Get(tag, new HashSet<GameObject>());
+
+        public GameObject GetUnique(IdTag tag) =>
+            uniqueTags.Get(tag, null);
+
+        public void Register(IdTag tag, GameObject obj) =>
+            tags.Update(tag,
+                set => Colls.Add(set, obj),
+                () => new HashSet<GameObject>());
+
+        public void RegisterUnique(IdTag tag, GameObject obj) {
+            if (uniqueTags.ContainsKey(tag))  {
+                throw new Exception("Unique game object already registered");
+            }
+            uniqueTags.Add(tag, obj);
+        }
+
+        public void Update() { }
+    }
+}

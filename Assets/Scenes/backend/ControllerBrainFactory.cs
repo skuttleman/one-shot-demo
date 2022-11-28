@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 using OSCore.Utils;
 using OSCore.Events.Brains;
-using OSCore.Interfaces.OSCore.Interfaces.Brains;
+using OSCore.Interfaces.Brains;
+using OSCore.Interfaces;
 
 namespace OSBE.Brains {
     public class ControllerBrainManager : IControllerBrainManager {
