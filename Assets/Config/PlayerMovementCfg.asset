@@ -15,6 +15,9 @@ MonoBehaviour:
   stanceChangeHeldThreshold: 0.35
   punchingSpeed: 0.175
   firingSpeed: 0.09
+  aimingSpeed: 0.2
+  scopingSpeed: 0.15
+  mouseLookReset: 0.75
   standing:
     moveSpeed: 5.5
     rotationSpeed: 15

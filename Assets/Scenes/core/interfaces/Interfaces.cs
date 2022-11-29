@@ -34,11 +34,6 @@ namespace OSCore.Interfaces {
     }
 
     namespace Brains {
-        public record BrainId(EControllerBrainTag tag) {
-            public record UniqueId(EControllerBrainTag tag) : BrainId(tag);
-            public record InstanceId(Transform transform, EControllerBrainTag tag) : BrainId(tag);
-        }
-
         public enum EControllerBrainTag {
             PLAYER, CAMERA
         }
@@ -48,8 +43,8 @@ namespace OSCore.Interfaces {
         }
 
         public interface IControllerBrainManager : IGameSystemComponent {
-            public IControllerBrain Ensure(BrainId id, Transform target);
-            public void OnMessage(BrainId id, IEvent message);
+            public IControllerBrain Ensure(EControllerBrainTag tag, Transform target);
+            public IControllerBrain EnsureUnique(EControllerBrainTag tag, Transform target);
         }
     }
 }

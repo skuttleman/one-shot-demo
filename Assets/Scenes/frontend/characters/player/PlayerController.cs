@@ -9,7 +9,6 @@ using OSCore.Interfaces.Brains;
 using OSCore.Interfaces;
 using OSCore.Data.Enums;
 using OSCore.Events.Brains;
-using static OSCore.Interfaces.Brains.BrainId;
 
 namespace OSFE {
     public class PlayerController : MonoBehaviour {
@@ -28,7 +27,10 @@ namespace OSFE {
             SendMessage(new InputEvent.MovementInput(value.Get<Vector2>()));
 
         public void OnInputLook(InputValue value) =>
-            SendMessage(new InputEvent.LookInput(value.Get<Vector2>()));
+            SendMessage(new InputEvent.LookInput(value.Get<Vector2>(), false));
+
+        public void OnInputMouseLook(InputValue value) =>
+            SendMessage(new InputEvent.LookInput(value.Get<Vector2>(), true));
 
         public void OnInputStance(InputValue value) =>
             SendMessage(new InputEvent.StanceInput(value.Get<float>()));
@@ -63,7 +65,7 @@ namespace OSFE {
 
         void SendMessage(IEvent message) =>
             system.Send<IControllerBrainManager>(mngr =>
-                mngr.Ensure(new UniqueId(EControllerBrainTag.PLAYER), transform)
+                mngr.EnsureUnique(EControllerBrainTag.PLAYER, transform)
                     .OnMessage(message));
     }
 }

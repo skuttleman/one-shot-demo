@@ -9,6 +9,9 @@ namespace OSCore {
         public float stanceChangeHeldThreshold;
         public float punchingSpeed;
         public float firingSpeed;
+        public float aimingSpeed;
+        public float scopingSpeed;
+        public float mouseLookReset;
 
         [Header("Movement")]
         public MoveConfig standing;

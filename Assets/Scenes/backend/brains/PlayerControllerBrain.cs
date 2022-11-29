@@ -33,6 +33,7 @@ namespace OSBE.Brains {
         PlayerAttackMode attackMode;
         bool isMoving = false;
         bool isScoping = false;
+        float mouseLookTimer = 0f;
 
         public PlayerControllerBrain(IGameSystem system, Transform target) {
             this.system = system;
@@ -73,8 +74,13 @@ namespace OSBE.Brains {
 
         void RotatePlayer(PlayerCfgSO.MoveConfig moveCfg) {
             float rotationZ;
-            if (Vectors.NonZero(facing)) rotationZ = Vectors.AngleTo(Vector2.zero, facing);
-            else if (Vectors.NonZero(movement)) rotationZ = Vectors.AngleTo(Vector2.zero, movement);
+
+            if (mouseLookTimer > 0f) mouseLookTimer -= Time.deltaTime;
+
+            if (Vectors.NonZero(facing))
+                rotationZ = Vectors.AngleTo(Vector2.zero, facing);
+            else if (mouseLookTimer <= 0f && Vectors.NonZero(movement))
+                rotationZ = Vectors.AngleTo(Vector2.zero, movement);
             else return;
 
             target.rotation = Quaternion.Lerp(
@@ -89,6 +95,7 @@ namespace OSBE.Brains {
 
                 if (PBUtils.IsAiming(attackMode)) speed *= cfg.aimFactor;
                 else if (isScoping) speed *= cfg.scopeFactor;
+
                 float movementSpeed = Mathf.Max(
                     Mathf.Abs(movement.x),
                     Mathf.Abs(movement.y));
@@ -105,8 +112,11 @@ namespace OSBE.Brains {
          *
          */
 
-        void Handle(LookInput ev) =>
+        void Handle(LookInput ev) {
             facing = ev.direction;
+            if (ev.isMouse && Vectors.NonZero(ev.direction))
+                mouseLookTimer = cfg.mouseLookReset;
+        }
 
         void Handle(MovementInput ev) {
             movement = ev.direction;
@@ -159,16 +169,16 @@ namespace OSBE.Brains {
             }
         }
 
-        void Handle(AttackModeChanged ev) {
-            if (attackMode != ev.mode) {
-                attackMode = ev.mode;
+        void Handle(MovementChanged ev) {
+            if (isMoving != ev.isMoving) {
+                isMoving = ev.isMoving;
                 PublishMessage(ev);
             }
         }
 
-        void Handle(MovementChanged ev) {
-            if (isMoving != ev.isMoving) {
-                isMoving = ev.isMoving;
+        void Handle(AttackModeChanged ev) {
+            if (attackMode != ev.mode) {
+                attackMode = ev.mode;
                 PublishMessage(ev);
             }
         }

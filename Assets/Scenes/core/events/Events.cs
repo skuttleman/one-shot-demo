@@ -15,7 +15,7 @@ namespace OSCore.Events {
 
             public record InputEvent : IPlayerEvent {
                 public record MovementInput(Vector2 direction) : InputEvent();
-                public record LookInput(Vector2 direction) : InputEvent();
+                public record LookInput(Vector2 direction, bool isMouse) : InputEvent();
                 public record StanceInput(float holdDuration) : InputEvent();
                 public record AimInput(bool isAiming) : InputEvent();
                 public record AttackInput(bool isAttacking) : InputEvent();
