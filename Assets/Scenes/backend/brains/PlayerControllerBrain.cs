@@ -6,6 +6,7 @@ using OSCore.Data.Enums;
 using OSCore.Events.Brains;
 using OSCore.Interfaces;
 using OSCore.Interfaces.Brains;
+using OSCore.Interfaces.Events;
 using OSCore.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -20,8 +21,8 @@ namespace OSBE.Brains {
         static readonly string ANIM_AIM = "isAiming";
         static readonly string ANIM_ATTACK = "isAttacking";
 
-        readonly PlayerCfgSO cfg;
-        IGameSystem system;
+        PlayerCfgSO cfg = null;
+        readonly IGameSystem system;
         readonly Transform target;
         readonly Animator anim;
 
@@ -34,25 +35,27 @@ namespace OSBE.Brains {
         bool isScoping = false;
 
         public PlayerControllerBrain(IGameSystem system, Transform target) {
-            cfg = AssetDatabase.LoadAssetAtPath<PlayerCfgSO>("Assets/Config/PlayerMovementCfg.asset");
             this.system = system;
             this.target = target;
             anim = target.gameObject.GetComponentInChildren<Animator>();
         }
 
         public void Update() {
-            PlayerCfgSO.MoveConfig moveCfg = stance switch {
-                PlayerStance.CROUCHING => cfg.crouching,
-                PlayerStance.CRAWLING => cfg.crawling,
-                _ => cfg.standing
-            };
+            if (cfg is not null) {
+                PlayerCfgSO.MoveConfig moveCfg = stance switch {
+                    PlayerStance.CROUCHING => cfg.crouching,
+                    PlayerStance.CRAWLING => cfg.crawling,
+                    _ => cfg.standing
+                };
 
-            RotatePlayer(moveCfg);
-            MovePlayer(moveCfg);
+                RotatePlayer(moveCfg);
+                MovePlayer(moveCfg);
+            }
         }
 
         public void OnMessage(IEvent e) {
             switch (e) {
+                case InitEvent<PlayerCfgSO> ev: cfg = ev.cfg; break;
                 case LookInput ev: Handle(ev); break;
                 case MovementInput ev: Handle(ev); break;
                 case StanceInput ev: Handle(ev); break;
@@ -139,7 +142,7 @@ namespace OSBE.Brains {
                     return promises
                         .Await(attackSpeed)
                         .Then(() => anim.SetBool(ANIM_ATTACK, false));
-                    });
+                });
             }
         }
 
@@ -149,19 +152,39 @@ namespace OSBE.Brains {
          *
          */
 
-        void Handle(StanceChanged ev) =>
-            stance = ev.stance;
+        void Handle(StanceChanged ev) {
+            if (stance != ev.stance) {
+                stance = ev.stance;
+                PublishMessage(ev);
+            }
+        }
 
-        void Handle(AttackModeChanged ev) =>
-            attackMode = ev.mode;
+        void Handle(AttackModeChanged ev) {
+            if (attackMode != ev.mode) {
+                attackMode = ev.mode;
+                PublishMessage(ev);
+            }
+        }
 
-        void Handle(MovementChanged ev) =>
-            isMoving = ev.isMoving;
+        void Handle(MovementChanged ev) {
+            if (isMoving != ev.isMoving) {
+                isMoving = ev.isMoving;
+                PublishMessage(ev);
+            }
+        }
 
-        void Handle(ScopingChanged ev) =>
-            isScoping = ev.isScoping;
+        void Handle(ScopingChanged ev) {
+            if (isScoping != ev.isScoping) {
+                isScoping = ev.isScoping;
+                PublishMessage(ev);
+            }
+        }
 
         void Handle(PlayerStep _) { }
+
+        void PublishMessage(IEvent message) {
+            system.Send<IPubSub>(pubsub => pubsub.Publish(message));
+        }
 
         static class PBUtils {
             public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {

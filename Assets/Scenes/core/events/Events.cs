@@ -34,5 +34,13 @@ namespace OSCore.Events {
                 private AnimationEmittedEvent() { }
             }
         }
+
+        namespace Camera {
+            public record CameraEvent : IEvent {
+                public record CameraInitEvent(CameraCfgSO cfg, CinemachineCameraOffset offset) : CameraEvent();
+
+                private CameraEvent() { }
+            }
+        }
     }
 }

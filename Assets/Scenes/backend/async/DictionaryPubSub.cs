@@ -5,12 +5,13 @@ using OSCore.Events.Brains;
 using OSCore.Interfaces;
 using OSCore.Interfaces.Events;
 using OSCore.Utils;
+using UnityEngine;
 
 namespace OSBE.Async {
-    public class DictionaryPubSub : IPubSub, IGameSystemComponent {
-        ConcurrentQueue<(Type, IEvent)> messages;
-        IDictionary<Type, ISet<Action<IEvent>>> subscribers;
-        IDictionary<long, (Type, Action<IEvent>)> subscriptions;
+    public class DictionaryPubSub : IPubSub {
+        readonly ConcurrentQueue<(Type, IEvent)> messages;
+        readonly IDictionary<Type, ISet<Action<IEvent>>> subscribers;
+        readonly IDictionary<long, (Type, Action<IEvent>)> subscriptions;
         long subId;
 
         public DictionaryPubSub() {
@@ -21,17 +22,17 @@ namespace OSBE.Async {
         }
 
         public void Publish<T>(T message) where T : IEvent {
-            messages.Enqueue((typeof(T), message));
+            messages.Enqueue((message.GetType(), message));
         }
 
-        public long Subscribe<T>(Action<IEvent> action) where T : IEvent {
+        public long Subscribe<T>(Action<T> action) where T : IEvent {
             long id = ++subId;
             Type t = typeof(T);
-            subscriptions.Add(id, (t, action));
+            Action<IEvent> cb = e => action((T)e);
+            subscriptions.Add(id, (t, cb));
             subscribers.Update(t,
-                set => Colls.Add(set, action),
+                set => Colls.Add(set, cb),
                 () => new HashSet<Action<IEvent>>());
-
             return id;
         }
 
@@ -46,8 +47,9 @@ namespace OSBE.Async {
         }
 
         public void Update() {
-            while (messages.TryDequeue(out (Type, IEvent) tpl))
-                subscribers[tpl.Item1]?.ForEach(action => action(tpl.Item2));
+            while (messages.TryDequeue(out (Type, IEvent) tpl)) {
+                subscribers.Get(tpl.Item1)?.ForEach(action => action(tpl.Item2));
+            }
         }
     }
 }

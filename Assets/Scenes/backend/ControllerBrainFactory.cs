@@ -8,38 +8,37 @@ using OSCore.Interfaces;
 
 namespace OSBE.Brains {
     public class ControllerBrainManager : IControllerBrainManager {
-        readonly IDictionary<EControllerBrainTag, IControllerBrain> brains;
+        readonly IDictionary<BrainId, IControllerBrain> brains;
         IGameSystem system;
 
         public ControllerBrainManager(IGameSystem system) {
-            brains = new Dictionary<EControllerBrainTag, IControllerBrain>();
+            brains = new Dictionary<BrainId, IControllerBrain>();
             this.system = system;
         }
 
-        public IControllerBrain Ensure(Transform target, EControllerBrainTag tag) {
-            if (brains.ContainsKey(tag))
-                return brains[tag];
+        public IControllerBrain Ensure(BrainId id, Transform target) {
+            if (brains.ContainsKey(id))
+                return brains.Get(id);
 
-            IControllerBrain brain = Create(target, tag);
-            brains[tag] = brain;
+            IControllerBrain brain = Create(id, target);
+            brains.Add(id, brain);
             return brain;
         }
 
         public void Update() =>
             brains.ForEach(brain => brain.Value.Update());
 
-        public void OnMessage(EControllerBrainTag tag, IEvent message) =>
-            brains.Get(tag)?.OnMessage(message);
+        public void OnMessage(BrainId id, IEvent message) =>
+            brains.Get(id)?.OnMessage(message);
 
-        IControllerBrain Create(Transform target, EControllerBrainTag tag) =>
-            tag switch {
+        IControllerBrain Create(BrainId id, Transform target) =>
+            id.tag switch {
                 EControllerBrainTag.PLAYER => new PlayerControllerBrain(system, target),
                 EControllerBrainTag.CAMERA => new CameraControllerBrain(system, target),
                 _ => default
             };
 
-        public void OnDestroy() {
+        public void OnDestroy() =>
             brains.ForEach(brain => brains.Remove(brain.Key));
-        }
     }
 }

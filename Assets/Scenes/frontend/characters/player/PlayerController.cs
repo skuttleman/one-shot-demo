@@ -8,13 +8,18 @@ using OSCore.Events.Brains.Player;
 using OSCore.Interfaces.Brains;
 using OSCore.Interfaces;
 using OSCore.Data.Enums;
+using OSCore.Events.Brains;
+using static OSCore.Interfaces.Brains.BrainId;
 
 namespace OSFE {
     public class PlayerController : MonoBehaviour {
-        IGameSystem controller;
+        [SerializeField] PlayerCfgSO cfg;
+        IGameSystem system;
 
         void Start() {
-            controller = FindObjectOfType<GameController>();
+            system = FindObjectOfType<GameController>();
+
+            SendMessage(new InitEvent<PlayerCfgSO>(cfg));
         }
 
         /* Input Events */
@@ -56,9 +61,9 @@ namespace OSFE {
 
         /* Send to Brain */
 
-        void SendMessage(IPlayerEvent message) =>
-            controller.Send<IControllerBrainManager>(mngr =>
-                mngr.Ensure(transform, EControllerBrainTag.PLAYER)
+        void SendMessage(IEvent message) =>
+            system.Send<IControllerBrainManager>(mngr =>
+                mngr.Ensure(new UniqueId(EControllerBrainTag.PLAYER), transform)
                     .OnMessage(message));
     }
 }

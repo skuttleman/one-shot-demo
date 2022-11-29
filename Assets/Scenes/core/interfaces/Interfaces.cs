@@ -26,14 +26,19 @@ namespace OSCore.Interfaces {
     }
 
     namespace Events {
-        public interface IPubSub {
+        public interface IPubSub : IGameSystemComponent {
             void Publish<T>(T item) where T : IEvent;
-            long Subscribe<T>(Action<IEvent> action) where T : IEvent;
+            long Subscribe<T>(Action<T> action) where T : IEvent;
             void Unsubscribe(long id);
         }
     }
 
     namespace Brains {
+        public record BrainId(EControllerBrainTag tag) {
+            public record UniqueId(EControllerBrainTag tag) : BrainId(tag);
+            public record InstanceId(Transform transform, EControllerBrainTag tag) : BrainId(tag);
+        }
+
         public enum EControllerBrainTag {
             PLAYER, CAMERA
         }
@@ -43,8 +48,8 @@ namespace OSCore.Interfaces {
         }
 
         public interface IControllerBrainManager : IGameSystemComponent {
-            public IControllerBrain Ensure(Transform target, EControllerBrainTag tag);
-            public void OnMessage(EControllerBrainTag tag, IEvent message);
+            public IControllerBrain Ensure(BrainId id, Transform target);
+            public void OnMessage(BrainId id, IEvent message);
         }
     }
 }
