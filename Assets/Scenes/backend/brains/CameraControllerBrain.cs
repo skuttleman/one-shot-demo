@@ -33,7 +33,7 @@ namespace OSBE.Brains {
             });
         }
 
-        public void OnMessage(IEvent message) {
+        public void Handle(IEvent message) {
             switch (message) {
                 case CameraInitEvent e:
                     cfg = e.cfg;

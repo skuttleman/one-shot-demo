@@ -15,6 +15,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "InputRun",
+                    "type": "Button",
+                    "id": "a57f1161-be05-45f1-9497-aafd1acf4c66",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "InputLook",
                     "type": "Value",
                     "id": "1132e764-3f36-45aa-b26f-40773f98ad7c",
@@ -243,6 +252,28 @@
                     "processors": "",
                     "groups": "Mouse + Keyboard",
                     "action": "InputMouseLook",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "77a43564-b8c5-4283-b5c3-137e2714d455",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "InputRun",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f25319d1-6f90-4e27-b16e-320e8d1628c7",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse + Keyboard",
+                    "action": "InputRun",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

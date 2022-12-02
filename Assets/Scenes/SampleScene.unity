@@ -1151,6 +1151,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cfg: {fileID: 11400000, guid: 53cb599f860b54f1cb8f4795f6281b08, type: 2}
+  gravityCfg: {fileID: 11400000, guid: 5315a5cf71bd74c75855914b68560801, type: 2}
+  collisionCfg: {fileID: 11400000, guid: 300ce61d5ea154485adcd91f688385af, type: 2}
 --- !u!114 &498204713
 MonoBehaviour:
   m_ObjectHideFlags: 0

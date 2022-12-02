@@ -14,7 +14,7 @@ namespace OSFE {
             FindObjectOfType<GameController>()
                 .Send<IControllerBrainManager>(mngr =>
                     mngr.Ensure(EControllerBrainTag.CAMERA, transform)
-                        .OnMessage(new CameraInitEvent(cfg, offset)));
+                        .Handle(new CameraInitEvent(cfg, offset)));
         }
     }
 }

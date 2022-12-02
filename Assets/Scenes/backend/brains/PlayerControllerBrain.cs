@@ -8,10 +8,10 @@ using OSCore.Interfaces;
 using OSCore.Interfaces.Brains;
 using OSCore.Interfaces.Events;
 using OSCore.Utils;
-using UnityEditor;
 using UnityEngine;
 using static OSCore.Events.Brains.Player.AnimationEmittedEvent;
 using static OSCore.Events.Brains.Player.InputEvent;
+using static OSCore.Events.Brains.SPA.SPAEvent;
 
 namespace OSBE.Brains {
     public class PlayerControllerBrain : IControllerBrain {
@@ -22,6 +22,7 @@ namespace OSBE.Brains {
         static readonly string ANIM_ATTACK = "isAttacking";
 
         PlayerCfgSO cfg = null;
+        IControllerBrain spa = null;
         readonly IGameSystem system;
         readonly Transform target;
         readonly Animator anim;
@@ -54,39 +55,34 @@ namespace OSBE.Brains {
             }
         }
 
-        public void OnMessage(IEvent e) {
+        public void Handle(IEvent e) {
             switch (e) {
                 case InitEvent<PlayerCfgSO> ev: cfg = ev.cfg; break;
-                case LookInput ev: Handle(ev); break;
-                case MovementInput ev: Handle(ev); break;
-                case StanceInput ev: Handle(ev); break;
-                case AimInput ev: Handle(ev); break;
-                case AttackInput ev: Handle(ev); break;
-                case ScopeInput ev: Handle(ev); break;
-                case StanceChanged ev: Handle(ev); break;
-                case AttackModeChanged ev: Handle(ev); break;
-                case MovementChanged ev: Handle(ev); break;
-                case ScopingChanged ev: Handle(ev); break;
-                case PlayerStep ev: Handle(ev); break;
-                default: Debug.LogWarning("unhandled event " + e); break;
+                case MovementInput ev: HandleEvent(ev); break;
+                case SprintInput ev: HandleEvent(ev); break;
+                case LookInput ev: HandleEvent(ev); break;
+                case StanceInput ev: HandleEvent(ev); break;
+                case AimInput ev: HandleEvent(ev); break;
+                case AttackInput ev: HandleEvent(ev); break;
+                case ScopeInput ev: HandleEvent(ev); break;
+                case StanceChanged ev: HandleEvent(ev); break;
+                case AttackModeChanged ev: HandleEvent(ev); break;
+                case MovementChanged ev: HandleEvent(ev); break;
+                case ScopingChanged ev: HandleEvent(ev); break;
+                case PlayerStep ev: HandleEvent(ev); break;
+                case InstallSPA ev: HandleEvent(ev); break;
+                default: Debug.LogWarning("Unhandled event " + e); break;
             }
         }
 
         void RotatePlayer(PlayerCfgSO.MoveConfig moveCfg) {
-            float rotationZ;
-
             if (mouseLookTimer > 0f) mouseLookTimer -= Time.deltaTime;
 
             if (Vectors.NonZero(facing))
-                rotationZ = Vectors.AngleTo(Vector2.zero, facing);
+                spa.Handle(new FaceSPA(facing, moveCfg.rotationSpeed));
             else if (mouseLookTimer <= 0f && Vectors.NonZero(movement))
-                rotationZ = Vectors.AngleTo(Vector2.zero, movement);
+                spa.Handle(new FaceSPA(movement, moveCfg.rotationSpeed));
             else return;
-
-            target.rotation = Quaternion.Lerp(
-                target.rotation,
-                Quaternion.Euler(0f, 0f, rotationZ),
-                moveCfg.rotationSpeed * Time.deltaTime);
         }
 
         void MovePlayer(PlayerCfgSO.MoveConfig moveCfg) {
@@ -101,8 +97,7 @@ namespace OSBE.Brains {
                     Mathf.Abs(movement.y));
                 anim.speed = movementSpeed * speed * moveCfg.animFactor;
 
-                if (Vectors.NonZero(movement))
-                    target.position += speed * Time.deltaTime * Vectors.Upgrade(movement);
+                spa.Handle(new MoveSPA(movement, speed));
             }
         }
 
@@ -112,18 +107,20 @@ namespace OSBE.Brains {
          *
          */
 
-        void Handle(LookInput ev) {
+        void HandleEvent(LookInput ev) {
             facing = ev.direction;
             if (ev.isMouse && Vectors.NonZero(ev.direction))
                 mouseLookTimer = cfg.mouseLookReset;
         }
 
-        void Handle(MovementInput ev) {
+        void HandleEvent(MovementInput ev) {
             movement = ev.direction;
             anim.SetBool(ANIM_MOVE, Vectors.NonZero(movement));
         }
 
-        void Handle(StanceInput ev) {
+        void HandleEvent(SprintInput ev) { }
+
+        void HandleEvent(StanceInput ev) {
             PlayerStance nextStance = PBUtils.NextStance(
                 cfg,
                 stance,
@@ -135,13 +132,13 @@ namespace OSBE.Brains {
             }
         }
 
-        void Handle(ScopeInput ev) =>
+        void HandleEvent(ScopeInput ev) =>
             anim.SetBool(ANIM_SCOPE, ev.isScoping);
 
-        void Handle(AimInput ev) =>
+        void HandleEvent(AimInput ev) =>
             anim.SetBool(ANIM_AIM, ev.isAiming);
 
-        void Handle(AttackInput ev) {
+        void HandleEvent(AttackInput ev) {
             if (ev.isAttacking && PBUtils.CanAttack(attackMode)) {
                 float attackSpeed = attackMode == PlayerAttackMode.HAND
                     ? cfg.punchingSpeed
@@ -162,35 +159,45 @@ namespace OSBE.Brains {
          *
          */
 
-        void Handle(StanceChanged ev) {
+        void HandleEvent(StanceChanged ev) {
             if (stance != ev.stance) {
                 stance = ev.stance;
                 PublishMessage(ev);
             }
         }
 
-        void Handle(MovementChanged ev) {
+        void HandleEvent(MovementChanged ev) {
             if (isMoving != ev.isMoving) {
                 isMoving = ev.isMoving;
                 PublishMessage(ev);
             }
         }
 
-        void Handle(AttackModeChanged ev) {
+        void HandleEvent(AttackModeChanged ev) {
             if (attackMode != ev.mode) {
                 attackMode = ev.mode;
                 PublishMessage(ev);
             }
         }
 
-        void Handle(ScopingChanged ev) {
+        void HandleEvent(ScopingChanged ev) {
             if (isScoping != ev.isScoping) {
                 isScoping = ev.isScoping;
                 PublishMessage(ev);
             }
         }
 
-        void Handle(PlayerStep _) { }
+        void HandleEvent(PlayerStep _) { }
+
+        /*
+         *
+         * Admin Event Handlers
+         *
+         */
+
+        void HandleEvent(InstallSPA ev) {
+            spa = ev.spa;
+        }
 
         void PublishMessage(IEvent message) {
             system.Send<IPubSub>(pubsub => pubsub.Publish(message));

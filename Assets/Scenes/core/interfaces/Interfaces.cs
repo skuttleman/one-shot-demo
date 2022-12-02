@@ -35,16 +35,51 @@ namespace OSCore.Interfaces {
 
     namespace Brains {
         public enum EControllerBrainTag {
-            PLAYER, CAMERA
+            PLAYER, CAMERA, SPA
         }
 
         public interface IControllerBrain : IGameSystemComponent {
-            public void OnMessage(IEvent message);
+            public void Handle(IEvent message);
         }
 
         public interface IControllerBrainManager : IGameSystemComponent {
             public IControllerBrain Ensure(EControllerBrainTag tag, Transform target);
-            public IControllerBrain EnsureUnique(EControllerBrainTag tag, Transform target);
+        }
+
+
+        public abstract class AControllerBrain<A> : IControllerBrain
+            where A : IEvent {
+            public void Handle(IEvent ev) {
+                switch (ev) {
+                    case A e: Handle(e); break;
+                    default: Debug.Log("Unhandled event: " + ev); break;
+                }
+            }
+            public abstract void Handle(A e);
+
+            public abstract void Update();
+        }
+
+        public abstract class AControllerBrain<A, B, C, D> : IControllerBrain
+            where A : IEvent
+            where B : IEvent
+            where C : IEvent
+            where D : IEvent {
+            public void Handle(IEvent ev) {
+                switch (ev) {
+                    case A e: Handle(e); break;
+                    case B e: Handle(e); break;
+                    case C e: Handle(e); break;
+                    case D e: Handle(e); break;
+                    default: Debug.Log("Unhandled event: " + ev); break;
+                }
+            }
+            public abstract void Handle(A e);
+            public abstract void Handle(B e);
+            public abstract void Handle(C e);
+            public abstract void Handle(D e);
+
+            public abstract void Update();
         }
     }
 }
