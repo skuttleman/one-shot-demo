@@ -10,8 +10,6 @@ using UnityEngine;
 namespace OSFE.Characters.Player {
     public class PlayerController : MonoBehaviour {
         [SerializeField] PlayerCfgSO cfg;
-        [SerializeField] GravityCfgSO gravityCfg;
-        [SerializeField] CollisionCfgSO collisionCfg;
 
         IGameSystem system;
 

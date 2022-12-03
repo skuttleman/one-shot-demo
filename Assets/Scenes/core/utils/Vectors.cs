@@ -2,17 +2,32 @@
 
 namespace OSCore.Utils {
     public static class Vectors {
+        public static Vector3 UP = new(0f, 0f, -1f);
+        public static Vector3 DOWN = new(0f, 0f, 1f);
+        public static Vector3 LEFT = new(-1f, 0f, 0f);
+        public static Vector3 RIGHT = new(1f, 0f, 0f);
+        public static Vector3 FORWARD = new(0f, 1f, 0f);
+        public static Vector3 BACK = new(0f, -1f, 0f);
+
         public static Vector3 Upgrade(this Vector2 vector) =>
             new(vector.x, vector.y, 0f);
+
         public static Vector3 Upgrade(this Vector2 vector, float z) =>
             new(vector.x, vector.y, z);
+
         public static Vector2 Downgrade(this Vector3 vector) =>
             new(vector.x, vector.y);
+
         public static Vector3 Clamp(Vector3 vector, Vector3 lower, Vector3 upper) =>
-            new Vector3(
-                Mathf.Clamp(vector.x, lower.x, upper.x),
+            new(Mathf.Clamp(vector.x, lower.x, upper.x),
                 Mathf.Clamp(vector.y, lower.y, upper.y),
                 Mathf.Clamp(vector.z, lower.z, upper.z));
+
+        public static Vector3 Range(float minValue, float maxValue) =>
+            new(Random.Range(minValue, maxValue),
+                Random.Range(minValue, maxValue),
+                Random.Range(minValue, maxValue));
+
         public static bool IsInside(this Vector3 pos, Vector3 lowerLeft, Vector3 upperRight) =>
             pos.x > lowerLeft.x
                 && pos.x <= upperRight.x
@@ -42,7 +57,7 @@ namespace OSCore.Utils {
 
         public static Vector3 ToVector3(float angle) {
             float angleRad = angle * (Mathf.PI / 180f);
-            return new Vector3(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+            return new(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
         }
 
         public static Vector2 ToVector2(float angle) =>

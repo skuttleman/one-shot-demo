@@ -4,6 +4,8 @@ using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
+using OSCore.Utils;
+using System;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
@@ -43,6 +45,7 @@ namespace OSBE.Brains {
 
         void SetOffset() {
             Vector3 rotFactor = LookAheadOffset();
+
             camOffset.m_Offset = Vector3.Lerp(
                 camOffset.m_Offset,
                 target.rotation * rotFactor,
@@ -74,10 +77,7 @@ namespace OSBE.Brains {
                 ? cfg.fireOffset : cfg.punchOffset;
 
             if (!IsAttacking()) return Vector3.zero;
-            return new Vector3(
-                Random.Range(-offset, offset),
-                Random.Range(-offset, offset),
-                Random.Range(-offset, offset));
+            return Vectors.Range(-offset, offset);
         }
 
         bool IsAiming() =>

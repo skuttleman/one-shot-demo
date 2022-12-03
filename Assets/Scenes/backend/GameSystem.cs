@@ -19,25 +19,28 @@ namespace OSBE {
 
         public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent {
             T component = (T)components.Get(typeof(T), null);
+
             if (component is not null) action(component);
             return this;
         }
 
         public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent {
             T component = (T)components.Get(typeof(T), null);
+
             if (component is null) {
+                Debug.Log("No Component Found for " + typeof(T));
                 return default;
             }
+
             return action(component);
         }
 
         void Awake() {
             foreach (GameSystem obj in FindObjectsOfType<GameSystem>())
-                if (obj.gameObject != gameObject) {
+                if (obj.gameObject != gameObject)
                     Destroy(obj.gameObject);
-                } else {
+                else
                     DontDestroyOnLoad(obj.gameObject);
-                }
         }
 
         void OnEnable() {

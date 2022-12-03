@@ -20,7 +20,7 @@ namespace OSBE.Brains {
             if (brains.ContainsKey(id))
                 return (T)brains.Get(id);
 
-            T brain = (T) Create<T>(target);
+            T brain = (T)Create<T>(target);
             brains.Add(id, brain);
             return brain;
         }

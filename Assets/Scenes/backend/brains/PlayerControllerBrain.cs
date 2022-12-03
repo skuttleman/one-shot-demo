@@ -8,6 +8,7 @@ using OSCore.System.Interfaces;
 using OSCore.Utils;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
+using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Brains {
     public class PlayerControllerBrain : IPlayerControllerBrain {
@@ -29,6 +30,7 @@ namespace OSBE.Brains {
         PlayerStance stance;
         PlayerAttackMode attackMode;
         bool isMoving = false;
+        bool isSprinting = false;
         bool isScoping = false;
         float mouseLookTimer = 0f;
 
@@ -40,30 +42,16 @@ namespace OSBE.Brains {
         }
 
         public void Update() {
-            if (cfg is not null) {
-                PlayerCfgSO.MoveConfig moveCfg = stance switch {
-                    PlayerStance.CROUCHING => cfg.crouching,
-                    PlayerStance.CRAWLING => cfg.crawling,
-                    _ => cfg.standing
-                };
-
-                RotatePlayer(moveCfg);
-            }
+            if (cfg is not null)
+                RotatePlayer(MoveCfg());
         }
 
         public void FixedUpdate() {
-            if (cfg is not null) {
-                PlayerCfgSO.MoveConfig moveCfg = stance switch {
-                    PlayerStance.CROUCHING => cfg.crouching,
-                    PlayerStance.CRAWLING => cfg.crawling,
-                    _ => cfg.standing
-                };
-
-                MovePlayer(moveCfg);
-            }
+            if (cfg is not null)
+                MovePlayer(MoveCfg());
         }
 
-        void RotatePlayer(PlayerCfgSO.MoveConfig moveCfg) {
+        void RotatePlayer(MoveConfig moveCfg) {
             if (mouseLookTimer > 0f) mouseLookTimer -= Time.deltaTime;
 
             Vector2 direction;
@@ -81,7 +69,7 @@ namespace OSBE.Brains {
                     moveCfg.rotationSpeed * Time.deltaTime);
         }
 
-        void MovePlayer(PlayerCfgSO.MoveConfig moveCfg) {
+        void MovePlayer(MoveConfig moveCfg) {
             if (PBUtils.IsMovable(stance, attackMode, isScoping)) {
                 float speed = moveCfg.moveSpeed;
 
@@ -91,10 +79,20 @@ namespace OSBE.Brains {
                 float movementSpeed = Mathf.Max(
                     Mathf.Abs(movement.x),
                     Mathf.Abs(movement.y));
-                anim.speed = movementSpeed * speed * moveCfg.animFactor;
-                Vector3 dir = speed * /*Time.fixedDeltaTime **/ movement.Upgrade();
+                bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
+                Vector3 dir = speed * movement.Upgrade();
 
-                if (Vectors.NonZero(movement)) rb.AddForce(dir);
+                float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
+                if (velocityDiff < moveCfg.maxVelocitydamper)
+                    dir *= velocityDiff / moveCfg.maxVelocitydamper;
+
+                if (isForceable && Vectors.NonZero(movement)) {
+                    anim.speed = movementSpeed * speed * Time.fixedDeltaTime * moveCfg.animFactor;
+
+                    if (isSprinting)
+                        rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);
+                    else rb.AddForce(dir);
+                }
             }
         }
 
@@ -106,18 +104,30 @@ namespace OSBE.Brains {
 
         public void OnMovementInput(Vector2 direction) {
             movement = direction;
-            anim.SetBool(ANIM_MOVE, Vectors.NonZero(movement));
+            bool isMoving = Vectors.NonZero(movement);
+            anim.SetBool(ANIM_MOVE, isMoving);
+
+            if (!isMoving) isSprinting = false;
         }
 
-        public void OnSprintInput(bool isSprinting) { }
+        public void OnSprintInput(bool isSprinting) {
+            if (isSprinting && ShouldTransitionToSprint()) {
+                this.isSprinting = true;
+                stance = PlayerStance.STANDING;
+                anim.SetInteger(ANIM_STANCE, (int)stance);
+            }
+        }
 
         public void OnLookInput(Vector2 direction, bool isMouse) {
             facing = direction;
+            isSprinting = false;
+
             if (isMouse && Vectors.NonZero(direction))
                 mouseLookTimer = cfg.mouseLookReset;
         }
 
         public void OnStanceInput(float holdDuration) {
+            isSprinting = false;
             PlayerStance nextStance = PBUtils.NextStance(
                 cfg,
                 stance,
@@ -129,11 +139,14 @@ namespace OSBE.Brains {
             }
         }
 
-        public void OnAimInput(bool isAiming) =>
+        public void OnAimInput(bool isAiming) {
+            isSprinting = false;
             anim.SetBool(ANIM_AIM, isAiming);
+        }
 
         public void OnAttackInput(bool isAttacking) {
             if (isAttacking && PBUtils.CanAttack(attackMode)) {
+                isSprinting = false;
                 float attackSpeed = attackMode == PlayerAttackMode.HAND
                     ? cfg.punchingSpeed
                     : cfg.firingSpeed;
@@ -147,8 +160,11 @@ namespace OSBE.Brains {
             }
         }
 
-        public void OnScopeInput(bool isScoping) =>
+        public void OnScopeInput(bool isScoping) {
             anim.SetBool(ANIM_SCOPE, isScoping);
+
+            if (isScoping) isSprinting = false;
+        }
 
         /*
          *
@@ -191,6 +207,15 @@ namespace OSBE.Brains {
          * Admin Event Handlers
          *
          */
+        MoveConfig MoveCfg() =>
+            stance switch {
+                PlayerStance.CROUCHING => cfg.crouching,
+                PlayerStance.CRAWLING => cfg.crawling,
+                _ => isSprinting ? cfg.sprinting : cfg.standing
+            };
+
+        bool ShouldTransitionToSprint() =>
+            !isSprinting && !isScoping && !PBUtils.IsAiming(attackMode);
 
         public void Init(PlayerCfgSO cfg) =>
             this.cfg = cfg;

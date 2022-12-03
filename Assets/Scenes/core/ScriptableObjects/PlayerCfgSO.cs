@@ -6,24 +6,33 @@ namespace OSCore.ScriptableObjects {
     public class PlayerCfgSO : ScriptableObject {
         [Header("Input")]
         public float stanceChangeHeldThreshold;
-        public float punchingSpeed;
-        public float firingSpeed;
-        public float aimingSpeed;
-        public float scopingSpeed;
         public float mouseLookReset;
 
-        [Header("Movement")]
+        [Header("Stance")]
+        public MoveConfig sprinting;
         public MoveConfig standing;
         public MoveConfig crouching;
         public MoveConfig crawling;
-        public float aimFactor;
+
+        [Header("Scoping")]
+        public float scopingSpeed;
         public float scopeFactor;
+
+        [Header("Aiming")]
+        public float aimFactor;
+        public float aimingSpeed;
+
+        [Header("Attacking")]
+        public float punchingSpeed;
+        public float firingSpeed;
 
         [Serializable]
         public struct MoveConfig {
             public float moveSpeed;
             public float rotationSpeed;
             public float animFactor;
+            public float maxVelocity;
+            public float maxVelocitydamper;
         }
     }
 }

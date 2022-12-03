@@ -13,22 +13,34 @@ MonoBehaviour:
   m_Name: PlayerMovementCfg
   m_EditorClassIdentifier: 
   stanceChangeHeldThreshold: 0.35
-  punchingSpeed: 0.175
-  firingSpeed: 0.09
-  aimingSpeed: 0.2
-  scopingSpeed: 0.15
   mouseLookReset: 0.75
+  sprinting:
+    moveSpeed: 60
+    rotationSpeed: 5
+    animFactor: 2
+    maxVelocity: 4
+    maxVelocitydamper: 1
   standing:
-    moveSpeed: 30
+    moveSpeed: 20
     rotationSpeed: 15
-    animFactor: 0.3
+    animFactor: 1
+    maxVelocity: 2
+    maxVelocitydamper: 0.25
   crouching:
     moveSpeed: 25
     rotationSpeed: 12
-    animFactor: 0.3
+    animFactor: 0.75
+    maxVelocity: 1.05
+    maxVelocitydamper: 0.25
   crawling:
     moveSpeed: 15
     rotationSpeed: 5
-    animFactor: 0.3
-  aimFactor: 0.9
+    animFactor: 1.5
+    maxVelocity: 1
+    maxVelocitydamper: 0.25
+  scopingSpeed: 0.15
   scopeFactor: 0.75
+  aimFactor: 0.9
+  aimingSpeed: 0.2
+  punchingSpeed: 0.175
+  firingSpeed: 0.09
