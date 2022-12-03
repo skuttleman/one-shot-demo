@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using OSCore.Data.Enums;
-using OSCore.Events.Brains;
+using OSCore.Data.Events.Brains;
 using UnityEngine;
 
-namespace OSCore.Interfaces {
+namespace OSCore.System.Interfaces {
     public interface IGameSystem {
         public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent;
         public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent;
@@ -44,42 +43,6 @@ namespace OSCore.Interfaces {
 
         public interface IControllerBrainManager : IGameSystemComponent {
             public IControllerBrain Ensure(EControllerBrainTag tag, Transform target);
-        }
-
-
-        public abstract class AControllerBrain<A> : IControllerBrain
-            where A : IEvent {
-            public void Handle(IEvent ev) {
-                switch (ev) {
-                    case A e: Handle(e); break;
-                    default: Debug.Log("Unhandled event: " + ev); break;
-                }
-            }
-            public abstract void Handle(A e);
-
-            public abstract void Update();
-        }
-
-        public abstract class AControllerBrain<A, B, C, D> : IControllerBrain
-            where A : IEvent
-            where B : IEvent
-            where C : IEvent
-            where D : IEvent {
-            public void Handle(IEvent ev) {
-                switch (ev) {
-                    case A e: Handle(e); break;
-                    case B e: Handle(e); break;
-                    case C e: Handle(e); break;
-                    case D e: Handle(e); break;
-                    default: Debug.Log("Unhandled event: " + ev); break;
-                }
-            }
-            public abstract void Handle(A e);
-            public abstract void Handle(B e);
-            public abstract void Handle(C e);
-            public abstract void Handle(D e);
-
-            public abstract void Update();
         }
     }
 }

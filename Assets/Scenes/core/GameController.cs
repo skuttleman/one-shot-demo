@@ -1,10 +1,8 @@
+using OSCore.System.Interfaces;
 using System;
-using System.Collections.Generic;
-using OSCore.Interfaces;
 using UnityEngine;
 
 namespace System.Runtime.CompilerServices { public class IsExternalInit { } }
-
 
 namespace OSCore {
     public class GameController : MonoBehaviour, IGameSystem {

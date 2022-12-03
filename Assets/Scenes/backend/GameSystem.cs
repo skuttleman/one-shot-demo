@@ -4,14 +4,14 @@ using OSCore;
 using UnityEngine;
 using OSCore.Utils;
 using OSBE.Brains;
-using OSCore.Interfaces.Brains;
 using System.Collections.Concurrent;
 using OSBE.Async.Core;
-using OSBE.Tags;
-using OSCore.Interfaces;
-using OSCore.Interfaces.Tagging;
-using OSCore.Interfaces.Events;
 using OSBE.Async;
+using OSCore.System.Interfaces;
+using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Tagging;
+using OSBE.Tagging;
+using OSCore.System.Interfaces.Events;
 
 namespace OSBE {
     public class GameSystem : MonoBehaviour, IGameSystem {

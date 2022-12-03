@@ -1,18 +1,17 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using OSCore;
-using OSCore.Utils;
-using OSCore.Interfaces.Brains;
-using OSCore.Interfaces;
 using OSCore.Data.Enums;
-using OSCore.Events.Brains;
-using static OSCore.Events.Brains.SPA.SPAEvent;
-using static OSCore.Events.Brains.Player.InputEvent;
-using static OSCore.Events.Brains.Player.AnimationEmittedEvent;
+using OSCore.Data.Events.Brains;
+using OSCore.ScriptableObjects;
+using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces;
+using OSCore.Utils;
+using OSCore;
+using UnityEngine.InputSystem;
+using UnityEngine;
+using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
+using static OSCore.Data.Events.Brains.Player.InputEvent;
+using static OSCore.Data.Events.Brains.SPA.SPAEvent;
 
-namespace OSFE {
+namespace OSFE.Characters.Player {
     public class PlayerController : MonoBehaviour {
         [SerializeField] PlayerCfgSO cfg;
         [SerializeField] GravityCfgSO gravityCfg;

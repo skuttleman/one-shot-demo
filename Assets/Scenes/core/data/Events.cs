@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using OSCore.Data.Enums;
-using OSCore.Interfaces.Brains;
+using OSCore.ScriptableObjects;
+using OSCore.System.Interfaces.Brains;
 using UnityEngine;
 
-namespace OSCore.Events {
+namespace OSCore.Data.Events {
     namespace Brains {
         public interface IEvent { }
 
@@ -12,9 +11,7 @@ namespace OSCore.Events {
             where T : ScriptableObject;
 
         namespace Player {
-            public interface IPlayerEvent : IEvent { }
-
-            public record InputEvent : IPlayerEvent {
+            public record InputEvent : IEvent {
                 public record MovementInput(Vector2 direction) : InputEvent();
                 public record SprintInput(bool isSprinting) : InputEvent();
                 public record LookInput(Vector2 direction, bool isMouse) : InputEvent();
@@ -26,12 +23,14 @@ namespace OSCore.Events {
                 private InputEvent() { }
             }
 
-            public record AnimationEmittedEvent : IPlayerEvent {
+            public record AnimationEmittedEvent : IEvent {
                 public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
                 public record AttackModeChanged(PlayerAttackMode mode) : AnimationEmittedEvent();
                 public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
                 public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
                 public record PlayerStep() : AnimationEmittedEvent();
+
+                private AnimationEmittedEvent() { }
             }
         }
 

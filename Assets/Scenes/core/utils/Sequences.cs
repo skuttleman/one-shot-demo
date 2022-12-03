@@ -1,6 +1,5 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System;
 
 namespace OSCore.Utils {
     public static class Sequences {

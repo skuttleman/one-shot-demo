@@ -1,15 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using OSCore.ScriptableObjects;
 using OSCore.Utils;
-
+using UnityEngine;
 
 namespace OSFE.Levels {
     public class Parallax : MonoBehaviour {
         private Vector3 realPosition;
         private Vector2 offset;
-        BuildingParallax cfg;
+        BuildingParallaxCfgSO cfg;
         Transform focus;
 
         void Start() {
@@ -19,7 +16,7 @@ namespace OSFE.Levels {
             focus = controller.focus;
         }
 
-        void FixedUpdate() {
+        void Update() {
             float diffZ = focus.position.z - realPosition.z;
             offset = cfg.customFactor * diffZ * (cfg.center.Upgrade() - focus.position);
 
@@ -27,6 +24,7 @@ namespace OSFE.Levels {
         }
 
         void UpdatePosition(float diffZ) {
+            Debug.Log(diffZ);
             transform.position = realPosition
                 + Vectors.Clamp(offset.Upgrade(), -cfg.maxOffset * diffZ, cfg.maxOffset * diffZ);
         }

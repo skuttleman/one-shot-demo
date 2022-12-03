@@ -1,9 +1,8 @@
-using System;
+using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces;
+using OSCore.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using OSCore.Utils;
-using OSCore.Interfaces.Brains;
-using OSCore.Interfaces;
 
 namespace OSBE.Brains {
     public class ControllerBrainManager : IControllerBrainManager {

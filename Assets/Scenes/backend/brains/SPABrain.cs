@@ -1,14 +1,12 @@
-using System;
-using System.Collections.Generic;
-using OSCore;
-using OSCore.Events.Brains;
-using OSCore.Interfaces;
-using OSCore.Interfaces.Brains;
+using OSCore.Data.Events.Brains;
+using OSCore.ScriptableObjects;
+using OSCore.System.Interfaces;
+using OSCore.System;
 using OSCore.Utils;
 using UnityEngine;
-using static OSCore.Events.Brains.SPA.SPAEvent;
+using static OSCore.Data.Events.Brains.SPA.SPAEvent;
 
-namespace OSBE {
+namespace OSBE.Brains {
     public class SPABrain : AControllerBrain
         <MoveSPA, FaceSPA, InitEvent<GravityCfgSO>, InitEvent<CollisionCfgSO>> {
         readonly IGameSystem system;
@@ -26,7 +24,7 @@ namespace OSBE {
             if (rb is null)
                 rb = target.GetComponent<Rigidbody>();
 
-            Vector3 dir = e.speed * /*Time.fixedDeltaTime **/ Vectors.Upgrade(e.direction);
+            Vector3 dir = e.speed * /*Time.fixedDeltaTime **/ e.direction.Upgrade();
 
             if (Vectors.NonZero(e.direction))
                 rb.AddForce(dir);

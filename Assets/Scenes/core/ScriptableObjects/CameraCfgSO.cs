@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace OSCore {
+namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/cam")]
     public class CameraCfgSO : ScriptableObject {
         public float orbitSpeed;

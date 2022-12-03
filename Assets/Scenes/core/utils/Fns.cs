@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 
 namespace OSCore.Utils {
     public delegate Reduction<A> RF<A, I>(Reduction<A> acc, I item);
@@ -63,54 +63,5 @@ namespace OSCore.Utils {
 
     public record CompXF<I, M, O>(IXForm<I, M> xf1, IXForm<M, O> xf2) : IXForm<I, O> {
         public RF<A, I> XForm<A>(RF<A, O> rf) => xf1.XForm(xf2.XForm(rf));
-    }
-
-    public class MultiMethod<T, U, R> {
-        readonly IDictionary<U, Func<T, R>> dict;
-        readonly Func<T, U> dispatchFn;
-        readonly R defaultVal;
-
-        public static MultiMethod<T, U, R> Over(Func<T, U> dispatchFn) {
-            return Over(dispatchFn, default);
-        }
-
-        public static MultiMethod<T, U, R> Over(Func<T, U> dispatchFn, R defaultVal) {
-            IDictionary<U, Func<T, R>> dict = new Dictionary<U, Func<T, R>>();
-            return new MultiMethod<T, U, R>(dict, dispatchFn, defaultVal);
-        }
-
-        private MultiMethod(IDictionary<U, Func<T, R>> dict, Func<T, U> dispatchFn, R defaultVal) {
-            this.dict = dict;
-            this.dispatchFn = dispatchFn;
-            this.defaultVal = defaultVal;
-        }
-
-        public MultiMethod<T, U, R> AddMethod(U dispatchVal, Func<T, R> fn) {
-            dict[dispatchVal] = fn;
-            return this;
-        }
-
-        public MultiMethod<T, U, R> AddMethod(U dispatchVal, Action<T> action) {
-            dict[dispatchVal] = input => { action(input); return default; };
-            return this;
-        }
-
-        public MultiMethod<T, U, R> RemoveMethod(U dispatchVal) {
-            dict.Remove(dispatchVal);
-            return this;
-        }
-
-        public Func<T, R> Func() {
-            return input => {
-                U dispatchVal = dispatchFn(input);
-                return dict.ContainsKey(dispatchVal)
-                    ? dict[dispatchVal](input)
-                    : defaultVal;
-            };
-        }
-
-        public Action<T> Action() {
-            return input => Func()(input);
-        }
     }
 }

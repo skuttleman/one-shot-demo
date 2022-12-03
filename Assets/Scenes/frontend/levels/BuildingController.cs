@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
+using OSCore.ScriptableObjects;
 using UnityEngine;
 
-public class BuildingController : MonoBehaviour
-{
-    public BuildingParallax cfg;
-    public Transform focus;
+namespace OSFE.Levels {
+    public class BuildingController : MonoBehaviour {
+        public BuildingParallaxCfgSO cfg;
+        public Transform focus;
+    }
 }

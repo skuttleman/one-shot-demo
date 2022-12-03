@@ -6320,7 +6320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecd56c8f6c4f4497b850be94b050a6a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cfg: {fileID: 11400000, guid: 89de63c16546a4ed490f819b4ab658d1, type: 2}
+  cfg: {fileID: 11400000, guid: 53591f7ee87c14b3abbc41e8fbbbf237, type: 2}
   focus: {fileID: 498204711}
 --- !u!1 &1425372921
 GameObject:

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using OSCore.Data.Enums;
-using OSCore.Interfaces.Tagging;
+﻿using OSCore.Data.Enums;
+using OSCore.System.Interfaces.Tagging;
 using OSCore.Utils;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-namespace OSBE.Tags {
+namespace OSBE.Tagging {
     public class TagRegistry : ITagRegistry {
         readonly IDictionary<IdTag, GameObject> uniqueTags;
         readonly IDictionary<IdTag, ISet<GameObject>> tags;

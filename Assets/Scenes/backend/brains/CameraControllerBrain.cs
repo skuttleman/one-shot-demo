@@ -1,15 +1,13 @@
-﻿using System;
-using OSCore;
-using OSCore.Data.Enums;
-using OSCore.Events.Brains;
-using OSCore.Events.Brains.Player;
-using OSCore.Interfaces;
-using OSCore.Interfaces.Brains;
-using OSCore.Interfaces.Events;
-using OSCore.Interfaces.Tagging;
+﻿using OSCore.Data.Enums;
+using OSCore.Data.Events.Brains;
+using OSCore.ScriptableObjects;
+using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Events;
+using OSCore.System.Interfaces.Tagging;
+using OSCore.System.Interfaces;
 using UnityEngine;
-using static OSCore.Events.Brains.Camera.CameraEvent;
-using static OSCore.Events.Brains.Player.AnimationEmittedEvent;
+using static OSCore.Data.Events.Brains.Camera.CameraEvent;
+using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
 namespace OSBE.Brains {
     public class CameraControllerBrain : IControllerBrain {
