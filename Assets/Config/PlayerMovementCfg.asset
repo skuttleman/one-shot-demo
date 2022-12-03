@@ -19,15 +19,15 @@ MonoBehaviour:
   scopingSpeed: 0.15
   mouseLookReset: 0.75
   standing:
-    moveSpeed: 5.5
+    moveSpeed: 30
     rotationSpeed: 15
     animFactor: 0.3
   crouching:
-    moveSpeed: 3.5
+    moveSpeed: 25
     rotationSpeed: 12
     animFactor: 0.3
   crawling:
-    moveSpeed: 1.5
+    moveSpeed: 15
     rotationSpeed: 5
     animFactor: 0.3
   aimFactor: 0.9
