@@ -7,12 +7,10 @@ using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces;
 using OSCore.Utils;
 using UnityEngine;
-using static OSCore.Data.Events.Brains.SPA.SPAEvent;
-using static OSCore.Data.Events.Brains.Player.InputEvent;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
 namespace OSBE.Brains {
-    public class PlayerControllerBrain : IControllerBrain {
+    public class PlayerControllerBrain : IPlayerControllerBrain {
         static readonly string ANIM_STANCE = "stance";
         static readonly string ANIM_MOVE = "isMoving";
         static readonly string ANIM_SCOPE = "isScoping";
@@ -20,9 +18,9 @@ namespace OSBE.Brains {
         static readonly string ANIM_ATTACK = "isAttacking";
 
         PlayerCfgSO cfg = null;
-        IControllerBrain spa = null;
         readonly IGameSystem system;
         readonly Transform target;
+        readonly Rigidbody rb;
         readonly Animator anim;
 
         // movement state
@@ -37,6 +35,7 @@ namespace OSBE.Brains {
         public PlayerControllerBrain(IGameSystem system, Transform target) {
             this.system = system;
             this.target = target;
+            rb = target.GetComponent<Rigidbody>();
             anim = target.gameObject.GetComponentInChildren<Animator>();
         }
 
@@ -49,38 +48,37 @@ namespace OSBE.Brains {
                 };
 
                 RotatePlayer(moveCfg);
-                MovePlayer(moveCfg);
             }
         }
 
-        public void Handle(IEvent e) {
-            switch (e) {
-                case InitEvent<PlayerCfgSO> ev: cfg = ev.cfg; break;
-                case MovementInput ev: HandleEvent(ev); break;
-                case SprintInput ev: HandleEvent(ev); break;
-                case LookInput ev: HandleEvent(ev); break;
-                case StanceInput ev: HandleEvent(ev); break;
-                case AimInput ev: HandleEvent(ev); break;
-                case AttackInput ev: HandleEvent(ev); break;
-                case ScopeInput ev: HandleEvent(ev); break;
-                case StanceChanged ev: HandleEvent(ev); break;
-                case AttackModeChanged ev: HandleEvent(ev); break;
-                case MovementChanged ev: HandleEvent(ev); break;
-                case ScopingChanged ev: HandleEvent(ev); break;
-                case PlayerStep ev: HandleEvent(ev); break;
-                case InstallSPA ev: HandleEvent(ev); break;
-                default: Debug.LogWarning("Unhandled event " + e); break;
+        public void FixedUpdate() {
+            if (cfg is not null) {
+                PlayerCfgSO.MoveConfig moveCfg = stance switch {
+                    PlayerStance.CROUCHING => cfg.crouching,
+                    PlayerStance.CRAWLING => cfg.crawling,
+                    _ => cfg.standing
+                };
+
+                MovePlayer(moveCfg);
             }
         }
 
         void RotatePlayer(PlayerCfgSO.MoveConfig moveCfg) {
             if (mouseLookTimer > 0f) mouseLookTimer -= Time.deltaTime;
 
+            Vector2 direction;
+
             if (Vectors.NonZero(facing))
-                spa.Handle(new FaceSPA(facing, moveCfg.rotationSpeed));
+                direction = facing;
             else if (mouseLookTimer <= 0f && Vectors.NonZero(movement))
-                spa.Handle(new FaceSPA(movement, moveCfg.rotationSpeed));
+                direction = movement;
             else return;
+
+            float rotationZ = Vectors.AngleTo(Vector2.zero, direction);
+            target.rotation = Quaternion.Lerp(
+                    target.rotation,
+                    Quaternion.Euler(0f, 0f, rotationZ),
+                    moveCfg.rotationSpeed * Time.deltaTime);
         }
 
         void MovePlayer(PlayerCfgSO.MoveConfig moveCfg) {
@@ -94,8 +92,9 @@ namespace OSBE.Brains {
                     Mathf.Abs(movement.x),
                     Mathf.Abs(movement.y));
                 anim.speed = movementSpeed * speed * moveCfg.animFactor;
+                Vector3 dir = speed * /*Time.fixedDeltaTime **/ movement.Upgrade();
 
-                spa.Handle(new MoveSPA(movement, speed));
+                if (Vectors.NonZero(movement)) rb.AddForce(dir);
             }
         }
 
@@ -105,24 +104,24 @@ namespace OSBE.Brains {
          *
          */
 
-        void HandleEvent(LookInput ev) {
-            facing = ev.direction;
-            if (ev.isMouse && Vectors.NonZero(ev.direction))
-                mouseLookTimer = cfg.mouseLookReset;
-        }
-
-        void HandleEvent(MovementInput ev) {
-            movement = ev.direction;
+        public void OnMovementInput(Vector2 direction) {
+            movement = direction;
             anim.SetBool(ANIM_MOVE, Vectors.NonZero(movement));
         }
 
-        void HandleEvent(SprintInput ev) { }
+        public void OnSprintInput(bool isSprinting) { }
 
-        void HandleEvent(StanceInput ev) {
+        public void OnLookInput(Vector2 direction, bool isMouse) {
+            facing = direction;
+            if (isMouse && Vectors.NonZero(direction))
+                mouseLookTimer = cfg.mouseLookReset;
+        }
+
+        public void OnStanceInput(float holdDuration) {
             PlayerStance nextStance = PBUtils.NextStance(
                 cfg,
                 stance,
-                ev.holdDuration);
+                holdDuration);
 
             if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isScoping)) {
                 stance = nextStance;
@@ -130,14 +129,11 @@ namespace OSBE.Brains {
             }
         }
 
-        void HandleEvent(ScopeInput ev) =>
-            anim.SetBool(ANIM_SCOPE, ev.isScoping);
+        public void OnAimInput(bool isAiming) =>
+            anim.SetBool(ANIM_AIM, isAiming);
 
-        void HandleEvent(AimInput ev) =>
-            anim.SetBool(ANIM_AIM, ev.isAiming);
-
-        void HandleEvent(AttackInput ev) {
-            if (ev.isAttacking && PBUtils.CanAttack(attackMode)) {
+        public void OnAttackInput(bool isAttacking) {
+            if (isAttacking && PBUtils.CanAttack(attackMode)) {
                 float attackSpeed = attackMode == PlayerAttackMode.HAND
                     ? cfg.punchingSpeed
                     : cfg.firingSpeed;
@@ -151,41 +147,44 @@ namespace OSBE.Brains {
             }
         }
 
+        public void OnScopeInput(bool isScoping) =>
+            anim.SetBool(ANIM_SCOPE, isScoping);
+
         /*
          *
          * Animation Event Handlers
          *
          */
 
-        void HandleEvent(StanceChanged ev) {
-            if (stance != ev.stance) {
-                stance = ev.stance;
-                PublishMessage(ev);
+        public void OnStanceChanged(PlayerStance stance) {
+            if (this.stance != stance) {
+                this.stance = stance;
+                PublishMessage(new StanceChanged(stance));
             }
         }
 
-        void HandleEvent(MovementChanged ev) {
-            if (isMoving != ev.isMoving) {
-                isMoving = ev.isMoving;
-                PublishMessage(ev);
+        public void OnAttackModeChanged(PlayerAttackMode attackMode) {
+            if (this.attackMode != attackMode) {
+                this.attackMode = attackMode;
+                PublishMessage(new AttackModeChanged(attackMode));
             }
         }
 
-        void HandleEvent(AttackModeChanged ev) {
-            if (attackMode != ev.mode) {
-                attackMode = ev.mode;
-                PublishMessage(ev);
+        public void OnMovementChanged(bool isMoving) {
+            if (this.isMoving != isMoving) {
+                this.isMoving = isMoving;
+                PublishMessage(new MovementChanged(isMoving));
             }
         }
 
-        void HandleEvent(ScopingChanged ev) {
-            if (isScoping != ev.isScoping) {
-                isScoping = ev.isScoping;
-                PublishMessage(ev);
+        public void OnScopingChanged(bool isScoping) {
+            if (this.isScoping != isScoping) {
+                this.isScoping = isScoping;
+                PublishMessage(new ScopingChanged(isScoping));
             }
         }
 
-        void HandleEvent(PlayerStep _) { }
+        public void OnPlayerStep() { }
 
         /*
          *
@@ -193,13 +192,11 @@ namespace OSBE.Brains {
          *
          */
 
-        void HandleEvent(InstallSPA ev) {
-            spa = ev.spa;
-        }
+        public void Init(PlayerCfgSO cfg) =>
+            this.cfg = cfg;
 
-        void PublishMessage(IEvent message) {
+        void PublishMessage(IEvent message) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(message));
-        }
 
         static class PBUtils {
             public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using OSCore.Data.Enums;
 using OSCore.Data.Events.Brains;
+using OSCore.ScriptableObjects;
 using UnityEngine;
 
 namespace OSCore.System.Interfaces {
@@ -11,7 +12,8 @@ namespace OSCore.System.Interfaces {
     }
 
     public interface IGameSystemComponent {
-        public void Update();
+        public void Update() { }
+        public void FixedUpdate() { }
         public void OnDestroy() { }
     }
 
@@ -33,16 +35,28 @@ namespace OSCore.System.Interfaces {
     }
 
     namespace Brains {
-        public enum EControllerBrainTag {
-            PLAYER, CAMERA, SPA
-        }
-
-        public interface IControllerBrain : IGameSystemComponent {
-            public void Handle(IEvent message);
-        }
-
         public interface IControllerBrainManager : IGameSystemComponent {
-            public IControllerBrain Ensure(EControllerBrainTag tag, Transform target);
+            public T Ensure<T>(Transform target) where T : IGameSystemComponent;
+        }
+
+        public interface IPlayerControllerBrain : IGameSystemComponent {
+            public void Init(PlayerCfgSO cfg);
+            public void OnMovementInput(Vector2 direction);
+            public void OnSprintInput(bool isSprinting);
+            public void OnLookInput(Vector2 direction, bool isMouse);
+            public void OnStanceInput(float holdDuration);
+            public void OnAimInput(bool isAiming);
+            public void OnAttackInput(bool isAttacking);
+            public void OnScopeInput(bool isScoping);
+            public void OnStanceChanged(PlayerStance stance);
+            public void OnAttackModeChanged(PlayerAttackMode attackMode);
+            public void OnMovementChanged(bool isMoving);
+            public void OnScopingChanged(bool isScoping);
+            public void OnPlayerStep();
+        }
+
+        public interface ICameraControllerBrain : IGameSystemComponent {
+            public void Init(CameraCfgSO cfg);
         }
     }
 }

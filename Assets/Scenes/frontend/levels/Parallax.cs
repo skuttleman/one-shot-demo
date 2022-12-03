@@ -23,10 +23,8 @@ namespace OSFE.Levels {
             UpdatePosition(Mathf.Abs(diffZ));
         }
 
-        void UpdatePosition(float diffZ) {
-            Debug.Log(diffZ);
+        void UpdatePosition(float diffZ) =>
             transform.position = realPosition
                 + Vectors.Clamp(offset.Upgrade(), -cfg.maxOffset * diffZ, cfg.maxOffset * diffZ);
-        }
     }
 }

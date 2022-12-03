@@ -1,18 +1,17 @@
 ﻿using OSCore.Data.Enums;
-using OSCore.Data.Events.Brains;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
 using UnityEngine;
-using static OSCore.Data.Events.Brains.Camera.CameraEvent;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
 namespace OSBE.Brains {
-    public class CameraControllerBrain : IControllerBrain {
+    public class CameraControllerBrain : ICameraControllerBrain {
         readonly IGameSystem system;
         readonly Transform target;
+        readonly Transform camera;
         CameraCfgSO cfg = null;
         CinemachineCameraOffset camOffset = null;
 
@@ -22,6 +21,7 @@ namespace OSBE.Brains {
 
         public CameraControllerBrain(IGameSystem system, Transform camera) {
             this.system = system;
+            this.camera = camera;
             target = system.Send<ITagRegistry, Transform>(registry =>
                 registry.GetUnique(IdTag.PLAYER).transform);
             system.Send<IPubSub>(pubsub => {
@@ -31,13 +31,9 @@ namespace OSBE.Brains {
             });
         }
 
-        public void Handle(IEvent message) {
-            switch (message) {
-                case CameraInitEvent e:
-                    cfg = e.cfg;
-                    camOffset = e.offset;
-                    break;
-            }
+        public void Init(CameraCfgSO cfg) {
+            this.cfg = cfg;
+            camOffset = camera.GetComponent<CinemachineCameraOffset>();
         }
 
         public void Update() {

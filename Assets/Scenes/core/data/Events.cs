@@ -1,14 +1,11 @@
 using OSCore.Data.Enums;
-using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Brains;
 using UnityEngine;
 
 namespace OSCore.Data.Events {
     namespace Brains {
         public interface IEvent { }
 
-        public record InitEvent<T>(T cfg) : IEvent
-            where T : ScriptableObject;
+        public record InitEvent<T>(T cfg) : IEvent;
 
         namespace Player {
             public record InputEvent : IEvent {
@@ -28,30 +25,8 @@ namespace OSCore.Data.Events {
                 public record AttackModeChanged(PlayerAttackMode mode) : AnimationEmittedEvent();
                 public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
                 public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
-                public record PlayerStep() : AnimationEmittedEvent();
 
                 private AnimationEmittedEvent() { }
-            }
-        }
-
-        namespace SPA {
-            public record SPAEvent : IEvent {
-                public record InstallSPA(IControllerBrain spa) : SPAEvent();
-                public record MoveSPA(Vector2 direction, float speed) : SPAEvent();
-                public record FaceSPA(Vector2 direction, float speed) : SPAEvent();
-
-                private SPAEvent() { }
-            }
-        }
-
-        namespace Camera {
-            public record CameraEvent : IEvent {
-                public record CameraInitEvent(
-                    CameraCfgSO cfg,
-                    CinemachineCameraOffset offset)
-                    : CameraEvent();
-
-                private CameraEvent() { }
             }
         }
     }
