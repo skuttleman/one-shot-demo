@@ -34,8 +34,6 @@ namespace OSBE {
         }
 
         void Awake() {
-            callbacks = new();
-
             foreach (GameSystem obj in FindObjectsOfType<GameSystem>())
                 if (obj.gameObject != gameObject) {
                     Destroy(obj.gameObject);
@@ -45,7 +43,6 @@ namespace OSBE {
         }
 
         void OnEnable() {
-            //Debug.Log("ENABLE");
             controller = FindObjectOfType<GameController>();
             Init();
         }
@@ -58,6 +55,7 @@ namespace OSBE {
         }
 
         void Init() {
+            callbacks = new();
             components = new Dictionary<Type, IGameSystemComponent> {
                 { typeof(IControllerBrainManager), new ControllerBrainManager(this) },
                 { typeof(PromiseFactory) , new PromiseFactory() },

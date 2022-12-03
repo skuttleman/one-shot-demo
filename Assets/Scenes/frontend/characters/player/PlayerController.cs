@@ -20,9 +20,8 @@ namespace OSFE {
 
         IGameSystem system;
 
-        void Start() {
+        void OnEnable() {
             system = FindObjectOfType<GameController>();
-
             ToController(new InitEvent<PlayerCfgSO>(cfg));
             ToSPA(new InitEvent<GravityCfgSO>(gravityCfg));
             ToSPA(new InitEvent<CollisionCfgSO>(collisionCfg));

@@ -26,7 +26,7 @@ namespace OSBE {
             if (rb is null)
                 rb = target.GetComponent<Rigidbody>();
 
-            Vector3 dir = e.speed * Time.fixedDeltaTime * Vectors.Upgrade(e.direction);
+            Vector3 dir = e.speed * /*Time.fixedDeltaTime **/ Vectors.Upgrade(e.direction);
 
             if (Vectors.NonZero(e.direction))
                 rb.AddForce(dir);

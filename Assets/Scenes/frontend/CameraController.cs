@@ -9,7 +9,7 @@ namespace OSFE {
     public class CameraController : MonoBehaviour {
         [SerializeField] CameraCfgSO cfg;
 
-        void Start() {
+        void OnEnable() {
             CinemachineCameraOffset offset = GetComponent<CinemachineCameraOffset>();
             FindObjectOfType<GameController>()
                 .Send<IControllerBrainManager>(mngr =>
