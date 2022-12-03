@@ -366,7 +366,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 082906d632a4e429b95c37e8c714ffee, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -788,11 +788,11 @@ MonoBehaviour:
     m_VirtualCamera: {fileID: 2048918909}
     m_ActivateAfter: 0
     m_MinDuration: 0
-  - m_FullHash: -202759393
+  - m_FullHash: -1432775002
     m_VirtualCamera: {fileID: 2048918909}
     m_ActivateAfter: 0
     m_MinDuration: 0
-  - m_FullHash: -1432775002
+  - m_FullHash: -202759393
     m_VirtualCamera: {fileID: 2048918909}
     m_ActivateAfter: 0
     m_MinDuration: 0
@@ -3182,7 +3182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Offset: {x: 0, y: 0, z: 0}
+  m_Offset: {x: 3.317599e-15, y: 3.000884e-15, z: 0}
   m_ApplyAfter: 1
   m_PreserveComposition: 0
 --- !u!1 &669848494
@@ -5135,7 +5135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Offset: {x: 0, y: 0, z: 0}
+  m_Offset: {x: 3.317599e-15, y: 3.000884e-15, z: 0}
   m_ApplyAfter: 1
   m_PreserveComposition: 0
 --- !u!1 &872921449
@@ -7088,7 +7088,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Offset: {x: 0, y: 0, z: 0}
+  m_Offset: {x: 3.317599e-15, y: 3.000884e-15, z: 0}
   m_ApplyAfter: 1
   m_PreserveComposition: 0
 --- !u!1 &2057467436

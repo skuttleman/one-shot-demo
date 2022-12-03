@@ -17,3 +17,5 @@ MonoBehaviour:
   scopeOffset: 3.5
   aimOffset: 1.5
   maxLookAhead: 3.75
+  punchOffset: 0.025
+  fireOffset: 0.05

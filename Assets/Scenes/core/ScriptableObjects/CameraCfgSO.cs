@@ -8,5 +8,9 @@ namespace OSCore.ScriptableObjects {
         public float scopeOffset;
         public float aimOffset;
         public float maxLookAhead;
+
+        [Header("Attacking")]
+        public float punchOffset;
+        public float fireOffset;
     }
 }
