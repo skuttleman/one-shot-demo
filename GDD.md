@@ -123,7 +123,7 @@ For example, short radio dialogs between characters can display closeup avatars 
 
 ### Music
 
-Heavy metal.
+Speed metal.
 
 Seriously though, I don't have strong opinions, but I'm happy to lead this up if no one else wants to.
 
