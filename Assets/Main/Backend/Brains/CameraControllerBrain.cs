@@ -64,9 +64,9 @@ namespace OSBE.Brains {
         Vector3 LookAheadOffset() {
             float lookAhead = 0f;
 
-            if (isScoping) lookAhead += cfg.scopeOffset;
-            else if (isMoving) lookAhead += cfg.moveOffset;
             if (IsAiming()) lookAhead += cfg.aimOffset;
+            else if (isScoping) lookAhead = 0f;
+            if (isMoving) lookAhead += cfg.moveOffset;
 
             return new Vector3(0f, Mathf.Clamp(lookAhead, 0f, cfg.maxLookAhead), 0f);
         }

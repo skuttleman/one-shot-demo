@@ -5,7 +5,6 @@ namespace OSCore.ScriptableObjects {
     public class CameraCfgSO : ScriptableObject {
         public float orbitSpeed;
         public float moveOffset;
-        public float scopeOffset;
         public float aimOffset;
         public float maxLookAhead;
 
