@@ -9,7 +9,6 @@ namespace OSFE {
         [SerializeField] Tag[] tags;
 
         void OnEnable() {
-
             FindObjectOfType<GameController>()
                 .Send<ITagRegistry>(registry => {
                     foreach (Tag tag in tags)
