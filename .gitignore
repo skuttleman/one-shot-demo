@@ -2,7 +2,6 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
-/[Aa]ssets/[Rr]esources/*
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -74,3 +73,5 @@ crashlytics-build.properties
 
 # Clojure, etc.
 .idea/
+*.png
+*.xcf

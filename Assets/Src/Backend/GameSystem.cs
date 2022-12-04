@@ -35,14 +35,6 @@ namespace OSBE {
             return action(component);
         }
 
-        void Awake() {
-            foreach (GameSystem obj in FindObjectsOfType<GameSystem>())
-                if (obj.gameObject != gameObject)
-                    Destroy(obj.gameObject);
-                else
-                    DontDestroyOnLoad(obj.gameObject);
-        }
-
         void OnEnable() {
             controller = FindObjectOfType<GameController>();
             Init();

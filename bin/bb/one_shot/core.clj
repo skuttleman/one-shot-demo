@@ -3,10 +3,10 @@
     [babashka.process :as p]))
 
 (def ^:const ^:private SYNC_PUSH_COMMAND
-  "aws s3 sync Assets/Resources s3://one-shot")
+  "aws s3 cp Assets/Resources s3://one-shot/ --recursive --exclude \"*\" --include \"*.png\" --include \"*.xcf\"")
 
 (def ^:const ^:private SYNC_PULL_COMMAND
-  "aws s3 sync s3://one-shot Assets/Resources")
+  "aws s3 cp s3://one-shot/ Assets/Resources --recursive --exclude \"*\" --include \"*.png\" --include \"*.xcf\"")
 
 (defn ^:private sh [command]
   (p/process ["sh" "-c" command]))

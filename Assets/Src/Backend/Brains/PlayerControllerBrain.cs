@@ -23,22 +23,20 @@ namespace OSBE.Brains {
         readonly Transform target;
         readonly Rigidbody rb;
         readonly Animator anim;
+        readonly GameObject stand;
+        readonly GameObject crouch;
+        readonly GameObject crawl;
 
         // movement state
         Vector2 movement = Vector2.zero;
         Vector2 facing = Vector2.zero;
-        PlayerStance stance;
-        PlayerAttackMode attackMode;
-
-        GameObject stand;
-        GameObject crouch;
-        GameObject crawl;
-
+        PlayerStance stance = PlayerStance.STANDING;
+        PlayerAttackMode attackMode = PlayerAttackMode.HAND;
+        float mouseLookTimer = 0f;
         bool isGrounded = false;
         bool isMoving = false;
         bool isSprinting = false;
         bool isScoping = false;
-        float mouseLookTimer = 0f;
 
         public PlayerControllerBrain(IGameSystem system, Transform target) {
             this.system = system;
