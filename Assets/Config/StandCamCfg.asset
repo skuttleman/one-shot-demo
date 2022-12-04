@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: StandCamCfg
   m_EditorClassIdentifier: 
   orbitSpeed: 1.75
-  moveOffset: 0.25
-  scopeOffset: 3.5
+  moveOffset: 2.5
+  scopeOffset: 5
   aimOffset: 1.5
-  maxLookAhead: 3.75
+  maxLookAhead: 4.85
   punchOffset: 0.025
   fireOffset: 0.05

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: CrouchCamCfg
   m_EditorClassIdentifier: 
   orbitSpeed: 1.75
-  moveOffset: 0.2
-  scopeOffset: 3.5
+  moveOffset: 1.25
+  scopeOffset: 5
   aimOffset: 1.5
-  maxLookAhead: 3.2
+  maxLookAhead: 4.15
   punchOffset: 0.025
   fireOffset: 0.05
