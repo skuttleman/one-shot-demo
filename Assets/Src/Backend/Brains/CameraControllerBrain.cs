@@ -5,7 +5,6 @@ using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
 using OSCore.Utils;
-using System;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 

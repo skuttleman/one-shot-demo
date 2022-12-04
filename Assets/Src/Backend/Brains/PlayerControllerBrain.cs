@@ -29,6 +29,11 @@ namespace OSBE.Brains {
         Vector2 facing = Vector2.zero;
         PlayerStance stance;
         PlayerAttackMode attackMode;
+
+        GameObject stand;
+        GameObject crouch;
+        GameObject crawl;
+
         bool isGrounded = false;
         bool isMoving = false;
         bool isSprinting = false;
@@ -40,6 +45,12 @@ namespace OSBE.Brains {
             this.target = target;
             rb = target.GetComponent<Rigidbody>();
             anim = target.gameObject.GetComponentInChildren<Animator>();
+
+            // TODO - this better
+            stand = GameObject.Find("/Player/stand");
+            crouch = GameObject.Find("/Player/crouch");
+            crawl = GameObject.Find("/Player/crawl");
+            ActivateStance();
         }
 
         public void Update() {
@@ -49,7 +60,10 @@ namespace OSBE.Brains {
 
         public void FixedUpdate() {
             if (cfg is not null) {
-                isGrounded = Physics.Raycast(target.position, Vectors.DOWN, cfg.groundedDist);
+                isGrounded = Physics.Raycast(
+                    target.position - new Vector3(0, 0, 0.01f),
+                    Vectors.DOWN,
+                    cfg.groundedDist);
                 MovePlayer(MoveCfg());
             }
         }
@@ -136,10 +150,8 @@ namespace OSBE.Brains {
                 stance,
                 holdDuration);
 
-            if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isGrounded, isScoping)) {
-                stance = nextStance;
+            if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isGrounded, isScoping))
                 anim.SetInteger(ANIM_STANCE, (int)nextStance);
-            }
         }
 
         public void OnAimInput(bool isAiming) {
@@ -178,6 +190,7 @@ namespace OSBE.Brains {
         public void OnStanceChanged(PlayerStance stance) {
             if (this.stance != stance) {
                 this.stance = stance;
+                ActivateStance();
                 PublishMessage(new StanceChanged(stance));
             }
         }
@@ -210,6 +223,7 @@ namespace OSBE.Brains {
          * Admin Event Handlers
          *
          */
+
         MoveConfig MoveCfg() =>
             stance switch {
                 PlayerStance.CROUCHING => cfg.crouching,
@@ -225,6 +239,12 @@ namespace OSBE.Brains {
 
         void PublishMessage(IEvent message) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(message));
+
+        void ActivateStance() {
+            stand.SetActive(stance == PlayerStance.STANDING);
+            crouch.SetActive(stance == PlayerStance.CROUCHING);
+            crawl.SetActive(stance == PlayerStance.CRAWLING);
+        }
 
         static class PBUtils {
             public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {

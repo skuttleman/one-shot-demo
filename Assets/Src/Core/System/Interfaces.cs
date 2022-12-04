@@ -55,6 +55,10 @@ namespace OSCore.System.Interfaces {
             public void OnPlayerStep();
         }
 
+        public interface IPlayerFOVBrain : IGameSystemComponent {
+            public void Init(PlayerFOVCfgSO cfg, Mesh mesh, Transform fov);
+        }
+
         public interface ICameraControllerBrain : IGameSystemComponent {
             public void Init(CameraCfgSO cfg);
         }

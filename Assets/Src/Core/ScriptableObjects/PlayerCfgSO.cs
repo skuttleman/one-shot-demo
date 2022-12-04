@@ -2,12 +2,12 @@ using System;
 using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
-    [CreateAssetMenu(menuName = "cfg/player")]
+    [CreateAssetMenu(menuName = "cfg/player/general")]
     public class PlayerCfgSO : ScriptableObject {
         [Header("Input")]
         public float stanceChangeHeldThreshold;
         public float mouseLookReset;
-        public float groundedDist;
+        [Range(0.1f, 1f)] public float groundedDist;
 
         [Header("Stance")]
         public MoveConfig sprinting;

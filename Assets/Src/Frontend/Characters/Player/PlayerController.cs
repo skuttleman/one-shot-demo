@@ -1,4 +1,3 @@
-using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces;
@@ -17,8 +16,6 @@ namespace OSFE.Characters.Player {
             system = FindObjectOfType<GameController>();
             Brain().Init(cfg);
         }
-
-        /* Input Events */
 
         public void OnInputMove(InputValue value) =>
             Brain().OnMovementInput(value.Get<Vector2>());
@@ -43,23 +40,6 @@ namespace OSFE.Characters.Player {
 
         public void OnInputAttack(InputValue value) =>
             Brain().OnAttackInput(value.isPressed);
-
-        /* Animation Events */
-
-        public void OnStanceChange(PlayerStance stance) =>
-            Brain().OnStanceChanged(stance);
-
-        public void OnAttackMode(PlayerAttackMode mode) =>
-            Brain().OnAttackModeChanged(mode);
-
-        public void OnMovement(int moving) =>
-            Brain().OnMovementChanged(moving != 0);
-
-        public void OnScope(int enabled) =>
-            Brain().OnScopingChanged(enabled != 0);
-
-        public void OnStep() =>
-            Brain().OnPlayerStep();
 
         IPlayerControllerBrain Brain() =>
             system.Send<IControllerBrainManager, IPlayerControllerBrain>(mngr =>

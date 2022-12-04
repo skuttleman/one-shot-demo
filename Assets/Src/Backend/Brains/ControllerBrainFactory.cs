@@ -7,16 +7,17 @@ using UnityEngine;
 
 namespace OSBE.Brains {
     public class ControllerBrainManager : IControllerBrainManager {
-        readonly IDictionary<(Transform, Type), IGameSystemComponent> brains;
+        readonly IDictionary<(int, Type), IGameSystemComponent> brains;
         readonly IGameSystem system;
 
         public ControllerBrainManager(IGameSystem system) {
-            brains = new Dictionary<(Transform, Type), IGameSystemComponent>();
+            brains = new Dictionary<(int, Type), IGameSystemComponent>();
             this.system = system;
         }
 
         public T Ensure<T>(Transform target) where T : IGameSystemComponent {
-            (Transform, Type) id = (target, typeof(T));
+            (int, Type) id = (target.GetHashCode(), typeof(T));
+
             if (brains.ContainsKey(id))
                 return (T)brains.Get(id);
 
@@ -35,6 +36,8 @@ namespace OSBE.Brains {
             Type t = typeof(T);
             if (t == typeof(IPlayerControllerBrain))
                 return new PlayerControllerBrain(system, target);
+            if (t == typeof(IPlayerFOVBrain))
+                return new PlayerFOVBrain(system, target);
             if (t == typeof(ICameraControllerBrain))
                 return new CameraControllerBrain(system, target);
             throw new Exception("Unknown Brain Type: " + t);
