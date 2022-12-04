@@ -129,9 +129,9 @@ Seriously though, I don't have strong opinions, but I'm happy to lead this up if
 
 ## Additional Ideas
 
-Here are som untethered brainstorming ideas.
+Here are some untethered brainstorming ideas.
 
-- **Discouraging Combat** in addition to player score penalty for firing more than one bullet, we can have killing people take a "mental toll" on Mel and she'll go mad - or something - if she kills too many enemies.
+- **Discouraging Combat** In addition to player score penalty for firing more than one bullet, we can have killing people take a "mental toll" on Mel and she'll go mad - or something - if she kills too many enemies.
 - **Difficulty Settings** If we choose to support variable difficulty settings, we could tie it to the player's loadout gear. For example:
     - equiping extra-silent boots isn't an upgrade to be unlocked, it's a difficulty lever.
 - **Character Customization** If we want to allow the player to customize name, pronouns, race, sexual orientation, etc, I think we should make sure it has absolutely no impact on the gameplay and is - at most - only casually referenced within the story.
