@@ -10,9 +10,11 @@ public class FOV : MonoBehaviour {
     [SerializeField] float startingAngle;
 
     Mesh mesh;
+    Vector3 lastPos;
 
     void Start() {
         mesh = new Mesh();
+        lastPos = transform.position;
         GetComponent<MeshFilter>().mesh = mesh;
     }
 
@@ -47,6 +49,7 @@ public class FOV : MonoBehaviour {
         mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.bounds = new Bounds(vertices[0], Vector3.one * 1000f);
+        lastPos = transform.position;
     }
 
     bool IsHit(float angle, out RaycastHit hit) =>
