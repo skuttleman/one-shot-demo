@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stanceChangeHeldThreshold: 0.35
   mouseLookReset: 0.75
+  groundedDist: 0.26
   sprinting:
     moveSpeed: 60
     rotationSpeed: 5

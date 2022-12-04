@@ -29,6 +29,7 @@ namespace OSBE.Brains {
         Vector2 facing = Vector2.zero;
         PlayerStance stance;
         PlayerAttackMode attackMode;
+        bool isGrounded = false;
         bool isMoving = false;
         bool isSprinting = false;
         bool isScoping = false;
@@ -47,8 +48,10 @@ namespace OSBE.Brains {
         }
 
         public void FixedUpdate() {
-            if (cfg is not null)
+            if (cfg is not null) {
+                isGrounded = Physics.Raycast(target.position, Vectors.DOWN, cfg.groundedDist);
                 MovePlayer(MoveCfg());
+            }
         }
 
         void RotatePlayer(MoveConfig moveCfg) {
@@ -70,7 +73,7 @@ namespace OSBE.Brains {
         }
 
         void MovePlayer(MoveConfig moveCfg) {
-            if (PBUtils.IsMovable(stance, attackMode, isScoping)) {
+            if (PBUtils.IsMovable(stance, attackMode, isGrounded, isScoping)) {
                 float speed = moveCfg.moveSpeed;
 
                 if (PBUtils.IsAiming(attackMode)) speed *= cfg.aimFactor;
@@ -133,7 +136,7 @@ namespace OSBE.Brains {
                 stance,
                 holdDuration);
 
-            if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isScoping)) {
+            if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isGrounded, isScoping)) {
                 stance = nextStance;
                 anim.SetInteger(ANIM_STANCE, (int)nextStance);
             }
@@ -239,8 +242,8 @@ namespace OSBE.Brains {
             public static bool IsAiming(PlayerAttackMode mode) =>
                 mode == PlayerAttackMode.WEAPON || mode == PlayerAttackMode.FIRING;
 
-            public static bool IsMovable(PlayerStance stance, PlayerAttackMode mode, bool isScoping) =>
-                stance != PlayerStance.CRAWLING || (!IsAiming(mode) && !isScoping);
+            public static bool IsMovable(PlayerStance stance, PlayerAttackMode mode, bool isGrounded, bool isScoping) =>
+                isGrounded && (stance != PlayerStance.CRAWLING || (!IsAiming(mode) && !isScoping));
 
             public static bool CanAttack(PlayerAttackMode mode) =>
                 mode != PlayerAttackMode.NONE

@@ -7,6 +7,7 @@ namespace OSCore.ScriptableObjects {
         [Header("Input")]
         public float stanceChangeHeldThreshold;
         public float mouseLookReset;
+        public float groundedDist;
 
         [Header("Stance")]
         public MoveConfig sprinting;
