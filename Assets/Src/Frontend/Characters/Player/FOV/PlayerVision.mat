@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Masked
-  m_Shader: {fileID: 4800000, guid: 98d79b67fa75c4802a49bb0c61ae675c, type: 3}
+  m_Name: PlayerVision
+  m_Shader: {fileID: 4800000, guid: de2a4acb96b134236a38e5860ca7ba5d, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4

@@ -1,4 +1,4 @@
-Shader "Custom/Masked"
+Shader "Custom/PVisibleInside"
 {
     Properties
     {
@@ -26,7 +26,7 @@ Shader "Custom/Masked"
         Stencil
         {
             Ref 1
-            Comp notequal
+            Comp equal
             Pass keep
         }
  

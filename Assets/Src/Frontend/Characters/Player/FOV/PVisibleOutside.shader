@@ -1,9 +1,9 @@
-Shader "Custom/Mask"
+Shader "Custom/PVisibleOutside"
 {
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-        _Color ("Tint", Color) = (1, 1, 1, 1)
+        _Color ("Tint", Color) = (1,1,1,1)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
     }
  
@@ -20,21 +20,19 @@ Shader "Custom/Mask"
  
         Cull Off
         Lighting Off
-        ColorMask 0
         ZWrite Off
         Blend One OneMinusSrcAlpha
  
         Stencil
         {
             Ref 1
-            Comp always
-            Pass replace
+            Comp notequal
+            Pass keep
         }
  
         Pass
         {
-            CGPROGRAM
-
+        CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile _ PIXELSNAP_ON
@@ -74,12 +72,10 @@ Shader "Custom/Mask"
             fixed4 frag(v2f IN) : SV_Target
             {
                 fixed4 c = tex2D(_MainTex, IN.texcoord) * IN.color;
-                if (c.a < 0.1) discard;
                 c.rgb *= c.a;
                 return c;
             }
-
-            ENDCG
+        ENDCG
         }
     }
 }
