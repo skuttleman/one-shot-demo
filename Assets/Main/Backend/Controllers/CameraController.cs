@@ -8,8 +8,8 @@ using OSCore.Utils;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
-namespace OSBE.Brains {
-    public class CameraControllerBrain : ICameraControllerBrain {
+namespace OSBE.Controllers {
+    public class CameraController : ICameraController {
         readonly IGameSystem system;
         readonly Transform target;
         readonly Transform camera;
@@ -20,7 +20,7 @@ namespace OSBE.Brains {
         bool isMoving;
         bool isScoping;
 
-        public CameraControllerBrain(IGameSystem system, Transform camera) {
+        public CameraController(IGameSystem system, Transform camera) {
             this.system = system;
             this.camera = camera;
             target = system.Send<ITagRegistry, Transform>(registry =>

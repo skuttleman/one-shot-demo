@@ -4,15 +4,15 @@ using OSCore.System.Interfaces;
 using OSCore.Utils;
 using UnityEngine;
 
-namespace OSBE.Brains {
-    public class PlayerFOVBrain : IPlayerFOVBrain {
+namespace OSBE.Controllers {
+    public class PlayerFOVController : IPlayerFOVController {
         readonly IGameSystem system;
         readonly Transform target;
         PlayerFOVCfgSO cfg;
         Mesh mesh;
         Transform fov;
 
-        public PlayerFOVBrain(IGameSystem system, Transform target) {
+        public PlayerFOVController(IGameSystem system, Transform target) {
             this.system = system;
             this.target = target;
         }

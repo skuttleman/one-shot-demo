@@ -21,8 +21,8 @@ namespace OSFE.Characters.Enemy {
         public void OnStep() =>
             Brain().OnEnemyStep();
 
-        IEnemyControllerBrain Brain() =>
-            system.Send<IControllerBrainManager, IEnemyControllerBrain>(mngr =>
-                mngr.Ensure<IEnemyControllerBrain>(transform.root));
+        IEnemyController Brain() =>
+            system.Send<IControllerManager, IEnemyController>(mngr =>
+                mngr.Ensure<IEnemyController>(transform.root));
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine;
 
 namespace OSFE.Characters.Player {
-    public class PlayerController : MonoBehaviour {
+    public class PlayerInputListener : MonoBehaviour {
         [SerializeField] PlayerCfgSO cfg;
 
         IGameSystem system;
@@ -41,8 +41,8 @@ namespace OSFE.Characters.Player {
         public void OnInputAttack(InputValue value) =>
             Brain().OnAttackInput(value.isPressed);
 
-        IPlayerControllerBrain Brain() =>
-            system.Send<IControllerBrainManager, IPlayerControllerBrain>(mngr =>
-                mngr.Ensure<IPlayerControllerBrain>(transform));
+        IPlayerController Brain() =>
+            system.Send<IControllerManager, IPlayerController>(mngr =>
+                mngr.Ensure<IPlayerController>(transform));
     }
 }

@@ -35,11 +35,11 @@ namespace OSCore.System.Interfaces {
     }
 
     namespace Brains {
-        public interface IControllerBrainManager : IGameSystemComponent {
+        public interface IControllerManager : IGameSystemComponent {
             public T Ensure<T>(Transform target) where T : IGameSystemComponent;
         }
 
-        public interface IPlayerControllerBrain : IGameSystemComponent {
+        public interface IPlayerController : IGameSystemComponent {
             public void Init(PlayerCfgSO cfg);
             public void OnMovementInput(Vector2 direction);
             public void OnSprintInput(bool isSprinting);
@@ -55,18 +55,18 @@ namespace OSCore.System.Interfaces {
             public void OnPlayerStep();
         }
 
-        public interface IPlayerFOVBrain : IGameSystemComponent {
+        public interface IPlayerFOVController : IGameSystemComponent {
             public void Init(PlayerFOVCfgSO cfg, Mesh mesh, Transform fov);
         }
 
-        public interface IEnemyControllerBrain : IGameSystemComponent {
+        public interface IEnemyController : IGameSystemComponent {
             //public void Init(EnemyCfgSO cfg);
             public void OnAttackModeChanged(AttackMode attackMode);
             public void OnMovementChanged(bool isMoving);
             public void OnEnemyStep();
         }
 
-        public interface ICameraControllerBrain : IGameSystemComponent {
+        public interface ICameraController : IGameSystemComponent {
             public void Init(CameraCfgSO cfg);
         }
     }

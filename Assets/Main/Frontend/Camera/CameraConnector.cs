@@ -4,13 +4,13 @@ using OSCore;
 using UnityEngine;
 
 namespace OSFE.Camera {
-    public class CameraController : MonoBehaviour {
+    public class CameraConnector : MonoBehaviour {
         [SerializeField] CameraCfgSO cfg;
 
         void OnEnable() {
             FindObjectOfType<GameController>()
-                .Send<IControllerBrainManager>(mngr =>
-                    mngr.Ensure<ICameraControllerBrain>(transform)
+                .Send<IControllerManager>(mngr =>
+                    mngr.Ensure<ICameraController>(transform)
                         .Init(cfg));
         }
     }

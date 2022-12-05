@@ -10,8 +10,8 @@ using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
-namespace OSBE.Brains {
-    public class PlayerControllerBrain : IPlayerControllerBrain {
+namespace OSBE.Controllers {
+    public class PlayerController : IPlayerController {
         static readonly string ANIM_STANCE = "stance";
         static readonly string ANIM_MOVE = "isMoving";
         static readonly string ANIM_SCOPE = "isScoping";
@@ -38,7 +38,7 @@ namespace OSBE.Brains {
         bool isSprinting = false;
         bool isScoping = false;
 
-        public PlayerControllerBrain(IGameSystem system, Transform target) {
+        public PlayerController(IGameSystem system, Transform target) {
             this.system = system;
             this.target = target;
             rb = target.GetComponent<Rigidbody>();
@@ -85,10 +85,10 @@ namespace OSBE.Brains {
         }
 
         void MovePlayer(MoveConfig moveCfg) {
-            if (PBUtils.IsMovable(stance, attackMode, isGrounded, isScoping)) {
+            if (PCUtils.IsMovable(stance, attackMode, isGrounded, isScoping)) {
                 float speed = moveCfg.moveSpeed;
 
-                if (PBUtils.IsAiming(attackMode)) speed *= cfg.aimFactor;
+                if (PCUtils.IsAiming(attackMode)) speed *= cfg.aimFactor;
                 else if (isScoping) speed *= cfg.scopeFactor;
 
                 float movementSpeed = Mathf.Max(
@@ -143,12 +143,12 @@ namespace OSBE.Brains {
 
         public void OnStanceInput(float holdDuration) {
             isSprinting = false;
-            PlayerStance nextStance = PBUtils.NextStance(
+            PlayerStance nextStance = PCUtils.NextStance(
                 cfg,
                 stance,
                 holdDuration);
 
-            if (!isMoving || PBUtils.IsMovable(nextStance, attackMode, isGrounded, isScoping))
+            if (!isMoving || PCUtils.IsMovable(nextStance, attackMode, isGrounded, isScoping))
                 anim.SetInteger(ANIM_STANCE, (int)nextStance);
         }
 
@@ -158,7 +158,7 @@ namespace OSBE.Brains {
         }
 
         public void OnAttackInput(bool isAttacking) {
-            if (isAttacking && PBUtils.CanAttack(attackMode)) {
+            if (isAttacking && PCUtils.CanAttack(attackMode)) {
                 isSprinting = false;
                 float attackSpeed = attackMode == AttackMode.HAND
                     ? cfg.punchingSpeed
@@ -230,7 +230,7 @@ namespace OSBE.Brains {
             };
 
         bool ShouldTransitionToSprint() =>
-            !isSprinting && !isScoping && !PBUtils.IsAiming(attackMode);
+            !isSprinting && !isScoping && !PCUtils.IsAiming(attackMode);
 
         public void Init(PlayerCfgSO cfg) =>
             this.cfg = cfg;
@@ -244,7 +244,7 @@ namespace OSBE.Brains {
             crawl.SetActive(stance == PlayerStance.CRAWLING);
         }
 
-        static class PBUtils {
+        static class PCUtils {
             public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {
                 bool held = stanceDuration >= cfg.stanceChangeHeldThreshold;
 

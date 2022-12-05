@@ -14,8 +14,8 @@ public class FOV : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        system.Send<IControllerBrainManager>(mngr =>
-            mngr.Ensure<IPlayerFOVBrain>(transform.parent.parent.parent)
+        system.Send<IControllerManager>(mngr =>
+            mngr.Ensure<IPlayerFOVController>(transform.parent.parent.parent)
                 .Init(cfg, mesh, transform));
     }
 }

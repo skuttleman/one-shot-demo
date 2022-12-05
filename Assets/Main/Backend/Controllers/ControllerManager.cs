@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-namespace OSBE.Brains {
-    public class ControllerBrainManager : IControllerBrainManager {
+namespace OSBE.Controllers {
+    public class ControllerManager : IControllerManager {
         readonly IDictionary<(int, Type), IGameSystemComponent> brains;
         readonly IGameSystem system;
 
-        public ControllerBrainManager(IGameSystem system) {
+        public ControllerManager(IGameSystem system) {
             brains = new Dictionary<(int, Type), IGameSystemComponent>();
             this.system = system;
         }
@@ -34,16 +34,16 @@ namespace OSBE.Brains {
 
         IGameSystemComponent Create<T>(Transform target) {
             Type t = typeof(T);
-            if (t == typeof(IPlayerControllerBrain))
-                return new PlayerControllerBrain(system, target);
-            if (t == typeof(IPlayerFOVBrain))
-                return new PlayerFOVBrain(system, target);
+            if (t == typeof(IPlayerController))
+                return new PlayerController(system, target);
+            if (t == typeof(IPlayerFOVController))
+                return new PlayerFOVController(system, target);
 
-            if (t == typeof(IEnemyControllerBrain))
-                return new EnemyControllerBrain(system, target);
+            if (t == typeof(IEnemyController))
+                return new EnemyController(system, target);
 
-            if (t == typeof(ICameraControllerBrain))
-                return new CameraControllerBrain(system, target);
+            if (t == typeof(ICameraController))
+                return new CameraController(system, target);
             throw new Exception("Unknown Brain Type: " + t);
         }
 

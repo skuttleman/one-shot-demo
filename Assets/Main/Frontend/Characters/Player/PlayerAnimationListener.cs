@@ -27,8 +27,8 @@ namespace OSFE.Characters.Player {
         public void OnStep() =>
             Brain().OnPlayerStep();
 
-        IPlayerControllerBrain Brain() =>
-            system.Send<IControllerBrainManager, IPlayerControllerBrain>(mngr =>
-                mngr.Ensure<IPlayerControllerBrain>(transform.parent));
+        IPlayerController Brain() =>
+            system.Send<IControllerManager, IPlayerController>(mngr =>
+                mngr.Ensure<IPlayerController>(transform.parent));
     }
 }
