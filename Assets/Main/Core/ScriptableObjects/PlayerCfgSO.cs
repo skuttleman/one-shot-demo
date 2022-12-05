@@ -34,6 +34,7 @@ namespace OSCore.ScriptableObjects {
             public float animFactor;
             public float maxVelocity;
             public float maxVelocitydamper;
+            [Range(0f, 1f)] public float lookSpeedInhibiter;
         }
     }
 }

@@ -71,7 +71,7 @@ namespace OSBE.Controllers {
 
             Vector2 direction;
 
-            if (Vectors.NonZero(facing))
+            if (Vectors.NonZero(facing) && (stance != PlayerStance.CRAWLING || !Vectors.NonZero(movement)))
                 direction = facing;
             else if (mouseLookTimer <= 0f && Vectors.NonZero(movement))
                 direction = movement;
@@ -95,6 +95,17 @@ namespace OSBE.Controllers {
                     Mathf.Abs(movement.x),
                     Mathf.Abs(movement.y));
                 bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
+
+                if (Vectors.NonZero(facing)) {
+                    float mov = (360f + Vectors.AngleTo(target.position, target.position - movement.Upgrade())) % 360;
+                    float fac = (360f + Vectors.AngleTo(target.position, target.position - facing.Upgrade())) % 360;
+                    float diff = Mathf.Abs(mov - fac);
+
+                    if (diff > 180f) diff = Mathf.Abs(diff - 360f);
+
+                    speed *= Mathf.Lerp(moveCfg.lookSpeedInhibiter, 1f, 1f - diff / 180f);
+                }
+
                 Vector3 dir = speed * movement.Upgrade();
 
                 float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
