@@ -49,7 +49,7 @@ namespace OSCore.System.Interfaces {
             public void OnAttackInput(bool isAttacking);
             public void OnScopeInput(bool isScoping);
             public void OnStanceChanged(PlayerStance stance);
-            public void OnAttackModeChanged(PlayerAttackMode attackMode);
+            public void OnAttackModeChanged(AttackMode attackMode);
             public void OnMovementChanged(bool isMoving);
             public void OnScopingChanged(bool isScoping);
             public void OnPlayerStep();
@@ -57,6 +57,13 @@ namespace OSCore.System.Interfaces {
 
         public interface IPlayerFOVBrain : IGameSystemComponent {
             public void Init(PlayerFOVCfgSO cfg, Mesh mesh, Transform fov);
+        }
+
+        public interface IEnemyControllerBrain : IGameSystemComponent {
+            //public void Init(EnemyCfgSO cfg);
+            public void OnAttackModeChanged(AttackMode attackMode);
+            public void OnMovementChanged(bool isMoving);
+            public void OnEnemyStep();
         }
 
         public interface ICameraControllerBrain : IGameSystemComponent {

@@ -15,7 +15,7 @@ namespace OSFE.Characters.Player {
         public void OnStanceChange(PlayerStance stance) =>
                 Brain().OnStanceChanged(stance);
 
-        public void OnAttackMode(PlayerAttackMode mode) =>
+        public void OnAttackMode(AttackMode mode) =>
             Brain().OnAttackModeChanged(mode);
 
         public void OnMovement(int moving) =>
@@ -29,6 +29,6 @@ namespace OSFE.Characters.Player {
 
         IPlayerControllerBrain Brain() =>
             system.Send<IControllerBrainManager, IPlayerControllerBrain>(mngr =>
-                mngr.Ensure<IPlayerControllerBrain>(transform.root));
+                mngr.Ensure<IPlayerControllerBrain>(transform.parent));
     }
 }

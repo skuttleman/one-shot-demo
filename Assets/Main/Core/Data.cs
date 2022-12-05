@@ -3,15 +3,15 @@ using OSCore.Data.Enums;
 namespace OSCore.Data {
     namespace Enums {
         public enum IdTag {
-            PLAYER
+            PLAYER, ENEMY
         }
 
         public enum PlayerStance {
             STANDING, CROUCHING, CRAWLING
         }
 
-        public enum PlayerAttackMode {
-            NONE, HAND, WEAPON, PUNCHING, FIRING
+        public enum AttackMode {
+            NONE, HAND, WEAPON, MELEE, FIRING
         }
     }
 
@@ -23,7 +23,7 @@ namespace OSCore.Data {
         namespace Player {
             public record AnimationEmittedEvent : IEvent {
                 public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
-                public record AttackModeChanged(PlayerAttackMode mode) : AnimationEmittedEvent();
+                public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
                 public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
                 public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
 

@@ -31,7 +31,7 @@ namespace OSBE.Brains {
         Vector2 movement = Vector2.zero;
         Vector2 facing = Vector2.zero;
         PlayerStance stance = PlayerStance.STANDING;
-        PlayerAttackMode attackMode = PlayerAttackMode.HAND;
+        AttackMode attackMode = AttackMode.HAND;
         float mouseLookTimer = 0f;
         bool isGrounded = false;
         bool isMoving = false;
@@ -45,9 +45,9 @@ namespace OSBE.Brains {
             anim = target.gameObject.GetComponentInChildren<Animator>();
 
             // TODO - this better
-            stand = GameObject.Find("/Player/stand");
-            crouch = GameObject.Find("/Player/crouch");
-            crawl = GameObject.Find("/Player/crawl");
+            stand = GameObject.Find("/Characters/Player/Entity/stand");
+            crouch = GameObject.Find("/Characters/Player/Entity/crouch");
+            crawl = GameObject.Find("/Characters/Player/Entity/crawl");
             ActivateStance();
         }
 
@@ -160,7 +160,7 @@ namespace OSBE.Brains {
         public void OnAttackInput(bool isAttacking) {
             if (isAttacking && PBUtils.CanAttack(attackMode)) {
                 isSprinting = false;
-                float attackSpeed = attackMode == PlayerAttackMode.HAND
+                float attackSpeed = attackMode == AttackMode.HAND
                     ? cfg.punchingSpeed
                     : cfg.firingSpeed;
 
@@ -193,7 +193,7 @@ namespace OSBE.Brains {
             }
         }
 
-        public void OnAttackModeChanged(PlayerAttackMode attackMode) {
+        public void OnAttackModeChanged(AttackMode attackMode) {
             if (this.attackMode != attackMode) {
                 this.attackMode = attackMode;
                 PublishMessage(new AttackModeChanged(attackMode));
@@ -257,16 +257,16 @@ namespace OSBE.Brains {
                 return PlayerStance.CROUCHING;
             }
 
-            public static bool IsAiming(PlayerAttackMode mode) =>
-                mode == PlayerAttackMode.WEAPON || mode == PlayerAttackMode.FIRING;
+            public static bool IsAiming(AttackMode mode) =>
+                mode == AttackMode.WEAPON || mode == AttackMode.FIRING;
 
-            public static bool IsMovable(PlayerStance stance, PlayerAttackMode mode, bool isGrounded, bool isScoping) =>
+            public static bool IsMovable(PlayerStance stance, AttackMode mode, bool isGrounded, bool isScoping) =>
                 isGrounded && (stance != PlayerStance.CRAWLING || (!IsAiming(mode) && !isScoping));
 
-            public static bool CanAttack(PlayerAttackMode mode) =>
-                mode != PlayerAttackMode.NONE
-                    && mode != PlayerAttackMode.FIRING
-                    && mode != PlayerAttackMode.PUNCHING;
+            public static bool CanAttack(AttackMode mode) =>
+                mode != AttackMode.NONE
+                    && mode != AttackMode.FIRING
+                    && mode != AttackMode.MELEE;
         }
     }
 }

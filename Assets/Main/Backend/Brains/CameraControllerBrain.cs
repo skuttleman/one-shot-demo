@@ -16,7 +16,7 @@ namespace OSBE.Brains {
         CameraCfgSO cfg = null;
         CinemachineCameraOffset camOffset = null;
 
-        PlayerAttackMode attackMode;
+        AttackMode attackMode;
         bool isMoving;
         bool isScoping;
 
@@ -72,7 +72,7 @@ namespace OSBE.Brains {
         }
 
         Vector3 ShakeOffset() {
-            float offset = attackMode == PlayerAttackMode.FIRING
+            float offset = attackMode == AttackMode.FIRING
                 ? cfg.fireOffset : cfg.punchOffset;
 
             if (!IsAttacking()) return Vector3.zero;
@@ -80,11 +80,11 @@ namespace OSBE.Brains {
         }
 
         bool IsAiming() =>
-            attackMode == PlayerAttackMode.WEAPON
-                || attackMode == PlayerAttackMode.FIRING;
+            attackMode == AttackMode.WEAPON
+                || attackMode == AttackMode.FIRING;
 
         bool IsAttacking() =>
-            attackMode == PlayerAttackMode.PUNCHING
-                || attackMode == PlayerAttackMode.FIRING;
+            attackMode == AttackMode.MELEE
+                || attackMode == AttackMode.FIRING;
     }
 }

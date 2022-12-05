@@ -38,6 +38,10 @@ namespace OSBE.Brains {
                 return new PlayerControllerBrain(system, target);
             if (t == typeof(IPlayerFOVBrain))
                 return new PlayerFOVBrain(system, target);
+
+            if (t == typeof(IEnemyControllerBrain))
+                return new EnemyControllerBrain(system, target);
+
             if (t == typeof(ICameraControllerBrain))
                 return new CameraControllerBrain(system, target);
             throw new Exception("Unknown Brain Type: " + t);
