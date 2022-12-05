@@ -44,7 +44,7 @@ namespace OSBE.Async {
             }
         }
 
-        public void Update() {
+        public void OnUpdate() {
             while (messages.TryDequeue(out (Type, IEvent) tpl)) {
                 subscribers.Get(tpl.Item1)?.ForEach(action => action(tpl.Item2));
             }

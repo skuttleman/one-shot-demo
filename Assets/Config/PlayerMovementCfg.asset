@@ -19,16 +19,16 @@ MonoBehaviour:
     moveSpeed: 75
     rotationSpeed: 10
     animFactor: 0.65
-    maxVelocity: 4.5
+    maxVelocity: 5
     maxVelocitydamper: 1
     lookSpeedInhibiter: 0
   standing:
     moveSpeed: 20
     rotationSpeed: 15
     animFactor: 1
-    maxVelocity: 1.75
+    maxVelocity: 2
     maxVelocitydamper: 0.25
-    lookSpeedInhibiter: 0.333
+    lookSpeedInhibiter: 0.33
   crouching:
     moveSpeed: 25
     rotationSpeed: 12
@@ -42,7 +42,7 @@ MonoBehaviour:
     animFactor: 1.25
     maxVelocity: 0.75
     maxVelocitydamper: 0.25
-    lookSpeedInhibiter: 1
+    lookSpeedInhibiter: 0
   scopingSpeed: 0.15
   scopeFactor: 0.75
   aimFactor: 0.9

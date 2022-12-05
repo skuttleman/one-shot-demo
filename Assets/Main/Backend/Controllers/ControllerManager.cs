@@ -26,12 +26,6 @@ namespace OSBE.Controllers {
             return brain;
         }
 
-        public void Update() =>
-            brains.ForEach(brain => brain.Value.Update());
-
-        public void FixedUpdate() =>
-            brains.ForEach(brain => brain.Value.FixedUpdate());
-
         IGameSystemComponent Create<T>(Transform target) {
             Type t = typeof(T);
             if (t == typeof(IPlayerController))
@@ -44,10 +38,23 @@ namespace OSBE.Controllers {
 
             if (t == typeof(ICameraController))
                 return new CameraController(system, target);
+            if (t == typeof(ICameraOverlayController))
+                return new CameraOverlayController(system, target);
+
+
             throw new Exception("Unknown Brain Type: " + t);
         }
 
+        public void OnStart() =>
+            brains?.ForEach(brain => brain.Value.OnStart());
+
+        public void OnUpdate() =>
+            brains?.ForEach(brain => brain.Value.OnUpdate());
+
+        public void OnFixedUpdate() =>
+            brains?.ForEach(brain => brain.Value.OnFixedUpdate());
+
         public void OnDestroy() =>
-            brains.ForEach(brain => brains.Remove(brain.Key));
+            brains?.ForEach(brain => brains.Remove(brain.Key));
     }
 }

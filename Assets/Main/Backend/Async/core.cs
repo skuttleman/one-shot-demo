@@ -94,8 +94,8 @@ namespace OSBE.Async.Core {
             promises.ForEach(promise => promise.Value.OnDestroy());
         }
 
-        public void Update() {
-            promises.ForEach(promise => promise.Value.Update());
+        public void OnUpdate() {
+            promises.ForEach(promise => promise.Value.OnUpdate());
         }
 
         public void Remove(long thisId) {
@@ -139,7 +139,7 @@ namespace OSBE.Async.Core {
                 });
             }
 
-            public void Update() {
+            public void OnUpdate() {
                 if (timeLeft <= 0f) {
                     while (!actions.IsEmpty())
                         actions.Dequeue()();
@@ -178,7 +178,7 @@ namespace OSBE.Async.Core {
                 });
             }
 
-            public void Update() {
+            public void OnUpdate() {
                 if (isCompleted) {
                     while (!actions.IsEmpty())
                         actions.Dequeue()();

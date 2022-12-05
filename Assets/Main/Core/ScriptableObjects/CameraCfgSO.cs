@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
-    [CreateAssetMenu(menuName = "cfg/cam")]
+    [CreateAssetMenu(menuName = "cfg/cam/general")]
     public class CameraCfgSO : ScriptableObject {
         public float orbitSpeed;
         public float moveOffset;

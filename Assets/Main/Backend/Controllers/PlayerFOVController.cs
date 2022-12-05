@@ -23,7 +23,7 @@ namespace OSBE.Controllers {
             this.fov = fov;
         }
 
-        public void Update() {
+        public void OnUpdate() {
             float angle = cfg.startingAngle;
             float angleIncrease = cfg.fov / cfg.RAY_COUNT;
 

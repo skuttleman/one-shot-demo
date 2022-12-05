@@ -40,13 +40,20 @@ namespace OSBE {
             Init();
         }
 
-        void Update() {
-            components?.ForEach(component => component.Value.Update());
+        void Start() =>
+            components?.ForEach(component => component.Value.OnStart());
+
+        void Update() =>
+            components?.ForEach(component => component.Value.OnUpdate());
+
+        void FixedUpdate() =>
+            components?.ForEach(component => component.Value.OnFixedUpdate());
+
+        void OnDestroy() {
+            components?.ForEach(component => component.Value.OnDestroy());
+            components = new Dictionary<Type, IGameSystemComponent>();
         }
 
-        void FixedUpdate() {
-            components?.ForEach(component => component.Value.FixedUpdate());
-        }
 
         void Init() {
             components = new Dictionary<Type, IGameSystemComponent> {

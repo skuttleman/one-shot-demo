@@ -32,7 +32,5 @@ namespace OSBE.Tagging {
             }
             uniqueTags.Add(tag, obj);
         }
-
-        public void Update() { }
     }
 }

@@ -12,8 +12,9 @@ namespace OSCore.System.Interfaces {
     }
 
     public interface IGameSystemComponent {
-        public void Update() { }
-        public void FixedUpdate() { }
+        public void OnStart() { }
+        public void OnUpdate() { }
+        public void OnFixedUpdate() { }
         public void OnDestroy() { }
     }
 
@@ -60,7 +61,6 @@ namespace OSCore.System.Interfaces {
         }
 
         public interface IEnemyController : IGameSystemComponent {
-            //public void Init(EnemyCfgSO cfg);
             public void OnAttackModeChanged(AttackMode attackMode);
             public void OnMovementChanged(bool isMoving);
             public void OnEnemyStep();
@@ -68,6 +68,10 @@ namespace OSCore.System.Interfaces {
 
         public interface ICameraController : IGameSystemComponent {
             public void Init(CameraCfgSO cfg);
+        }
+
+        public interface ICameraOverlayController : IGameSystemComponent {
+            public void Init(CameraOverlayCfgSO cfg);
         }
     }
 }

@@ -51,12 +51,12 @@ namespace OSBE.Controllers {
             ActivateStance();
         }
 
-        public void Update() {
+        public void OnUpdate() {
             if (cfg is not null)
                 RotatePlayer(MoveCfg());
         }
 
-        public void FixedUpdate() {
+        public void OnFixedUpdate() {
             if (cfg is not null) {
                 isGrounded = Physics.Raycast(
                     target.position - new Vector3(0, 0, 0.01f),

@@ -37,7 +37,7 @@ namespace OSBE.Controllers {
             camOffset = camera.GetComponent<CinemachineCameraOffset>();
         }
 
-        public void Update() {
+        public void OnUpdate() {
             if (cfg != null && camOffset != null)
                 SetOffset();
         }
@@ -58,8 +58,9 @@ namespace OSBE.Controllers {
         void UpdateState(MovementChanged ev) =>
             isMoving = ev.isMoving;
 
-        void UpdateState(ScopingChanged ev) =>
+        void UpdateState(ScopingChanged ev) {
             isScoping = ev.isScoping;
+        }
 
         Vector3 LookAheadOffset() {
             float lookAhead = 0f;
