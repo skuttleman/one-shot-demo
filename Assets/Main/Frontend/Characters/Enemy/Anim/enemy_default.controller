@@ -486,19 +486,7 @@ AnimatorController:
   m_Name: enemy_default
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: stance
-    m_Type: 3
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 0}
   - m_Name: isAiming
-    m_Type: 4
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 0}
-  - m_Name: isScoping
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0

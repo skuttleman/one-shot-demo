@@ -54,7 +54,8 @@ namespace OSBE.Controllers {
         public void OnFixedUpdate() =>
             brains?.ForEach(brain => brain.Value.OnFixedUpdate());
 
-        public void OnDestroy() =>
-            brains?.ForEach(brain => brains.Remove(brain.Key));
+        public void OnDestroy() {
+            brains?.ForEach(brain => brain.Value.OnDestroy());
+        }
     }
 }

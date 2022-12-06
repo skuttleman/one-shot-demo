@@ -87,6 +87,12 @@ namespace OSCore.Utils {
             yield return head;
             foreach (T item in tail ?? Empty<T>()) yield return item;
         }
+        public static IEnumerable<T> Cons<T>(this IEnumerable<T> tail, T head) =>
+            ConsIf(tail, true, head);
+        public static IEnumerable<T> ConsIf<T>(this IEnumerable<T> tail, bool condition, T head) {
+            if (condition) yield return head;
+            foreach (T item in tail ?? Empty<T>()) yield return item;
+        }
         public static IEnumerable<T> Cycle<T>(this IEnumerable<T> coll) {
             while (true)
                 foreach (T item in coll ?? Empty<T>())

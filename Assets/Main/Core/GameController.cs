@@ -1,4 +1,5 @@
 using OSCore.System.Interfaces;
+using OSCore.Utils;
 using System;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ namespace System.Runtime.CompilerServices { public class IsExternalInit { } }
 
 namespace OSCore {
     public class GameController : MonoBehaviour, IGameSystem {
+        [SerializeField] bool hideInvisible = true;
         IGameSystem system;
 
         public void Init(IGameSystem system) {
@@ -26,6 +28,11 @@ namespace OSCore {
                 return;
             }
             DontDestroyOnLoad(gameObject);
+
+            if (hideInvisible)
+                GameObject.FindGameObjectsWithTag("Invisible")
+                    .MapCat(obj => obj.GetComponentsInChildren<Renderer>())
+                    .ForEach(rdr => rdr.enabled = false);
         }
     }
 }

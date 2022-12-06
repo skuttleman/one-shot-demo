@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OSCore.Data.Enums;
 using OSCore.Data.Events.Brains;
 using OSCore.ScriptableObjects;
+using OSCore.System.Interfaces.Brains.Patrol;
 using UnityEngine;
 
 namespace OSCore.System.Interfaces {
@@ -61,9 +62,11 @@ namespace OSCore.System.Interfaces {
         }
 
         public interface IEnemyController : IGameSystemComponent {
+            public IEnumerable<EnemyPatrol> Init(EnemyCfgSO cfg);
             public void OnAttackModeChanged(AttackMode attackMode);
             public void OnMovementChanged(bool isMoving);
             public void OnEnemyStep();
+            public IEnumerable<float> DoPatrolStep(EnemyPatrol step);
         }
 
         public interface ICameraController : IGameSystemComponent {
@@ -72,6 +75,17 @@ namespace OSCore.System.Interfaces {
 
         public interface ICameraOverlayController : IGameSystemComponent {
             public void Init(CameraOverlayCfgSO cfg);
+        }
+
+        namespace Patrol {
+            public record EnemyPatrol {
+                public record PatrolWait(float seconds) : EnemyPatrol();
+                public record PatrolGoto(Vector3 position) : EnemyPatrol();
+                public record PatrolFace(Vector3 rotation) : EnemyPatrol();
+                public record PatrolRotate(float rotation) : EnemyPatrol();
+
+                private EnemyPatrol() { }
+            }
         }
     }
 }

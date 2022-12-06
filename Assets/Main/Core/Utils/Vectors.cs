@@ -9,6 +9,12 @@ namespace OSCore.Utils {
         public static Vector3 FORWARD = new(0f, 1f, 0f);
         public static Vector3 BACK = new(0f, -1f, 0f);
 
+        public static Vector3 Sign(this Vector3 vector) =>
+            new(Mathf.Sign(vector.x), Mathf.Sign(vector.y), Mathf.Sign(vector.z));
+
+        public static Vector2 Sign(this Vector2 vector) =>
+            new(Mathf.Sign(vector.x), Mathf.Sign(vector.y));
+
         public static Vector3 Upgrade(this Vector2 vector) =>
             new(vector.x, vector.y, 0f);
 
@@ -18,10 +24,10 @@ namespace OSCore.Utils {
         public static Vector2 Downgrade(this Vector3 vector) =>
             new(vector.x, vector.y);
 
-        public static Vector3 Clamp(Vector3 vector, Vector3 lower, Vector3 upper) =>
-            new(Mathf.Clamp(vector.x, lower.x, upper.x),
-                Mathf.Clamp(vector.y, lower.y, upper.y),
-                Mathf.Clamp(vector.z, lower.z, upper.z));
+        public static Vector3 Clamp(this Vector3 vector, Vector3 bound1, Vector3 bound2) =>
+            new(Mathf.Clamp(vector.x, Mathf.Min(bound1.x, bound2.x), Mathf.Max(bound1.x, bound2.x)),
+                Mathf.Clamp(vector.y, Mathf.Min(bound1.y, bound2.y), Mathf.Max(bound1.y, bound2.y)),
+                Mathf.Clamp(vector.z, Mathf.Min(bound1.z, bound2.z), Mathf.Max(bound1.z, bound2.z)));
 
         public static Vector3 Range(float minValue, float maxValue) =>
             new(Random.Range(minValue, maxValue),

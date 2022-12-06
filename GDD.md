@@ -29,8 +29,6 @@ I'm not going to lie. My overall dream/vision for this game is ambitious. I don'
 
 ### Gameplay
 
-When it comes to _narrative_ vs _gameplay_, I always side with gameplay. To be clear, I very much welcome the idea of including a fantastic story. All I'm saying is that, to my tastes, a pretty-decent story with really fun gameplay is the limit of my personal hopes and dreams.
-
 I would like a game that can be playable from beginning to end without ever requiring the player to engage with combat mechanics. There can be rare exceptions for story beats or other tailored moments, but I want this game to be - above all else - a stealth focused game.
 
 #### Core Mechanics
@@ -41,15 +39,13 @@ I think the core mechanics should include:
 - stance switching between standing, crouching, and crawling, also affecting enemy hearing and vision range
 - binoculars w/ directional microphone for seeing/hearing further across the level
 - a pistol for holding up/interrogating enemies and limited combat
-- a basic melee attack for escaping combat
+- basic melee attacks
 - ability to "hear" enemy footsteps (i.e. a visual representation on screen) when the player is not moving
-- inability to see enemies through walls
-
-We'll want to think of more mechanics to layer on top of these, but those are TBD as of now. I think those will come once we lock down story, characters, and setting.
+- inability to see enemies through walls or behind obstacles
 
 #### Enemy AI
 
-As is typical in stealth games, rank-and-file enemy awareness will have different states depending on player actions. There will also be a _base_ awareness level which is triggered by an enemy reporting their awareness level to central dispatch followed by dispatch communicating the awareness level to all other enemies. Some awareness levels do not apply to the base. I'm envisioning an event-driven system with a robust state machine for driving enemy awareness states as well as their ability to coordinate with surrounding enemies or call for back up. There will likely be bosses and other enemy types (yet to be designed) which follow different rules.
+As is typical in stealth games, rank-and-file enemy awareness will have different states depending on player actions. There will also be a _base awareness level_ which is triggered by an enemy reporting their awareness level to central dispatch followed by dispatch communicating the awareness level to all other enemies. Some awareness levels do not apply to the base. I'm envisioning an event-driven system with a robust state machine for driving enemy awareness states as well as their ability to coordinate with surrounding enemies or call for back up.
 
 ##### Passive State
 
@@ -61,7 +57,7 @@ In this state the enemy's attention has been drawn. They will look toward the so
 
 ##### Concerned State
 
-In this state the enemy's attention has been drawn enough that they feel the need to investigate. They _may_ also choose to speak out to nearby enemies or radio to central dispatch. This will also put relevant enemies into a `concerned` state. If the enemy's concerns are abated, they may return to a `passive` state. However, if an enemy repeatedly enters a `concerned` state they may progress to an `alerted` state instead.
+In this state the enemy's attention has been drawn enough that they feel the need to investigate. They _may_ also choose to speak out to nearby enemies or radio to central dispatch. This will also put relevant enemies into a `concerned` state. If they enemy positively identifies the player, they will enter an `agressive` state. If the enemy's concerns are abated, they may return to a `passive` state. However, if an enemy repeatedly enters a `concerned` state they may progress to an `alerted` state instead.
 
 ##### Alerted State
 
@@ -77,7 +73,7 @@ In this state, enemies are aware of the player's presense and location. They are
 
 ##### Searching State
 
-In this state, enemies are aware of the player's presense and will patrol the area around their last known location for a time. Within the search zone, players may not be safe within zones (i.e. hiding spots) that would normally conceal them. If player is spotted, the enemy will re-enter the `aggressive` state. Otherwise, they will digress to the `alerted` state.
+In this state, enemies are aware of the player's presense and will patrol the area around their last known location for a time. Within the search are, players may not be safe within zones that would normally conceal them (i.e. hiding spots). If the player is spotted, the enemy will re-enter the `aggressive` state. Otherwise, they will digress to the `alerted` state.
 
 ##### Neutralized State
 
@@ -93,15 +89,15 @@ I thought it would be helpful to have some ideas to kick things off. I think the
 
 ### Number of Ds
 
-I think we can get a lot of mileage out of a 2D game. If others are keen to go 3D I'd be down, but I'd rather spend time and effort making a better 2D game then going all in on a 3D game. It's worth noting that most of the systems I've built for the POC should scale up to 3D should we decided to go that route.
+I think we can get a lot of mileage out of a 2D game. If others are keen to go 3D I'd be down, but I'd rather spend time and effort making a better 2D game then going all in on a 3D game. It's worth noting that most of the systems I've built for the POC should scale up to 3D should we decide to go that route.
 
 ### Narrative
 
-Gear up. The story below is trope-y and cliche, but I think it could be fun if we handle it with the right tone, namely: witty, playful, and self-aware. Think _Monkey Island™_ or _Portal_.
+Gear up. The story outline below is trope-y and cliche, but I think it could be fun if we handle it with the right tone, namely: witty, playful, and self-aware. Think _Monkey Island™_ or _Portal_.
 
 #### Story Outline
 
-Melanie "Mel" Cartright is a U.S. park ranger, animal rights activist, and devout pacifist. She leads a simple life trying to be a good friend and neighbor, and attempts to keep a close relationship with her anti-social twin sister, Francine (aka "Cici"). In her home one night, Mel is abducted by a group of unidentified assailants. When she comes to, she discovers that Cici has been leading a secret life as a world-renouned assassin, codenamed "One Shot". Unfortunately, Cici's most recent assignment got her captured and Mel was abducted to be used as leverage over Cici. Cici manages to create an opportunity for Mel to escape, who reluctantly fleas leaving her sister behind.
+Melanie "Mel" Cartright is a U.S. park ranger, animal rights activist, and devout pacifist. She leads a simple life trying to be a good friend and neighbor, and attempts to keep a close relationship with her anti-social twin sister, Francine (aka "Cici"). In her home one night, Mel is abducted by a group of unidentified assailants. When she comes to, she discovers that Cici has been leading a secret life as a world-renowned assassin, codenamed "One Shot". Unfortunately, Cici's most recent assignment got her captured and Mel was abducted to be used as leverage over Cici. Cici manages to create an opportunity for Mel to escape, who reluctantly fleas leaving her sister behind.
 
 After Mel narrowly escapes, she is contacted by Dick Babbit who explains that he works with Cici and that he needs Mel's help to rescue her. In order to do so, Mel must pose as Cici so they can leverage the resources and contacts of The Syndicate - Cici and Babbit's employer - to track down the shadow organization that has abucted Cici and rescue her. Babbit insists that if they are to stay under The Syndicate's radar, Mel will have to do everything in her power to make them believe she is Cici, including the need for her to adopt Cici's trademark style of only ever firing _one shot_ per assignment. Being a pacifist, Mel doesn't think it will be a problem for her to fire at most one shot. She's far more worried that she'll be able to shoot anyone at all when the occasion requires it. But, her sister needs her.
 
