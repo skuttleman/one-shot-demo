@@ -7,25 +7,27 @@ using UnityEngine;
 namespace OSBE.Controllers {
     public class PlayerFOVController : IPlayerFOVController {
         readonly IGameSystem system;
-        readonly Transform target;
+        readonly Transform fov;
         PlayerFOVCfgSO cfg;
         Mesh mesh;
-        Transform fov;
 
         public PlayerFOVController(IGameSystem system, Transform target) {
             this.system = system;
-            this.target = target;
+            fov = target;
         }
 
-        public void Init(PlayerFOVCfgSO cfg, Mesh mesh, Transform fov) {
+        public void Init(PlayerFOVCfgSO cfg, Mesh mesh) {
             this.cfg = cfg;
             this.mesh = mesh;
-            this.fov = fov;
         }
 
         public void OnUpdate() {
             float angle = cfg.startingAngle;
             float angleIncrease = cfg.fov / cfg.RAY_COUNT;
+            Transform head = Transforms
+                .FindInChildren(fov.parent, xform => xform.name == "head")
+                .First();
+            fov.SetPositionAndRotation(head.position, head.rotation);
 
             Vector3[] vertices = new Vector3[cfg.RAY_COUNT + 1 + 1];
             Vector2[] uv = new Vector2[vertices.Length];

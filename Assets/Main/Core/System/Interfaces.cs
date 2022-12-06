@@ -58,7 +58,7 @@ namespace OSCore.System.Interfaces {
         }
 
         public interface IPlayerFOVController : IGameSystemComponent {
-            public void Init(PlayerFOVCfgSO cfg, Mesh mesh, Transform fov);
+            public void Init(PlayerFOVCfgSO cfg, Mesh mesh);
         }
 
         public interface IEnemyController : IGameSystemComponent {
