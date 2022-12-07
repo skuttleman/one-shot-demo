@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using OSCore.Data.Enums;
+using OSCore.Data.Patrol;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces;
 using OSCore.System.Interfaces.Brains;
-using OSCore.System.Interfaces.Brains.Patrol;
 using OSCore.Utils;
 using UnityEngine;
-using static OSCore.System.Interfaces.Brains.Patrol.EnemyPatrol;
+using static OSCore.Data.Patrol.EnemyPatrol;
 
 namespace OSBE.Controllers {
     public class EnemyController : IEnemyController {

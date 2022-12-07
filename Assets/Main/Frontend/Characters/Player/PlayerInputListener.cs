@@ -1,4 +1,3 @@
-using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces;
 using OSCore.Utils;
@@ -8,13 +7,10 @@ using UnityEngine;
 
 namespace OSFE.Characters.Player {
     public class PlayerInputListener : MonoBehaviour {
-        [SerializeField] PlayerCfgSO cfg;
-
         IGameSystem system;
 
         void OnEnable() {
             system = FindObjectOfType<GameController>();
-            Brain().Init(cfg);
         }
 
         public void OnInputMove(InputValue value) =>
@@ -41,8 +37,8 @@ namespace OSFE.Characters.Player {
         public void OnInputAttack(InputValue value) =>
             Brain().OnAttackInput(value.isPressed);
 
-        IPlayerController Brain() =>
-            system.Send<IControllerManager, IPlayerController>(mngr =>
-                mngr.Ensure<IPlayerController>(transform));
+        IPlayerStateReducer Brain() =>
+            system.Send<IControllerManager, IPlayerStateReducer>(mngr =>
+                mngr.Ensure<IPlayerStateReducer>(transform));
     }
 }

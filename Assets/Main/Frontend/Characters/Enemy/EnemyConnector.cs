@@ -1,10 +1,10 @@
+using OSCore.Data.Patrol;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces;
 using OSCore;
-using UnityEngine;
-using OSCore.System.Interfaces.Brains.Patrol;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class EnemyConnector : MonoBehaviour {
     [SerializeField] EnemyCfgSO cfg;

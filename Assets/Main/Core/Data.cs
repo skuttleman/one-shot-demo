@@ -1,4 +1,5 @@
 using OSCore.Data.Enums;
+using UnityEngine;
 
 namespace OSCore.Data {
     namespace Enums {
@@ -14,6 +15,29 @@ namespace OSCore.Data {
             NONE, HAND, WEAPON, MELEE, FIRING
         }
     }
+
+    public record PlayerState {
+        public Vector2 movement { get; init; }
+        public Vector2 facing { get; init; }
+        public PlayerStance stance { get; init; }
+        public AttackMode attackMode { get; init; }
+        public float mouseLookTimer { get; init; }
+        public bool isMoving { get; init; }
+        public bool isSprinting { get; init; }
+        public bool isScoping { get; init; }
+    }
+
+    namespace Patrol {
+        public record EnemyPatrol {
+            public record PatrolWait(float seconds) : EnemyPatrol();
+            public record PatrolGoto(Vector3 position) : EnemyPatrol();
+            public record PatrolFace(Vector3 rotation) : EnemyPatrol();
+            public record PatrolRotate(float rotation) : EnemyPatrol();
+
+            private EnemyPatrol() { }
+        }
+    }
+
 
     namespace Events.Brains {
         public interface IEvent { }

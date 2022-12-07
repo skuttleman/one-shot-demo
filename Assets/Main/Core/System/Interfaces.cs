@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using OSCore.Data;
 using OSCore.Data.Enums;
 using OSCore.Data.Events.Brains;
+using OSCore.Data.Patrol;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Brains.Patrol;
 using UnityEngine;
 
 namespace OSCore.System.Interfaces {
@@ -41,8 +42,8 @@ namespace OSCore.System.Interfaces {
             public T Ensure<T>(Transform target) where T : IGameSystemComponent;
         }
 
-        public interface IPlayerController : IGameSystemComponent {
-            public void Init(PlayerCfgSO cfg);
+        public interface IPlayerStateReducer : IGameSystemComponent {
+            public void Init(IStateReceiver<PlayerState> receiver, PlayerCfgSO cfg);
             public void OnMovementInput(Vector2 direction);
             public void OnSprintInput(bool isSprinting);
             public void OnLookInput(Vector2 direction, bool isMouse);
@@ -55,6 +56,10 @@ namespace OSCore.System.Interfaces {
             public void OnMovementChanged(bool isMoving);
             public void OnScopingChanged(bool isScoping);
             public void OnPlayerStep();
+        }
+
+        public interface IStateReceiver<T> {
+            public void OnStateChange(T state);
         }
 
         public interface IPlayerFOVController : IGameSystemComponent {
@@ -77,15 +82,15 @@ namespace OSCore.System.Interfaces {
             public void Init(CameraOverlayCfgSO cfg);
         }
 
-        namespace Patrol {
-            public record EnemyPatrol {
-                public record PatrolWait(float seconds) : EnemyPatrol();
-                public record PatrolGoto(Vector3 position) : EnemyPatrol();
-                public record PatrolFace(Vector3 rotation) : EnemyPatrol();
-                public record PatrolRotate(float rotation) : EnemyPatrol();
+        public abstract class AConnector : MonoBehaviour {
+            IGameSystem system;
 
-                private EnemyPatrol() { }
+            public void OnEnable() {
+                system = FindObjectOfType<GameController>();
+                system.Send<IControllerManager>(WireUp);
             }
+
+            public abstract void WireUp(IControllerManager mngr);
         }
     }
 }
