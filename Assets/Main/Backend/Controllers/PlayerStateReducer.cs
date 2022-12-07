@@ -33,6 +33,17 @@ namespace OSBE.Controllers {
             this.system = system;
             this.target = target;
             anim = target.gameObject.GetComponentInChildren<Animator>();
+
+            state = new PlayerState {
+                movement = Vector2.zero,
+                facing = Vector2.zero,
+                stance = PlayerStance.STANDING,
+                attackMode = AttackMode.HAND,
+                mouseLookTimer = 0f,
+                isMoving = false,
+                isSprinting = false,
+                isScoping = false
+            };
         }
 
         public void OnUpdate() {
@@ -49,16 +60,7 @@ namespace OSBE.Controllers {
             crouch = GameObject.Find("/Characters/Player/Entity/crouch");
             crawl = GameObject.Find("/Characters/Player/Entity/crawl");
 
-            EmitState(new PlayerState {
-                movement = Vector2.zero,
-                facing = Vector2.zero,
-                stance = PlayerStance.STANDING,
-                attackMode = AttackMode.HAND,
-                mouseLookTimer = 0f,
-                isMoving = false,
-                isSprinting = false,
-                isScoping = false
-            });
+            EmitState(state);
             ActivateStance();
         }
 

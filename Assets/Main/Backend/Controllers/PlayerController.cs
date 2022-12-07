@@ -9,7 +9,7 @@ using UnityEngine;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers {
-    public class PlayerBrain : MonoBehaviour, IStateReceiver<PlayerState> {
+    public class PlayerController : MonoBehaviour, IStateReceiver<PlayerState> {
         [SerializeField] PlayerCfgSO cfg;
 
         IGameSystem system;
