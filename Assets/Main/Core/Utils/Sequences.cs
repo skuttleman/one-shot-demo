@@ -110,6 +110,14 @@ namespace OSCore.Utils {
         public static bool IsEmpty<T>(this IEnumerable<T> coll) =>
             !coll.GetEnumerator().MoveNext();
 
+        public static IDictionary<K, IList<T>> GroupBy<T, K>(this IEnumerable<T> coll, Func<T, K> groupFn) =>
+            coll.Reduce<T, IDictionary<K, IList<T>>>((dict, item) =>
+                dict.Update(
+                    groupFn(item),
+                    lst => Colls.Add(lst, item),
+                    () => new List<T>()),
+                new Dictionary<K, IList<T>>());
+
         // transduction
         public static A Transduce<A, I, O>(
             this IEnumerable<I> coll,

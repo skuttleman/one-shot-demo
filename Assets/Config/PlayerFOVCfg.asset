@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a08b3ba66561848e8b3b6fc2abb757a3, type: 3}
   m_Name: PlayerFOVCfg
   m_EditorClassIdentifier: 
-  layerMask:
+  <RAY_COUNT>k__BackingField: 80
+  <layerMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 64
-  fov: 225
-  viewDistance: 5
-  startingAngle: 202.5
+  <viewDistance>k__BackingField: 10
+  <lookZ>k__BackingField: 0
+  <angleDither>k__BackingField: 14.5

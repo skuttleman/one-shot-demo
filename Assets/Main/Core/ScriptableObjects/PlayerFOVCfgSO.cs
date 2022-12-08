@@ -3,11 +3,11 @@ using UnityEngine;
 namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/player/fov")]
     public class PlayerFOVCfgSO : ScriptableObject {
-        public readonly int RAY_COUNT = 50;
+        [field: SerializeField] public int RAY_COUNT { get; private set; }
 
-        public LayerMask layerMask;
-        public float fov;
-        public float viewDistance;
-        public float startingAngle;
+        [field: SerializeField] public LayerMask layerMask { get; private set; }
+        [field: SerializeField] public float viewDistance { get; private set; }
+        [field: SerializeField] public float lookZ { get; private set; }
+        [field: SerializeField] public float angleDither { get; private set; }
     }
 }

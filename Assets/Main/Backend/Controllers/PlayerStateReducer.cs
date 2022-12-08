@@ -134,8 +134,8 @@ namespace OSBE.Controllers {
 
         public void OnStanceChanged(PlayerStance stance) {
             if (state.stance != stance) {
-                ActivateStance();
                 EmitState(state with { stance = stance });
+                ActivateStance();
                 PublishMessage(new StanceChanged(stance));
             }
         }
