@@ -16,5 +16,12 @@ namespace OSCore.Utils {
         public static ISet<Transform> FindInChildren(
             Transform parent, Predicate<Transform> pred) =>
             FindInChildren(new HashSet<Transform>(), parent, pred);
+
+        public static ISet<Transform> FindInActiveChildren(
+            Transform parent, Predicate<Transform> pred) =>
+            FindInChildren(
+                new HashSet<Transform>(),
+                parent,
+                child => child.gameObject.activeInHierarchy && pred(child));
     }
 }

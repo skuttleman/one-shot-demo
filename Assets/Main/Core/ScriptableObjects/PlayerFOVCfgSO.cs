@@ -7,7 +7,6 @@ namespace OSCore.ScriptableObjects {
 
         [field: SerializeField] public LayerMask layerMask { get; private set; }
         [field: SerializeField] public float viewDistance { get; private set; }
-        [field: SerializeField] public float lookZ { get; private set; }
-        [field: SerializeField] public float angleDither { get; private set; }
+        [field: SerializeField] public float secondsBetween { get; private set; }
     }
 }

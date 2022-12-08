@@ -3,7 +3,6 @@ using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces;
 using OSCore.Utils;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace OSBE.Controllers {
     public class PlayerFOVController : IPlayerFOVController {
@@ -11,10 +10,12 @@ namespace OSBE.Controllers {
         readonly Transform fov;
         PlayerFOVCfgSO cfg;
         Mesh mesh;
+        float timeout;
 
         public PlayerFOVController(IGameSystem system, Transform target) {
             this.system = system;
             fov = target;
+            timeout = 0f;
         }
 
         public void Init(PlayerFOVCfgSO cfg, Mesh mesh) {
@@ -23,10 +24,17 @@ namespace OSBE.Controllers {
         }
 
         public void OnUpdate() {
+            if (timeout > 0f) {
+                timeout -= Time.deltaTime;
+            } else if (cfg is not null) {
+                timeout = cfg.secondsBetween;
+                DrawFOV();
+            }
+        }
+        private void DrawFOV() {
             Transform head = Transforms
-                .FindInChildren(fov.parent, xform => xform.gameObject.activeInHierarchy && xform.name == "head")
+                .FindInActiveChildren(fov.parent, xform => xform.name == "head")
                 .First();
-
             float angle = head.rotation.eulerAngles.z;
             float angleIncrease = 360f / cfg.RAY_COUNT;
 
@@ -43,18 +51,15 @@ namespace OSBE.Controllers {
                 if (diff > 180f) diff = Mathf.Abs(360f - diff);
 
                 float percent = Mathf.Max(0.333f, (180f - diff) / 180f);
-                float distance = Mathf.Lerp(cfg.viewDistance - cfg.angleDither, cfg.viewDistance, percent);
-
                 bool isHit = Physics.Raycast(
                     head.position,
                     Vectors.ToVector2(angle + fov.rotation.eulerAngles.z).Upgrade(),
                     out RaycastHit hit,
-                    distance,
+                    cfg.viewDistance,
                     cfg.layerMask);
-
                 vertices[vertexIdx] = isHit
                     ? fov.InverseTransformPoint(hit.point)
-                    : vertices[0] + Vectors.ToVector3(angle) * distance;
+                    : vertices[0] + Vectors.ToVector3(angle) * cfg.viewDistance;
 
                 if (triangleIdx >= 0) {
                     triangles[triangleIdx] = 0;
