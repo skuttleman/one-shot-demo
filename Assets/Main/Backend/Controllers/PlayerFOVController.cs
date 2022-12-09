@@ -53,7 +53,7 @@ namespace OSBE.Controllers {
                 float percent = Mathf.Max(0.333f, (180f - diff) / 180f);
                 bool isHit = Physics.Raycast(
                     head.position,
-                    Vectors.ToVector2(angle + fov.rotation.eulerAngles.z).Upgrade(),
+                    Vectors.ToVector3(angle + fov.rotation.eulerAngles.z),
                     out RaycastHit hit,
                     cfg.viewDistance,
                     cfg.layerMask);
