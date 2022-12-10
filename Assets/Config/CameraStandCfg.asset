@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   orbitSpeed: 1.75
   moveOffset: 2.5
-  scopeOffset: 5
   aimOffset: 1.5
   maxLookAhead: 4.85
-  punchOffset: 0.025
-  fireOffset: 0.05
+  punchOffset: 0.5
+  fireOffset: 1.25

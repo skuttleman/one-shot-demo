@@ -76,8 +76,9 @@ namespace OSBE.Controllers {
             float offset = attackMode == AttackMode.FIRING
                 ? cfg.fireOffset : cfg.punchOffset;
 
-            if (!IsAttacking()) return Vector3.zero;
-            return Vectors.Range(-offset, offset);
+            if (IsAttacking())
+                return target.rotation * new Vector3(0, -offset, 0f) * Time.deltaTime;
+            return Vector3.zero;
         }
 
         bool IsAiming() =>

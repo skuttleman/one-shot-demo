@@ -36,6 +36,13 @@ namespace OSBE.Controllers {
                 transform.position - new Vector3(0, 0, 0.01f),
                 Vectors.DOWN,
                 cfg.groundedDist);
+            anim.SetBool("isGrounded", isGrounded);
+
+            if (!isGrounded) {
+                anim.SetBool("isScoping", false);
+                anim.SetInteger("stance", 0);
+            }
+
             MovePlayer(MoveCfg());
         }
 
