@@ -1,34 +1,94 @@
 using System.Collections.Generic;
+using OSCore;
+using OSCore.Data;
 using OSCore.Data.Enums;
 using OSCore.Data.Patrol;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces;
 using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Tagging;
 using OSCore.Utils;
+using TMPro;
 using UnityEngine;
 using static OSCore.Data.Patrol.EnemyPatrol;
 
-namespace OSBE.Controllers {
-    public class EnemyController : IEnemyController {
-        readonly IGameSystem system;
-        readonly Transform target;
-        Animator anim;
-        EnemyCfgSO cfg = null;
 
-        public EnemyController(IGameSystem system, Transform target) {
-            this.system = system;
-            this.target = target;
-            anim = target.GetComponentInChildren<Animator>();
+namespace OSBE.Controllers {
+    public class EnemyController : MonoBehaviour, IStateReceiver<EnemyState> {
+        [SerializeField] EnemyCfgSO cfg;
+        IGameSystem system;
+        GameObject player;
+        Animator anim;
+        TextMeshPro speech;
+
+        float timeSinceSeenPlayer = 0f;
+        EnemyState state;
+
+        void OnEnable() {
+            system = FindObjectOfType<GameController>();
+            anim = GetComponentInChildren<Animator>();
+
+            system.Send<IControllerManager>(mngr =>
+               mngr.Ensure<IEnemyStateReducer>(transform).Init(this, cfg));
+            player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
+            speech = transform.parent.parent.gameObject.GetComponentInChildren<TextMeshPro>();
+            speech.text = "";
         }
 
-        public IEnumerable<EnemyPatrol> Init(EnemyCfgSO cfg) {
-            this.cfg = cfg;
+        void Start() {
+            StartCoroutine(DoPatrol());
+            StartCoroutine(SpeakUp());
+        }
+
+        void FixedUpdate() {
+            speech.transform.position = transform.position + new Vector3(0f, 0.75f, 0f);
+            if (!state.seesPlayer) timeSinceSeenPlayer += Time.fixedDeltaTime;
+            else timeSinceSeenPlayer = 0f;
+        }
+
+        IEnumerator<YieldInstruction> SpeakUp() {
+            while (!state.seesPlayer)
+                yield return new WaitForSeconds(0.1f);
+            while (true) {
+                while (state.seesPlayer || timeSinceSeenPlayer <= 1f) {
+                    speech.text = "I see you, Bro.";
+                    speech.enabled = true;
+                    yield return new WaitForSeconds(2f);
+                    speech.enabled = false;
+                    yield return new WaitForSeconds(1f);
+                }
+                if (!state.seesPlayer) {
+                    speech.text = "Where'd they go?";
+                    speech.enabled = true;
+                    yield return new WaitForSeconds(2f);
+                    speech.enabled = false;
+                }
+            }
+        }
+
+        IEnumerator<YieldInstruction> DoPatrol() {
+            foreach (EnemyPatrol step in Patrol()) {
+                foreach (float wait in DoPatrolStep(step)) {
+                    if (wait > 0) yield return new WaitForSeconds(wait);
+                    else yield return new WaitForFixedUpdate();
+
+                    while (state.seesPlayer || timeSinceSeenPlayer <= 1f) {
+                        foreach (float wait2 in Face(player.transform.position))
+                            if (wait2 > 0) yield return new WaitForSeconds(wait2);
+                            else yield return new WaitForFixedUpdate();
+                        yield return new WaitForFixedUpdate();
+                    }
+                }
+            }
+        }
+
+        IEnumerable<EnemyPatrol> Patrol() {
             return Transforms
-                .FindInChildren(target.parent, node => node.name.Contains("position"))
+                .FindInChildren(transform.parent, node => node.name.Contains("position"))
                 .Reduce((tpl, xform) => {
                     float waitTime = xform.localScale.z;
-                    bool notFirstStep = tpl.target != xform;
-                    bool isFarEnough = Vector3.Distance(xform.position, tpl.target.position) > 0.01f;
+                    bool notFirstStep = tpl.transform != xform;
+                    bool isFarEnough = Vector3.Distance(xform.position, tpl.transform.position) > 0.01f;
 
                     return (
                         xform,
@@ -38,7 +98,7 @@ namespace OSBE.Controllers {
                             .ConsIf(notFirstStep && isFarEnough, new PatrolGoto(xform.position))
                             .ConsIf(notFirstStep && isFarEnough, new PatrolFace(xform.position))));
                 },
-                (target, Sequences.Empty<EnemyPatrol>()))
+                (transform, Sequences.Empty<EnemyPatrol>()))
                 .Item2
                 .Cycle();
         }
@@ -61,14 +121,14 @@ namespace OSBE.Controllers {
         }
 
         IEnumerable<float> Face(Vector3 rotation) =>
-            Face(Vectors.AngleTo(target.position, rotation));
+            Face(Vectors.AngleTo(transform.position, rotation));
 
         IEnumerable<float> Face(float rotationZ) {
-            while (Mathf.Abs(target.rotation.eulerAngles.z - rotationZ) % 360 > cfg.rotationSpeed * Time.fixedDeltaTime) {
-                target.rotation = Quaternion.Lerp(
-                        target.rotation,
-                        Quaternion.Euler(0f, 0f, rotationZ),
-                        cfg.rotationSpeed * Time.fixedDeltaTime);
+            while (Mathf.Abs(transform.rotation.eulerAngles.z - rotationZ) % 360 > cfg.rotationSpeed * Time.fixedDeltaTime) {
+                transform.rotation = Quaternion.Lerp(
+                    transform.rotation,
+                    Quaternion.Euler(0f, 0f, rotationZ),
+                    cfg.rotationSpeed * Time.fixedDeltaTime);
 
                 yield return 0;
             }
@@ -77,18 +137,21 @@ namespace OSBE.Controllers {
         IEnumerable<float> Goto(Vector3 position) {
             anim.SetBool("isMoving", true);
 
-            while (Vector2.Distance(position, target.position) > Time.fixedDeltaTime) {
+            while (Vector2.Distance(position, transform.position) > Time.fixedDeltaTime) {
                 Vector3 direction =
                     cfg.moveSpoeed
                     * Time.fixedDeltaTime
-                    * (position - target.position).Sign();
-                direction = direction.Clamp(position - target.position, target.position - position);
+                    * (position - transform.position).Sign();
+                direction = direction.Clamp(position - transform.position, transform.position - position);
 
-                target.position += direction;
+                transform.position += direction;
                 yield return 0;
             }
 
             anim.SetBool("isMoving", false);
         }
+
+        public void OnStateChange(EnemyState state) =>
+            this.state = state;
     }
 }

@@ -33,8 +33,8 @@ namespace OSBE.Controllers {
             if (t == typeof(IPlayerFOVController))
                 return new PlayerFOVController(system, target);
 
-            if (t == typeof(IEnemyController))
-                return new EnemyController(system, target);
+            if (t == typeof(IEnemyStateReducer))
+                return new EnemyStateReducer(system, target);
 
             if (t == typeof(ICameraController))
                 return new CameraController(system, target);

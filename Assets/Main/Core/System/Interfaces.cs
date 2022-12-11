@@ -58,20 +58,20 @@ namespace OSCore.System.Interfaces {
             public void OnPlayerStep();
         }
 
+        public interface IEnemyStateReducer : IGameSystemComponent {
+            public void Init(IStateReceiver<EnemyState> receiver, EnemyCfgSO cfg);
+            public void OnAttackModeChanged(AttackMode attackMode);
+            public void OnMovementChanged(bool isMoving);
+            public void OnEnemyStep();
+            public void OnPlayerSightChange(bool isInView);
+        }
+
         public interface IStateReceiver<T> {
             public void OnStateChange(T state);
         }
 
         public interface IPlayerFOVController : IGameSystemComponent {
             public void Init(PlayerFOVCfgSO cfg, Mesh mesh);
-        }
-
-        public interface IEnemyController : IGameSystemComponent {
-            public IEnumerable<EnemyPatrol> Init(EnemyCfgSO cfg);
-            public void OnAttackModeChanged(AttackMode attackMode);
-            public void OnMovementChanged(bool isMoving);
-            public void OnEnemyStep();
-            public IEnumerable<float> DoPatrolStep(EnemyPatrol step);
         }
 
         public interface ICameraController : IGameSystemComponent {
