@@ -42,27 +42,34 @@ namespace OSBE.Controllers {
 
         void FixedUpdate() {
             speech.transform.position = transform.position + new Vector3(0f, 0.75f, 0f);
-            if (!state.seesPlayer) timeSinceSeenPlayer += Time.fixedDeltaTime;
+            if (!state.isPlayerInView) timeSinceSeenPlayer += Time.fixedDeltaTime;
             else timeSinceSeenPlayer = 0f;
         }
 
         IEnumerator<YieldInstruction> SpeakUp() {
-            while (!state.seesPlayer)
+            while (!state.isPlayerInView)
                 yield return new WaitForSeconds(0.1f);
             while (true) {
-                while (state.seesPlayer || timeSinceSeenPlayer <= 1f) {
+                if (state.isPlayerInView || timeSinceSeenPlayer <= 1f) {
                     speech.text = "I see you, Bro.";
                     speech.enabled = true;
                     yield return new WaitForSeconds(2f);
                     speech.enabled = false;
                     yield return new WaitForSeconds(1f);
+                    speech.text = "";
+                    if (!state.isPlayerInView && timeSinceSeenPlayer > 1f) {
+                        speech.text = "Where'd they go?";
+                        speech.enabled = true;
+                        float elapsed = 0f;
+                        while (!state.isPlayerInView && elapsed < 2f) {
+                            elapsed += Time.fixedDeltaTime;
+                            yield return new WaitForFixedUpdate();
+                        }
+                        speech.enabled = false;
+                        speech.text = "";
+                    }
                 }
-                if (!state.seesPlayer) {
-                    speech.text = "Where'd they go?";
-                    speech.enabled = true;
-                    yield return new WaitForSeconds(2f);
-                    speech.enabled = false;
-                }
+                yield return new WaitForFixedUpdate();
             }
         }
 
@@ -72,10 +79,9 @@ namespace OSBE.Controllers {
                     if (wait > 0) yield return new WaitForSeconds(wait);
                     else yield return new WaitForFixedUpdate();
 
-                    while (state.seesPlayer || timeSinceSeenPlayer <= 1f) {
-                        foreach (float wait2 in Face(player.transform.position))
-                            if (wait2 > 0) yield return new WaitForSeconds(wait2);
-                            else yield return new WaitForFixedUpdate();
+                    while (state.isPlayerInView || timeSinceSeenPlayer <= 1f) {
+                        anim.SetBool("isMoving", false);
+                        DoFace(player.transform.position);
                         yield return new WaitForFixedUpdate();
                     }
                 }
@@ -95,8 +101,7 @@ namespace OSBE.Controllers {
                         tpl.Item2.Concat(Sequences.Empty<EnemyPatrol>()
                             .ConsIf(waitTime > 0, new PatrolWait(waitTime))
                             .Cons(new PatrolRotate(xform.rotation.eulerAngles.z))
-                            .ConsIf(notFirstStep && isFarEnough, new PatrolGoto(xform.position))
-                            .ConsIf(notFirstStep && isFarEnough, new PatrolFace(xform.position))));
+                            .ConsIf(notFirstStep && isFarEnough, new PatrolGoto(xform.position))));
                 },
                 (transform, Sequences.Empty<EnemyPatrol>()))
                 .Item2
@@ -125,26 +130,37 @@ namespace OSBE.Controllers {
 
         IEnumerable<float> Face(float rotationZ) {
             while (Mathf.Abs(transform.rotation.eulerAngles.z - rotationZ) % 360 > cfg.rotationSpeed * Time.fixedDeltaTime) {
-                transform.rotation = Quaternion.Lerp(
-                    transform.rotation,
-                    Quaternion.Euler(0f, 0f, rotationZ),
-                    cfg.rotationSpeed * Time.fixedDeltaTime);
-
+                DoFace(rotationZ);
                 yield return 0;
             }
         }
 
-        IEnumerable<float> Goto(Vector3 position) {
-            anim.SetBool("isMoving", true);
+        void DoFace(Vector3 rotation) =>
+            DoFace(Vectors.AngleTo(transform.position, rotation));
 
+        void DoFace(float rotationZ) =>
+            transform.rotation = Quaternion.Lerp(
+                transform.rotation,
+                Quaternion.Euler(0f, 0f, rotationZ),
+                cfg.rotationSpeed * Time.fixedDeltaTime);
+
+        IEnumerable<float> Goto(Vector3 position) {
             while (Vector2.Distance(position, transform.position) > Time.fixedDeltaTime) {
+                DoFace(position);
+
                 Vector3 direction =
-                    cfg.moveSpoeed
+                    cfg.moveSpeed
                     * Time.fixedDeltaTime
                     * (position - transform.position).Sign();
                 direction = direction.Clamp(position - transform.position, transform.position - position);
 
-                transform.position += direction;
+                float diff = Mathf.Abs(Vectors.AngleTo(transform.position - position) - transform.rotation.eulerAngles.z);
+                diff = diff > 180f ? 360f - diff : diff;
+                if (diff < 45f) {
+                    anim.SetBool("isMoving", true);
+                    transform.position += direction;
+                }
+
                 yield return 0;
             }
 

@@ -18,8 +18,7 @@ namespace OSBE.Controllers {
             this.system = system;
             this.target = target;
             state = new EnemyState {
-                awareness = EnemyAwareness.PASSIVE,
-                seesPlayer = false
+                isPlayerInView = false
             };
         }
 
@@ -36,7 +35,7 @@ namespace OSBE.Controllers {
         public void OnMovementChanged(bool isMoving) { }
 
         public void OnPlayerSightChange(bool isInView) =>
-            EmitState(state with { seesPlayer = isInView });
+            EmitState(state with { isPlayerInView = isInView });
 
         public void EmitState(EnemyState state) {
             if (this.state != state) {

@@ -14,10 +14,6 @@ namespace OSCore.Data {
         public enum AttackMode {
             NONE, HAND, WEAPON, MELEE, FIRING
         }
-
-        public enum EnemyAwareness {
-            PASSIVE, AWARE, AGGRESSIVE
-        }
     }
 
     public record PlayerState {
@@ -32,8 +28,7 @@ namespace OSCore.Data {
     }
 
     public record EnemyState {
-        public EnemyAwareness awareness { get; init; }
-        public bool seesPlayer { get; init; }
+        public bool isPlayerInView { get; init; }
     }
 
     namespace Patrol {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using OSCore.Data;
 using OSCore.Data.Enums;
 using OSCore.Data.Events.Brains;
-using OSCore.Data.Patrol;
 using OSCore.ScriptableObjects;
 using UnityEngine;
 
