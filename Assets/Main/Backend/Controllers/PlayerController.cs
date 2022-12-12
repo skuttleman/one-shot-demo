@@ -17,6 +17,7 @@ namespace OSBE.Controllers {
         Animator anim;
         PlayerState state;
         bool isGrounded = false;
+        RaycastHit ground;
 
         void OnEnable() {
             system = FindObjectOfType<GameController>();
@@ -35,10 +36,13 @@ namespace OSBE.Controllers {
             isGrounded = Physics.Raycast(
                 transform.position - new Vector3(0, 0, 0.01f),
                 Vectors.DOWN,
+                out ground,
                 cfg.groundedDist);
+
             anim.SetBool("isGrounded", isGrounded);
 
             if (!isGrounded) {
+                anim.SetBool("isAiming", false);
                 anim.SetBool("isScoping", false);
                 anim.SetInteger("stance", 0);
             }
@@ -66,6 +70,9 @@ namespace OSBE.Controllers {
         void MovePlayer(MoveConfig moveCfg) {
             if (isGrounded && PCUtils.IsMovable(state.stance, state)) {
                 float speed = moveCfg.moveSpeed;
+                float forceZ = ground.transform.rotation != Quaternion.identity && Vectors.NonZero(state.movement)
+                    ? (Vector3.Angle(ground.normal, state.movement) - 90f) / 90f
+                    : 0f;
 
                 if (PCUtils.IsAiming(state.attackMode)) speed *= cfg.aimFactor;
                 else if (state.isScoping) speed *= cfg.scopeFactor;
@@ -85,7 +92,7 @@ namespace OSBE.Controllers {
                     speed *= Mathf.Lerp(moveCfg.lookSpeedInhibiter, 1f, 1f - diff / 180f);
                 }
 
-                Vector3 dir = speed * state.movement.Upgrade();
+                Vector3 dir = speed * state.movement.Upgrade(-forceZ);
 
                 float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
                 if (velocityDiff < moveCfg.maxVelocitydamper)
