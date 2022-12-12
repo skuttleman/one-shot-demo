@@ -12,7 +12,6 @@ using TMPro;
 using UnityEngine;
 using static OSCore.Data.Patrol.EnemyPatrol;
 
-
 namespace OSBE.Controllers {
     public class EnemyController : MonoBehaviour, IStateReceiver<EnemyState> {
         [SerializeField] EnemyCfgSO cfg;
