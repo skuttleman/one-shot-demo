@@ -37,6 +37,9 @@ namespace OSBE.Controllers {
         public void OnPlayerSightChange(bool isInView) =>
             EmitState(state with { isPlayerInView = isInView });
 
+        public void OnDamage(float damage) =>
+            EmitState(state with { isPlayerInView = true });
+
         public void EmitState(EnemyState state) {
             if (this.state != state) {
                 this.state = state;

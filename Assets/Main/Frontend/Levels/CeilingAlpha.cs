@@ -22,7 +22,7 @@ public class CeilingAlpha : MonoBehaviour {
     }
 
     void OnTriggerStay(Collider other) {
-        if (other.transform.parent.parent.gameObject == player) {
+        if (other.transform.IsChildOf(player.transform)) {
             foreach (Tilemap map in maps) {
                 float diff = Mathf.Abs(
                     map.transform.position.z
@@ -37,7 +37,7 @@ public class CeilingAlpha : MonoBehaviour {
     }
 
     void OnTriggerExit(Collider other) {
-        if (other.transform.parent.parent.gameObject == player) {
+        if (other.transform.IsChildOf(player.transform)) {
             foreach (Tilemap map in maps)
                 map.color = new(map.color.r, map.color.g, map.color.b, 1f);
             fov.gameObject.SetActive(true);

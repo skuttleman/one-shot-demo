@@ -63,6 +63,7 @@ namespace OSCore.System.Interfaces {
             public void OnMovementChanged(bool isMoving);
             public void OnEnemyStep();
             public void OnPlayerSightChange(bool isInView);
+            public void OnDamage(float damage);
         }
 
         public interface IStateReceiver<T> {
@@ -81,8 +82,12 @@ namespace OSCore.System.Interfaces {
             public void Init(CameraOverlayCfgSO cfg);
         }
 
+        public interface IDamage {
+            public void OnAttack(float damage);
+        }
+
         public abstract class AConnector : MonoBehaviour {
-            IGameSystem system;
+            internal IGameSystem system;
 
             public void OnEnable() {
                 system = FindObjectOfType<GameController>();

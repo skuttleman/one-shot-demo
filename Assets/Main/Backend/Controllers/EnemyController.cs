@@ -20,6 +20,7 @@ namespace OSBE.Controllers {
         GameObject player;
         Animator anim;
         TextMeshPro speech;
+        const float SEEN_THRESHOLD = 5f;
 
         float timeSinceSeenPlayer = 0f;
         EnemyState state;
@@ -43,21 +44,19 @@ namespace OSBE.Controllers {
         void FixedUpdate() {
             speech.transform.position = transform.position + new Vector3(0f, 0.75f, 0f);
             if (!state.isPlayerInView) timeSinceSeenPlayer += Time.fixedDeltaTime;
-            else timeSinceSeenPlayer = 0f;
         }
 
         IEnumerator<YieldInstruction> SpeakUp() {
             while (!state.isPlayerInView)
                 yield return new WaitForSeconds(0.1f);
             while (true) {
-                if (state.isPlayerInView || timeSinceSeenPlayer <= 1f) {
+                if (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
                     speech.text = "I see you, Bro.";
                     speech.enabled = true;
                     yield return new WaitForSeconds(2f);
                     speech.enabled = false;
                     yield return new WaitForSeconds(1f);
-                    speech.text = "";
-                    if (!state.isPlayerInView && timeSinceSeenPlayer > 1f) {
+                    if (!state.isPlayerInView && timeSinceSeenPlayer > SEEN_THRESHOLD) {
                         speech.text = "Where'd they go?";
                         speech.enabled = true;
                         float elapsed = 0f;
@@ -66,8 +65,8 @@ namespace OSBE.Controllers {
                             yield return new WaitForFixedUpdate();
                         }
                         speech.enabled = false;
-                        speech.text = "";
                     }
+                    speech.text = "";
                 }
                 yield return new WaitForFixedUpdate();
             }
@@ -76,14 +75,17 @@ namespace OSBE.Controllers {
         IEnumerator<YieldInstruction> DoPatrol() {
             foreach (EnemyPatrol step in Patrol()) {
                 foreach (float wait in DoPatrolStep(step)) {
-                    if (wait > 0) yield return new WaitForSeconds(wait);
-                    else yield return new WaitForFixedUpdate();
-
-                    while (state.isPlayerInView || timeSinceSeenPlayer <= 1f) {
-                        anim.SetBool("isMoving", false);
-                        DoFace(player.transform.position);
+                    float waitAmount = wait;
+                    while (waitAmount > 0f) {
+                        waitAmount -= Time.fixedDeltaTime;
                         yield return new WaitForFixedUpdate();
+                        while (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
+                            anim.SetBool("isMoving", false);
+                            DoFace(player.transform.position);
+                            yield return new WaitForFixedUpdate();
+                        }
                     }
+                    yield return new WaitForFixedUpdate();
                 }
             }
         }
@@ -167,7 +169,9 @@ namespace OSBE.Controllers {
             anim.SetBool("isMoving", false);
         }
 
-        public void OnStateChange(EnemyState state) =>
+        public void OnStateChange(EnemyState state) {
             this.state = state;
+            if (state.isPlayerInView) timeSinceSeenPlayer = 0f;
+        }
     }
 }
