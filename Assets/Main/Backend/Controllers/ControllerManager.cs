@@ -41,12 +41,6 @@ namespace OSBE.Controllers {
 
         private IGameSystemComponent Create<T>(Transform target) {
             Type t = typeof(T);
-            if (t == typeof(IPlayerFOVController))
-                return new PlayerFOVController(system, target);
-
-            if (t == typeof(IEnemyStateReducer))
-                return new EnemyStateReducer(system, target);
-
             if (t == typeof(ICameraController))
                 return new CameraController(system, target);
             if (t == typeof(ICameraOverlayController))

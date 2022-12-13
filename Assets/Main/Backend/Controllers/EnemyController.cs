@@ -13,7 +13,7 @@ using UnityEngine;
 using static OSCore.Data.Patrol.EnemyPatrol;
 
 namespace OSBE.Controllers {
-    public class EnemyController : MonoBehaviour, IStateReceiver<EnemyState> {
+    public class EnemyController : MonoBehaviour, IEnemyController {
         [SerializeField] private EnemyCfgSO cfg;
         private const float SEEN_THRESHOLD = 5f;
 
@@ -39,20 +39,30 @@ namespace OSBE.Controllers {
 
         public void OnEnemyStep() { }
 
-        public void OnStateChange(EnemyState state) {
-            this.state = state;
-            if (state.isPlayerInView) timeSinceSeenPlayer = 0f;
+        public void OnPlayerSightChange(bool isInView) {
+            state = state with { isPlayerInView = isInView };
+            if (isInView) timeSinceSeenPlayer = 0f;
+        }
+
+        public void OnDamage(float damage) {
+            state = state with { isPlayerInView = true };
+            timeSinceSeenPlayer = 0f;
         }
 
         private void OnEnable() {
             system = FindObjectOfType<GameController>();
             anim = GetComponentInChildren<Animator>();
 
-            system.Send<IControllerManager>(mngr =>
-               mngr.Ensure<IEnemyStateReducer>(transform).Init(this, cfg));
             player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
-            speech = transform.parent.parent.gameObject.GetComponentInChildren<TextMeshPro>();
+            speech = Transforms.Entity(transform)
+                .parent
+                .gameObject
+                .GetComponentInChildren<TextMeshPro>();
             speech.text = "";
+
+            state = new EnemyState {
+                isPlayerInView = false
+            };
         }
 
         private void Start() {

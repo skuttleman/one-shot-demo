@@ -1,28 +1,23 @@
 using OSCore.Data.Enums;
 using OSCore.System.Interfaces.Brains;
-using OSCore.System.Interfaces;
-using OSCore;
+using OSCore.Utils;
 using UnityEngine;
 
 namespace OSFE.Characters.Enemy {
     public class EnemyAnimationListener : MonoBehaviour {
-        private IGameSystem system;
+        private IEnemyController controller;
 
         public void OnAttackMode(AttackMode mode) =>
-            Brain().OnAttackModeChanged(mode);
+            controller.OnAttackModeChanged(mode);
 
         public void OnMovement(int moving) =>
-            Brain().OnMovementChanged(moving != 0);
+            controller.OnMovementChanged(moving != 0);
 
         public void OnStep() =>
-            Brain().OnEnemyStep();
+            controller.OnEnemyStep();
 
         private void OnEnable() {
-            system = FindObjectOfType<GameController>();
+            controller = Transforms.Entity(transform).GetComponent<IEnemyController>();
         }
-
-        private IEnemyStateReducer Brain() =>
-            system.Send<IControllerManager, IEnemyStateReducer>(mngr =>
-                mngr.Ensure<IEnemyStateReducer>(transform.parent));
     }
 }

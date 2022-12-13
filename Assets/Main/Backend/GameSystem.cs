@@ -1,4 +1,3 @@
-using OSBE.Async.Core;
 using OSBE.Async;
 using OSBE.Controllers;
 using OSBE.Tagging;
@@ -57,7 +56,6 @@ namespace OSBE {
         private void Init() {
             components = new Dictionary<Type, IGameSystemComponent> {
                 { typeof(IControllerManager), new ControllerManager(this) },
-                { typeof(PromiseFactory) , new PromiseFactory() },
                 { typeof(ITagRegistry), new TagRegistry() },
                 { typeof(IPubSub), new DictionaryPubSub() }
             };

@@ -1,39 +1,31 @@
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Brains;
-using OSCore.System.Interfaces;
 using OSCore.Utils;
 using UnityEngine;
 
 namespace OSBE.Controllers {
-    public class PlayerFOVController : IPlayerFOVController {
-        private readonly IGameSystem system;
-        private readonly Transform fov;
-        private PlayerFOVCfgSO cfg;
+    public class PlayerFOVController : MonoBehaviour {
+        [SerializeField] private PlayerFOVCfgSO cfg;
+
         private Mesh mesh;
         private float timeout;
 
-        public PlayerFOVController(IGameSystem system, Transform target) {
-            this.system = system;
-            fov = target;
+        private void OnEnable() {
+            mesh = new();
             timeout = 0f;
+            GetComponent<MeshFilter>().mesh = mesh;
         }
 
-        public void Init(PlayerFOVCfgSO cfg, Mesh mesh) {
-            this.cfg = cfg;
-            this.mesh = mesh;
-        }
-
-        public void OnUpdate() {
+        private void Update() {
             if (timeout > 0f) {
                 timeout -= Time.deltaTime;
-            } else if (cfg is not null) {
+            } else {
                 timeout = cfg.secondsBetween;
                 DrawFOV();
             }
         }
         private void DrawFOV() {
             Transform head = Transforms
-                .FindInActiveChildren(fov.parent, xform => xform.name == "head")
+                .FindInActiveChildren(transform.parent, xform => xform.name == "head")
                 .First();
             float angle = head.rotation.eulerAngles.z;
             float angleIncrease = 360f / cfg.RAY_COUNT;
@@ -53,12 +45,12 @@ namespace OSBE.Controllers {
                 float percent = Mathf.Max(0.333f, (180f - diff) / 180f);
                 bool isHit = Physics.Raycast(
                     head.position,
-                    Vectors.ToVector3(angle + fov.rotation.eulerAngles.z),
+                    Vectors.ToVector3(angle + transform.rotation.eulerAngles.z),
                     out RaycastHit hit,
                     cfg.viewDistance,
                     cfg.layerMask);
                 vertices[vertexIdx] = isHit
-                    ? fov.InverseTransformPoint(hit.point)
+                    ? transform.InverseTransformPoint(hit.point)
                     : vertices[0] + Vectors.ToVector3(angle) * cfg.viewDistance;
 
                 if (triangleIdx >= 0) {

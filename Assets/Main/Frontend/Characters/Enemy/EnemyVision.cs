@@ -8,16 +8,19 @@ using System.Collections.Generic;
 
 public class EnemyVision : MonoBehaviour {
     private IGameSystem system;
+    private IEnemyController controller;
     private GameObject player;
     private Renderer rdr;
     private bool seesPlayer = false;
     private float timeSinceSeen = 1f;
 
     private void OnEnable() {
+        Transform entity = Transforms.Entity(transform);
+        controller = entity.GetComponent<IEnemyController>();
         system = FindObjectOfType<GameController>();
         player = system.Send<ITagRegistry, GameObject>(reg =>
             reg.GetUnique(OSCore.Data.Enums.IdTag.PLAYER));
-        rdr = transform.parent.parent.parent.GetComponentInChildren<SpriteRenderer>();
+        rdr = entity.GetComponentInChildren<SpriteRenderer>();
     }
 
     private void FixedUpdate() {
@@ -32,7 +35,7 @@ public class EnemyVision : MonoBehaviour {
         if (!hits.IsEmpty() && hits.First().transform.IsChildOf(player.transform))
             los = true;
 
-        Brain().OnPlayerSightChange(seesPlayer && los);
+        controller.OnPlayerSightChange(seesPlayer && los);
 
         if (!los) {
             timeSinceSeen += Time.fixedDeltaTime;
@@ -49,8 +52,4 @@ public class EnemyVision : MonoBehaviour {
         if (other.transform.IsChildOf(player.transform))
             seesPlayer = false;
     }
-
-    private IEnemyStateReducer Brain() =>
-        system.Send<IControllerManager, IEnemyStateReducer>(mngr =>
-            mngr.Ensure<IEnemyStateReducer>(transform.parent.parent.parent));
 }

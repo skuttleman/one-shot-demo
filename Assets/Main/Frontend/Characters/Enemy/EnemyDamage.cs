@@ -1,19 +1,17 @@
-using OSCore;
-using OSCore.System.Interfaces;
 using OSCore.System.Interfaces.Brains;
+using OSCore.Utils;
 using UnityEngine;
 
-public class EnemyDamage : MonoBehaviour, IDamage {
-    private IGameSystem system;
+namespace OSFE.Characters.Enemy {
+    public class EnemyDamage : MonoBehaviour, IDamage {
+        private IEnemyController controller;
 
-    public void OnAttack(float damage) =>
-        Brain().OnDamage(damage);
+        public void OnAttack(float damage) =>
+            controller.OnDamage(damage);
 
-    private void OnEnable() {
-        system = FindObjectOfType<GameController>();
+        private void OnEnable() {
+            controller = Transforms.Entity(transform)
+                .GetComponent<IEnemyController>();
+        }
     }
-
-    private IEnemyStateReducer Brain() =>
-        system.Send<IControllerManager, IEnemyStateReducer>(mngr =>
-            mngr.Ensure<IEnemyStateReducer>(transform));
 }
