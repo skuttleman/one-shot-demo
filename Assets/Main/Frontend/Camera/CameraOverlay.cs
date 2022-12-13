@@ -6,10 +6,11 @@ using OSCore.ScriptableObjects;
 
 namespace OSFE.Camera {
 public class CameraOverlay : MonoBehaviour {
-        [SerializeField] CameraOverlayCfgSO cfg;
-        IGameSystem system;
+        [SerializeField] private CameraOverlayCfgSO cfg;
 
-        void OnEnable() {
+        private IGameSystem system;
+
+        private void OnEnable() {
             system = FindObjectOfType<GameController>();
             system.Send<IControllerManager>(mngr =>
                 mngr.Ensure<ICameraOverlayController>(transform)

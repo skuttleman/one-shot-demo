@@ -7,11 +7,7 @@ using UnityEngine;
 
 namespace OSFE.Characters.Player {
     public class PlayerInputListener : MonoBehaviour {
-        IGameSystem system;
-
-        void OnEnable() {
-            system = FindObjectOfType<GameController>();
-        }
+        private IGameSystem system;
 
         public void OnInputMove(InputValue value) =>
             Brain().OnMovementInput(value.Get<Vector2>());
@@ -37,7 +33,11 @@ namespace OSFE.Characters.Player {
         public void OnInputAttack(InputValue value) =>
             Brain().OnAttackInput(value.isPressed);
 
-        IPlayerStateReducer Brain() =>
+        private void OnEnable() {
+            system = FindObjectOfType<GameController>();
+        }
+
+        private IPlayerStateReducer Brain() =>
             system.Send<IControllerManager, IPlayerStateReducer>(mngr =>
                 mngr.Ensure<IPlayerStateReducer>(transform));
     }

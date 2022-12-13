@@ -8,12 +8,12 @@ using OSCore.Utils;
 using System.Collections.Generic;
 
 public class CeilingAlpha : MonoBehaviour {
-    IGameSystem system;
-    IEnumerable<Tilemap> maps;
-    GameObject player;
-    Transform fov;
+    private IGameSystem system;
+    private IEnumerable<Tilemap> maps;
+    private GameObject player;
+    private Transform fov;
 
-    void Start() {
+    private void Start() {
         system = FindObjectOfType<GameController>();
         maps = transform.parent.GetComponentsInChildren<Tilemap>()
             .Filter(map => !map.transform.name.Contains("seethrough"));
@@ -23,7 +23,7 @@ public class CeilingAlpha : MonoBehaviour {
             .First();
     }
 
-    void OnTriggerStay(Collider other) {
+    private void OnTriggerStay(Collider other) {
         if (other.transform.IsChildOf(player.transform)) {
             foreach (Tilemap map in maps) {
                 float diff = Mathf.Abs(
@@ -38,7 +38,7 @@ public class CeilingAlpha : MonoBehaviour {
         }
     }
 
-    void OnTriggerExit(Collider other) {
+    private void OnTriggerExit(Collider other) {
         if (other.transform.IsChildOf(player.transform)) {
             foreach (Tilemap map in maps)
                 map.color = new(map.color.r, map.color.g, map.color.b, 1f);

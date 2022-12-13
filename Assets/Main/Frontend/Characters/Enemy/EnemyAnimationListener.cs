@@ -6,11 +6,7 @@ using UnityEngine;
 
 namespace OSFE.Characters.Enemy {
     public class EnemyAnimationListener : MonoBehaviour {
-        IGameSystem system;
-
-        void OnEnable() {
-            system = FindObjectOfType<GameController>();
-        }
+        private IGameSystem system;
 
         public void OnAttackMode(AttackMode mode) =>
             Brain().OnAttackModeChanged(mode);
@@ -21,7 +17,11 @@ namespace OSFE.Characters.Enemy {
         public void OnStep() =>
             Brain().OnEnemyStep();
 
-        IEnemyStateReducer Brain() =>
+        private void OnEnable() {
+            system = FindObjectOfType<GameController>();
+        }
+
+        private IEnemyStateReducer Brain() =>
             system.Send<IControllerManager, IEnemyStateReducer>(mngr =>
                 mngr.Ensure<IEnemyStateReducer>(transform.parent));
     }

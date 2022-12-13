@@ -3,13 +3,13 @@ using UnityEngine;
 namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/cam/general")]
     public class CameraCfgSO : ScriptableObject {
-        public float orbitSpeed;
-        public float moveOffset;
-        public float aimOffset;
-        public float maxLookAhead;
+        [field: SerializeField] public float orbitSpeed { get; private set; }
+        [field: SerializeField] public float moveOffset { get; private set; }
+        [field: SerializeField] public float aimOffset { get; private set; }
+        [field: SerializeField] public float maxLookAhead { get; private set; }
 
-        [Header("Attacking")]
-        public float punchOffset;
-        public float fireOffset;
+        [field: Header("Attacking")]
+        [field: SerializeField] public float punchOffset { get; private set; }
+        [field: SerializeField] public float fireOffset { get; private set; }
     }
 }

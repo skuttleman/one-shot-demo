@@ -7,20 +7,20 @@ using OSCore.Utils;
 using System.Collections.Generic;
 
 public class EnemyVision : MonoBehaviour {
-    IGameSystem system;
-    GameObject player;
-    Renderer rdr;
-    bool seesPlayer = false;
-    float timeSinceSeen = 1f;
+    private IGameSystem system;
+    private GameObject player;
+    private Renderer rdr;
+    private bool seesPlayer = false;
+    private float timeSinceSeen = 1f;
 
-    void OnEnable() {
+    private void OnEnable() {
         system = FindObjectOfType<GameController>();
         player = system.Send<ITagRegistry, GameObject>(reg =>
             reg.GetUnique(OSCore.Data.Enums.IdTag.PLAYER));
         rdr = transform.parent.parent.parent.GetComponentInChildren<SpriteRenderer>();
     }
 
-    void FixedUpdate() {
+    private void FixedUpdate() {
         bool los = false;
         Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.25f);
 
@@ -40,17 +40,17 @@ public class EnemyVision : MonoBehaviour {
         } else rdr.enabled = true;
     }
 
-    void OnTriggerStay(Collider other) {
+    private void OnTriggerStay(Collider other) {
         if (other.transform.IsChildOf(player.transform))
             seesPlayer = true;
     }
 
-    void OnTriggerExit(Collider other) {
+    private void OnTriggerExit(Collider other) {
         if (other.transform.IsChildOf(player.transform))
             seesPlayer = false;
     }
 
-    IEnemyStateReducer Brain() =>
+    private IEnemyStateReducer Brain() =>
         system.Send<IControllerManager, IEnemyStateReducer>(mngr =>
             mngr.Ensure<IEnemyStateReducer>(transform.parent.parent.parent));
 }

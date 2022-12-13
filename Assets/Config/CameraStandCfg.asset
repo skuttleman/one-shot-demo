@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb6075876b904371b6b71af7bbad98e, type: 3}
   m_Name: CameraStandCfg
   m_EditorClassIdentifier: 
-  orbitSpeed: 1.75
-  moveOffset: 2.5
-  aimOffset: 1.5
-  maxLookAhead: 4.85
-  punchOffset: 0.5
-  fireOffset: 1.25
+  <orbitSpeed>k__BackingField: 1.75
+  <moveOffset>k__BackingField: 2.5
+  <aimOffset>k__BackingField: 1.5
+  <maxLookAhead>k__BackingField: 4.85
+  <punchOffset>k__BackingField: 0.5
+  <fireOffset>k__BackingField: 1.25

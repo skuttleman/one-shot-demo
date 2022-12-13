@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb6075876b904371b6b71af7bbad98e, type: 3}
   m_Name: CameraCrawlCfg
   m_EditorClassIdentifier: 
-  orbitSpeed: 1.75
-  moveOffset: 0.1
-  scopeOffset: 3.5
-  aimOffset: 1.5
-  maxLookAhead: 2.6
-  punchOffset: 0.025
-  fireOffset: 0.05
+  <orbitSpeed>k__BackingField: 1.75
+  <moveOffset>k__BackingField: 0.1
+  <aimOffset>k__BackingField: 1.5
+  <maxLookAhead>k__BackingField: 2.6
+  <punchOffset>k__BackingField: 0.025
+  <fireOffset>k__BackingField: 0.05

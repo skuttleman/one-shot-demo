@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace OSFE {
     public class Tags : MonoBehaviour {
-        [SerializeField] Tag[] tags;
+        [SerializeField] private Tag[] tags;
 
-        void OnEnable() {
+        private void OnEnable() {
             FindObjectOfType<GameController>()
                 .Send<ITagRegistry>(registry => {
                     foreach (Tag tag in tags)
@@ -18,9 +18,9 @@ namespace OSFE {
         }
 
         [Serializable]
-        public struct Tag {
-            public IdTag tag;
-            public bool isUnique;
+        private struct Tag {
+            [field: SerializeField] public IdTag tag { get; private set; }
+            [field: SerializeField] public bool isUnique { get; private set; }
         }
     }
 }

@@ -5,13 +5,13 @@ using OSCore;
 using UnityEngine;
 
 public class FOV : MonoBehaviour {
-    [SerializeField] PlayerFOVCfgSO cfg;
-    IGameSystem system;
-    Mesh mesh;
+    [SerializeField] private PlayerFOVCfgSO cfg;
+    private IGameSystem system;
+    private Mesh mesh;
 
-    void OnEnable() {
+    private void OnEnable() {
         system = FindObjectOfType<GameController>();
-        mesh = new Mesh();
+        mesh = new();
         GetComponent<MeshFilter>().mesh = mesh;
 
         system.Send<IControllerManager>(mngr =>

@@ -7,8 +7,9 @@ namespace System.Runtime.CompilerServices { public class IsExternalInit { } }
 
 namespace OSCore {
     public class GameController : MonoBehaviour, IGameSystem {
-        [SerializeField] bool hideInvisible = true;
-        IGameSystem system;
+        [SerializeField] private bool hideInvisible = true;
+
+        private IGameSystem system;
 
         public void Init(IGameSystem system) {
             this.system = system;
@@ -22,7 +23,7 @@ namespace OSCore {
         public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent =>
             system.Send(action);
 
-        void Awake() {
+        private void Awake() {
             if (FindObjectsOfType<GameController>().Length > 1) {
                 Destroy(gameObject);
                 return;

@@ -40,7 +40,7 @@ namespace OSBE.Async.Core {
     }
 
     public class ResolvedPromise<T> : IPromise<T> {
-        readonly T val;
+        private readonly T val;
 
         public ResolvedPromise(T val) =>
             this.val = val;
@@ -52,20 +52,20 @@ namespace OSBE.Async.Core {
     }
 
     public class RejectedPromise<T> : IPromise<T> {
-        readonly Exception ex;
+        private readonly Exception ex;
 
         public RejectedPromise(Exception ex) =>
             this.ex = ex;
 
-        IPromise<R> IPromise<T>.AndThen<R>(
+        public IPromise<R> AndThen<R>(
             Func<T, IPromise<R>> onSuccess,
             Func<Exception, IPromise<R>> onError) =>
                 onError(ex);
     }
 
     public class PromiseFactory : IGameSystemComponent {
-        IDictionary<long, IGameSystemComponent> promises;
-        long id = 0;
+        private IDictionary<long, IGameSystemComponent> promises;
+        private long id = 0;
 
         public PromiseFactory() {
             promises = new Dictionary<long, IGameSystemComponent>();
@@ -103,15 +103,15 @@ namespace OSBE.Async.Core {
                 .Of(promises.Filter(prom => prom.Key != thisId));
         }
 
-        class AwaitPromise<T> : IPromise<T>, IGameSystemComponent {
-            readonly Queue<Action> actions;
-            readonly PromiseFactory factory;
-            readonly long id;
-            readonly T val;
-            float timeLeft;
+        private class AwaitPromise<T> : IPromise<T>, IGameSystemComponent {
+            private readonly Queue<Action> actions;
+            private readonly PromiseFactory factory;
+            private readonly long id;
+            private readonly T val;
+            private float timeLeft;
 
             public AwaitPromise(PromiseFactory factory, long id, float timeLeft, T val) {
-                actions = new Queue<Action>();
+                actions = new();
                 this.factory = factory;
                 this.id = id;
                 this.timeLeft = timeLeft;
@@ -150,20 +150,20 @@ namespace OSBE.Async.Core {
             }
         }
 
-        class SubroutinePromise<T> : IPromise<T>, IGameSystemComponent {
-            readonly Queue<Action> actions;
-            readonly PromiseFactory factory;
-            readonly long id;
-            bool isCompleted = false;
-            bool? wasSuccessful;
-            T val;
-            Exception ex;
+        private class SubroutinePromise<T> : IPromise<T>, IGameSystemComponent {
+            private readonly Queue<Action> actions;
+            private readonly PromiseFactory factory;
+            private readonly long id;
+            private bool isCompleted = false;
+            private bool? wasSuccessful;
+            private T val;
+            private Exception ex;
 
             internal SubroutinePromise(
                 PromiseFactory factory,
                 long id,
                 Action<Action<T>, Action<Exception>> creator) {
-                actions = new Queue<Action>();
+                actions = new();
                 this.factory = factory;
                 this.id = id;
 

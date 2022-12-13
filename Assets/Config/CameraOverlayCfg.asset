@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a685ebc4e110b44eea2d4fa17748432f, type: 3}
   m_Name: CameraOverlayCfg
   m_EditorClassIdentifier: 
-  maxOverlayAlpha: 0.558
+  <maxOverlayAlpha>k__BackingField: 0.55

@@ -10,13 +10,13 @@ using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers {
     public class CameraOverlayController : ICameraOverlayController {
-        readonly IGameSystem system;
-        readonly Transform target;
-        Transform player;
-        CameraOverlayCfgSO cfg = null;
-        SpriteRenderer rdr;
-        bool isScoping = false;
-        float alpha = 0f;
+        private readonly IGameSystem system;
+        private readonly Transform target;
+        private Transform player;
+        private CameraOverlayCfgSO cfg = null;
+        private SpriteRenderer rdr;
+        private bool isScoping = false;
+        private float alpha = 0f;
 
         public CameraOverlayController(IGameSystem system, Transform target) {
             this.system = system;
@@ -35,7 +35,7 @@ namespace OSBE.Controllers {
                 else alpha -= Time.deltaTime;
 
                 alpha = Mathf.Clamp(alpha, 0f, cfg.maxOverlayAlpha);
-                rdr.color = new Color(rdr.color.r, rdr.color.g, rdr.color.b, alpha);
+                rdr.color = new(rdr.color.r, rdr.color.g, rdr.color.b, alpha);
                 if (isScoping)
                     target.rotation = Quaternion.Euler(
                         0f,
@@ -49,7 +49,7 @@ namespace OSBE.Controllers {
             rdr = target.GetComponent<SpriteRenderer>();
         }
 
-        void ScopeChanged(ScopingChanged ev) =>
+        private void ScopeChanged(ScopingChanged ev) =>
             isScoping = ev.isScoping;
     }
 }

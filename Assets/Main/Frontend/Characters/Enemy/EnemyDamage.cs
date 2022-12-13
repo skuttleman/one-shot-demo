@@ -4,16 +4,16 @@ using OSCore.System.Interfaces.Brains;
 using UnityEngine;
 
 public class EnemyDamage : MonoBehaviour, IDamage {
-    IGameSystem system;
-
-    void OnEnable() {
-        system = FindObjectOfType<GameController>();
-    }
+    private IGameSystem system;
 
     public void OnAttack(float damage) =>
         Brain().OnDamage(damage);
 
-    IEnemyStateReducer Brain() =>
+    private void OnEnable() {
+        system = FindObjectOfType<GameController>();
+    }
+
+    private IEnemyStateReducer Brain() =>
         system.Send<IControllerManager, IEnemyStateReducer>(mngr =>
             mngr.Ensure<IEnemyStateReducer>(transform));
 }

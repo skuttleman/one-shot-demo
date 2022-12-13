@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace OSFE.Camera {
     public class CameraConnector : MonoBehaviour {
-        [SerializeField] CameraCfgSO cfg;
+        [SerializeField] private CameraCfgSO cfg;
 
-        void OnEnable() {
+        private void OnEnable() {
             FindObjectOfType<GameController>()
                 .Send<IControllerManager>(mngr =>
                     mngr.Ensure<ICameraController>(transform)

@@ -7,10 +7,10 @@ using System;
 
 namespace OSBE.Async {
     public class DictionaryPubSub : IPubSub {
-        readonly ConcurrentQueue<(Type, IEvent)> messages;
-        readonly IDictionary<Type, ISet<Action<IEvent>>> subscribers;
-        readonly IDictionary<long, (Type, Action<IEvent>)> subscriptions;
-        long subId;
+        private readonly ConcurrentQueue<(Type, IEvent)> messages;
+        private readonly IDictionary<Type, ISet<Action<IEvent>>> subscribers;
+        private readonly IDictionary<long, (Type, Action<IEvent>)> subscriptions;
+        private long subId;
 
         public DictionaryPubSub() {
             messages = new();

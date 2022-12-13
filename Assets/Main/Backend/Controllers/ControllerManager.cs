@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace OSBE.Controllers {
     public class ControllerManager : IControllerManager {
-        readonly IDictionary<(int, Type), IGameSystemComponent> brains;
-        readonly IGameSystem system;
+        private readonly IDictionary<(int, Type), IGameSystemComponent> brains;
+        private readonly IGameSystem system;
 
         public ControllerManager(IGameSystem system) {
             brains = new Dictionary<(int, Type), IGameSystemComponent>();
@@ -26,7 +26,20 @@ namespace OSBE.Controllers {
             return brain;
         }
 
-        IGameSystemComponent Create<T>(Transform target) {
+        public void OnStart() =>
+            brains?.ForEach(brain => brain.Value.OnStart());
+
+        public void OnUpdate() =>
+            brains?.ForEach(brain => brain.Value.OnUpdate());
+
+        public void OnFixedUpdate() =>
+            brains?.ForEach(brain => brain.Value.OnFixedUpdate());
+
+        public void OnDestroy() {
+            brains?.ForEach(brain => brain.Value.OnDestroy());
+        }
+
+        private IGameSystemComponent Create<T>(Transform target) {
             Type t = typeof(T);
             if (t == typeof(IPlayerStateReducer))
                 return new PlayerStateReducer(system, target);
@@ -41,21 +54,7 @@ namespace OSBE.Controllers {
             if (t == typeof(ICameraOverlayController))
                 return new CameraOverlayController(system, target);
 
-
             throw new Exception("Unknown Brain Type: " + t);
-        }
-
-        public void OnStart() =>
-            brains?.ForEach(brain => brain.Value.OnStart());
-
-        public void OnUpdate() =>
-            brains?.ForEach(brain => brain.Value.OnUpdate());
-
-        public void OnFixedUpdate() =>
-            brains?.ForEach(brain => brain.Value.OnFixedUpdate());
-
-        public void OnDestroy() {
-            brains?.ForEach(brain => brain.Value.OnDestroy());
         }
     }
 }

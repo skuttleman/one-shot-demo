@@ -10,16 +10,19 @@ using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers {
     public class PlayerController : MonoBehaviour, IStateReceiver<PlayerState> {
-        [SerializeField] PlayerCfgSO cfg;
+        [SerializeField] private PlayerCfgSO cfg;
 
-        IGameSystem system;
-        Rigidbody rb;
-        Animator anim;
-        PlayerState state;
-        bool isGrounded = false;
-        RaycastHit ground;
+        private IGameSystem system;
+        private Rigidbody rb;
+        private Animator anim;
+        private PlayerState state;
+        private bool isGrounded = false;
+        private RaycastHit ground;
 
-        void OnEnable() {
+        public void OnStateChange(PlayerState state) =>
+            this.state = state;
+
+        private void OnEnable() {
             system = FindObjectOfType<GameController>();
             rb = GetComponent<Rigidbody>();
             anim = GetComponentInChildren<Animator>();
@@ -28,11 +31,11 @@ namespace OSBE.Controllers {
                 mngr.Ensure<IPlayerStateReducer>(transform).Init(this, cfg));
         }
 
-        void Update() {
+        private void Update() {
             RotatePlayer(MoveCfg());
         }
 
-        void FixedUpdate() {
+        private void FixedUpdate() {
             isGrounded = Physics.Raycast(
                 transform.position - new Vector3(0, 0, 0.01f),
                 Vectors.DOWN,
@@ -50,7 +53,7 @@ namespace OSBE.Controllers {
             MovePlayer(MoveCfg());
         }
 
-        void RotatePlayer(MoveConfig moveCfg) {
+        private void RotatePlayer(MoveConfig moveCfg) {
             Vector2 direction;
 
             if (Vectors.NonZero(state.facing)
@@ -67,7 +70,7 @@ namespace OSBE.Controllers {
                     moveCfg.rotationSpeed * Time.deltaTime);
         }
 
-        void MovePlayer(MoveConfig moveCfg) {
+        private void MovePlayer(MoveConfig moveCfg) {
             if (isGrounded && PCUtils.IsMovable(state.stance, state)) {
                 float speed = moveCfg.moveSpeed;
                 float forceZ = ground.transform.rotation != Quaternion.identity && Vectors.NonZero(state.movement)
@@ -108,14 +111,11 @@ namespace OSBE.Controllers {
             }
         }
 
-        MoveConfig MoveCfg() =>
+        private MoveConfig MoveCfg() =>
                 state.stance switch {
                     PlayerStance.CROUCHING => cfg.crouching,
                     PlayerStance.CRAWLING => cfg.crawling,
                     _ => state.isSprinting ? cfg.sprinting : cfg.standing
                 };
-
-        public void OnStateChange(PlayerState state) =>
-            this.state = state;
     }
 }

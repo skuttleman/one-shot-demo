@@ -6,11 +6,7 @@ using UnityEngine;
 
 namespace OSFE.Characters.Player {
     public class PlayerAnimationListener : MonoBehaviour {
-        IGameSystem system;
-
-        void OnEnable() {
-            system = FindObjectOfType<GameController>();
-        }
+        private IGameSystem system;
 
         public void OnStanceChange(PlayerStance stance) =>
                 Brain().OnStanceChanged(stance);
@@ -27,7 +23,11 @@ namespace OSFE.Characters.Player {
         public void OnStep() =>
             Brain().OnPlayerStep();
 
-        IPlayerStateReducer Brain() =>
+        private void OnEnable() {
+            system = FindObjectOfType<GameController>();
+        }
+
+        private IPlayerStateReducer Brain() =>
             system.Send<IControllerManager, IPlayerStateReducer>(mngr =>
                 mngr.Ensure<IPlayerStateReducer>(transform.parent));
     }

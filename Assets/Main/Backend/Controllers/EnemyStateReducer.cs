@@ -7,12 +7,11 @@ using UnityEngine;
 
 namespace OSBE.Controllers {
     public class EnemyStateReducer : IEnemyStateReducer {
-        IGameSystem system;
-        Transform target;
-
-        IStateReceiver<EnemyState> receiver = null;
-        EnemyCfgSO cfg = null;
-        EnemyState state = null;
+        private IGameSystem system;
+        private Transform target;
+        private IStateReceiver<EnemyState> receiver = null;
+        private EnemyCfgSO cfg = null;
+        private EnemyState state;
 
         public EnemyStateReducer(IGameSystem system, Transform target) {
             this.system = system;

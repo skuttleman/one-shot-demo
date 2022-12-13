@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace OSBE.Controllers {
     public class PlayerFOVController : IPlayerFOVController {
-        readonly IGameSystem system;
-        readonly Transform fov;
-        PlayerFOVCfgSO cfg;
-        Mesh mesh;
-        float timeout;
+        private readonly IGameSystem system;
+        private readonly Transform fov;
+        private PlayerFOVCfgSO cfg;
+        private Mesh mesh;
+        private float timeout;
 
         public PlayerFOVController(IGameSystem system, Transform target) {
             this.system = system;

@@ -85,16 +85,5 @@ namespace OSCore.System.Interfaces {
         public interface IDamage {
             public void OnAttack(float damage);
         }
-
-        public abstract class AConnector : MonoBehaviour {
-            internal IGameSystem system;
-
-            public void OnEnable() {
-                system = FindObjectOfType<GameController>();
-                system.Send<IControllerManager>(WireUp);
-            }
-
-            public abstract void WireUp(IControllerManager mngr);
-        }
     }
 }

@@ -14,17 +14,37 @@ using static OSCore.Data.Patrol.EnemyPatrol;
 
 namespace OSBE.Controllers {
     public class EnemyController : MonoBehaviour, IStateReceiver<EnemyState> {
-        [SerializeField] EnemyCfgSO cfg;
-        IGameSystem system;
-        GameObject player;
-        Animator anim;
-        TextMeshPro speech;
-        const float SEEN_THRESHOLD = 5f;
+        [SerializeField] private EnemyCfgSO cfg;
+        private const float SEEN_THRESHOLD = 5f;
 
-        float timeSinceSeenPlayer = 0f;
-        EnemyState state;
+        private IGameSystem system;
+        private GameObject player;
+        private Animator anim;
+        private TextMeshPro speech;
+        private float timeSinceSeenPlayer = 0f;
+        private EnemyState state;
 
-        void OnEnable() {
+        public IEnumerable<float> DoPatrolStep(EnemyPatrol step) =>
+            step switch {
+                PatrolWait msg => Wait(msg.seconds),
+                PatrolFace msg => Face(msg.rotation),
+                PatrolRotate msg => Face(msg.rotation),
+                PatrolGoto msg => Goto(msg.position),
+                _ => new float[] { }
+            };
+
+        public void OnMovementChanged(bool isMoving) { }
+
+        public void OnAttackModeChanged(AttackMode attackMode) { }
+
+        public void OnEnemyStep() { }
+
+        public void OnStateChange(EnemyState state) {
+            this.state = state;
+            if (state.isPlayerInView) timeSinceSeenPlayer = 0f;
+        }
+
+        private void OnEnable() {
             system = FindObjectOfType<GameController>();
             anim = GetComponentInChildren<Animator>();
 
@@ -35,17 +55,17 @@ namespace OSBE.Controllers {
             speech.text = "";
         }
 
-        void Start() {
+        private void Start() {
             StartCoroutine(DoPatrol());
             StartCoroutine(SpeakUp());
         }
 
-        void FixedUpdate() {
+        private void FixedUpdate() {
             speech.transform.position = transform.position + new Vector3(0f, 0.75f, 0f);
             if (!state.isPlayerInView) timeSinceSeenPlayer += Time.fixedDeltaTime;
         }
 
-        IEnumerator<YieldInstruction> SpeakUp() {
+        private IEnumerator<YieldInstruction> SpeakUp() {
             while (!state.isPlayerInView)
                 yield return new WaitForSeconds(0.1f);
             while (true) {
@@ -71,7 +91,7 @@ namespace OSBE.Controllers {
             }
         }
 
-        IEnumerator<YieldInstruction> DoPatrol() {
+        private IEnumerator<YieldInstruction> DoPatrol() {
             foreach (EnemyPatrol step in Patrol()) {
                 foreach (float wait in DoPatrolStep(step)) {
                     float waitAmount = wait;
@@ -89,7 +109,7 @@ namespace OSBE.Controllers {
             }
         }
 
-        IEnumerable<EnemyPatrol> Patrol() {
+        private IEnumerable<EnemyPatrol> Patrol() {
             return Transforms
                 .FindInChildren(transform.parent, node => node.name.Contains("position"))
                 .Reduce((tpl, xform) => {
@@ -109,43 +129,30 @@ namespace OSBE.Controllers {
                 .Cycle();
         }
 
-        public IEnumerable<float> DoPatrolStep(EnemyPatrol step) =>
-            step switch {
-                PatrolWait msg => Wait(msg.seconds),
-                PatrolFace msg => Face(msg.rotation),
-                PatrolRotate msg => Face(msg.rotation),
-                PatrolGoto msg => Goto(msg.position),
-                _ => new float[] { }
-            };
-
-        public void OnMovementChanged(bool isMoving) { }
-        public void OnAttackModeChanged(AttackMode attackMode) { }
-        public void OnEnemyStep() { }
-
-        IEnumerable<float> Wait(float seconds) {
+        private IEnumerable<float> Wait(float seconds) {
             yield return seconds;
         }
 
-        IEnumerable<float> Face(Vector3 rotation) =>
+        private IEnumerable<float> Face(Vector3 rotation) =>
             Face(Vectors.AngleTo(transform.position, rotation));
 
-        IEnumerable<float> Face(float rotationZ) {
+        private IEnumerable<float> Face(float rotationZ) {
             while (Mathf.Abs(transform.rotation.eulerAngles.z - rotationZ) % 360 > cfg.rotationSpeed * Time.fixedDeltaTime) {
                 DoFace(rotationZ);
                 yield return 0;
             }
         }
 
-        void DoFace(Vector3 rotation) =>
+        private void DoFace(Vector3 rotation) =>
             DoFace(Vectors.AngleTo(transform.position, rotation));
 
-        void DoFace(float rotationZ) =>
+        private void DoFace(float rotationZ) =>
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
                 Quaternion.Euler(0f, 0f, rotationZ),
                 cfg.rotationSpeed * Time.fixedDeltaTime);
 
-        IEnumerable<float> Goto(Vector3 position) {
+        private IEnumerable<float> Goto(Vector3 position) {
             while (Vector2.Distance(position, transform.position) > Time.fixedDeltaTime) {
                 DoFace(position);
 
@@ -166,11 +173,6 @@ namespace OSBE.Controllers {
             }
 
             anim.SetBool("isMoving", false);
-        }
-
-        public void OnStateChange(EnemyState state) {
-            this.state = state;
-            if (state.isPlayerInView) timeSinceSeenPlayer = 0f;
         }
     }
 }

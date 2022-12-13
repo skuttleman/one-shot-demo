@@ -12,22 +12,22 @@ using OSCore.Data;
 
 namespace OSBE.Controllers {
     public class PlayerStateReducer : IPlayerStateReducer {
-        static readonly string ANIM_STANCE = "stance";
-        static readonly string ANIM_MOVE = "isMoving";
-        static readonly string ANIM_SCOPE = "isScoping";
-        static readonly string ANIM_AIM = "isAiming";
-        static readonly string ANIM_ATTACK = "isAttacking";
+        private static readonly string ANIM_STANCE = "stance";
+        private static readonly string ANIM_MOVE = "isMoving";
+        private static readonly string ANIM_SCOPE = "isScoping";
+        private static readonly string ANIM_AIM = "isAiming";
+        private static readonly string ANIM_ATTACK = "isAttacking";
 
-        readonly IGameSystem system;
-        readonly Transform target;
-        readonly Animator anim;
+        private readonly IGameSystem system;
+        private readonly Transform target;
+        private readonly Animator anim;
 
-        IStateReceiver<PlayerState> receiver;
-        PlayerCfgSO cfg = null;
-        PlayerState state;
-        GameObject stand;
-        GameObject crouch;
-        GameObject crawl;
+        private IStateReceiver<PlayerState> receiver;
+        private PlayerCfgSO cfg = null;
+        private PlayerState state;
+        private GameObject stand;
+        private GameObject crouch;
+        private GameObject crawl;
 
         public PlayerStateReducer(IGameSystem system, Transform target) {
             this.system = system;
@@ -163,19 +163,19 @@ namespace OSBE.Controllers {
 
         public void OnPlayerStep() { }
 
-        bool ShouldTransitionToSprint() =>
+        private bool ShouldTransitionToSprint() =>
                 !state.isSprinting && !state.isScoping && !PCUtils.IsAiming(state.attackMode);
 
-        void PublishMessage(IEvent message) =>
+        private void PublishMessage(IEvent message) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(message));
 
-        void ActivateStance() {
+        private void ActivateStance() {
             stand.SetActive(state.stance == PlayerStance.STANDING);
             crouch.SetActive(state.stance == PlayerStance.CROUCHING);
             crawl.SetActive(state.stance == PlayerStance.CRAWLING);
         }
 
-        void EmitState(PlayerState state) {
+        private void EmitState(PlayerState state) {
             this.state = state;
             receiver.OnStateChange(state);
         }

@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace OSBE.Tagging {
     public class TagRegistry : ITagRegistry {
-        readonly IDictionary<IdTag, GameObject> uniqueTags;
-        readonly IDictionary<IdTag, ISet<GameObject>> tags;
+        private readonly IDictionary<IdTag, GameObject> uniqueTags;
+        private readonly IDictionary<IdTag, ISet<GameObject>> tags;
 
         public TagRegistry() {
             uniqueTags = new Dictionary<IdTag, GameObject>();

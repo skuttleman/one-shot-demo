@@ -14,8 +14,8 @@ using UnityEngine;
 
 namespace OSBE {
     public class GameSystem : MonoBehaviour, IGameSystem {
-        IDictionary<Type, IGameSystemComponent> components;
-        GameController controller;
+        private IDictionary<Type, IGameSystemComponent> components;
+        private GameController controller;
 
         public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent {
             T component = (T)components.Get(typeof(T), null);
@@ -35,27 +35,26 @@ namespace OSBE {
             return action(component);
         }
 
-        void OnEnable() {
+        private void OnEnable() {
             controller = FindObjectOfType<GameController>();
             Init();
         }
 
-        void Start() =>
+        private void Start() =>
             components?.ForEach(component => component.Value.OnStart());
 
-        void Update() =>
+        private void Update() =>
             components?.ForEach(component => component.Value.OnUpdate());
 
-        void FixedUpdate() =>
+        private void FixedUpdate() =>
             components?.ForEach(component => component.Value.OnFixedUpdate());
 
-        void OnDestroy() {
+        private void OnDestroy() {
             components?.ForEach(component => component.Value.OnDestroy());
             components = new Dictionary<Type, IGameSystemComponent>();
         }
 
-
-        void Init() {
+        private void Init() {
             components = new Dictionary<Type, IGameSystemComponent> {
                 { typeof(IControllerManager), new ControllerManager(this) },
                 { typeof(PromiseFactory) , new PromiseFactory() },
