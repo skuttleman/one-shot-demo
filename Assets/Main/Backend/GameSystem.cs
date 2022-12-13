@@ -1,7 +1,5 @@
 using OSBE.Async;
-using OSBE.Controllers;
 using OSBE.Tagging;
-using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
@@ -55,7 +53,6 @@ namespace OSBE {
 
         private void Init() {
             components = new Dictionary<Type, IGameSystemComponent> {
-                { typeof(IControllerManager), new ControllerManager(this) },
                 { typeof(ITagRegistry), new TagRegistry() },
                 { typeof(IPubSub), new DictionaryPubSub() }
             };

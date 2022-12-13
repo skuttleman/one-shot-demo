@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using OSCore.Data;
 using OSCore.Data.Enums;
 using OSCore.Data.Events.Brains;
-using OSCore.ScriptableObjects;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace OSCore.System.Interfaces {
@@ -37,10 +35,6 @@ namespace OSCore.System.Interfaces {
     }
 
     namespace Brains {
-        public interface IControllerManager : IGameSystemComponent {
-            public T Ensure<T>(Transform target) where T : IGameSystemComponent;
-        }
-
         public interface IPlayerController {
             public void OnMovementInput(Vector2 direction);
             public void OnSprintInput(bool isSprinting);
@@ -62,14 +56,6 @@ namespace OSCore.System.Interfaces {
             public void OnEnemyStep();
             public void OnPlayerSightChange(bool isInView);
             public void OnDamage(float damage);
-        }
-
-        public interface ICameraController : IGameSystemComponent {
-            public void Init(CameraCfgSO cfg);
-        }
-
-        public interface ICameraOverlayController : IGameSystemComponent {
-            public void Init(CameraOverlayCfgSO cfg);
         }
 
         public interface IDamage {

@@ -1,29 +1,25 @@
 ﻿using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces.Events;
-using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
+using OSCore;
 
 namespace OSBE.Controllers {
-    public class CameraController : ICameraController {
-        private readonly IGameSystem system;
-        private readonly Transform target;
-        private readonly Transform camera;
-        private CameraCfgSO cfg = null;
+    public class CameraController : MonoBehaviour {
+        [SerializeField] private CameraCfgSO cfg;
+
+        private IGameSystem system;
         private CinemachineCameraOffset camOffset = null;
 
         private AttackMode attackMode;
         private bool isMoving;
         private bool isScoping;
 
-        public CameraController(IGameSystem system, Transform camera) {
-            this.system = system;
-            this.camera = camera;
-            target = system.Send<ITagRegistry, Transform>(registry =>
-                registry.GetUnique(IdTag.PLAYER).transform);
+        private void OnEnable() {
+            system = FindObjectOfType<GameController>();
+            camOffset = GetComponent<CinemachineCameraOffset>();
             system.Send<IPubSub>(pubsub => {
                 pubsub.Subscribe<AttackModeChanged>(UpdateState);
                 pubsub.Subscribe<MovementChanged>(UpdateState);
@@ -31,12 +27,7 @@ namespace OSBE.Controllers {
             });
         }
 
-        public void Init(CameraCfgSO cfg) {
-            this.cfg = cfg;
-            camOffset = camera.GetComponent<CinemachineCameraOffset>();
-        }
-
-        public void OnUpdate() {
+        private void Update() {
             if (cfg != null && camOffset != null)
                 SetOffset();
         }
@@ -46,7 +37,7 @@ namespace OSBE.Controllers {
 
             camOffset.m_Offset = Vector3.Lerp(
                 camOffset.m_Offset,
-                target.rotation * rotFactor,
+                transform.rotation * rotFactor,
                 cfg.orbitSpeed * Time.deltaTime)
                 + ShakeOffset();
         }
@@ -76,7 +67,7 @@ namespace OSBE.Controllers {
                 ? cfg.fireOffset : cfg.punchOffset;
 
             if (IsAttacking())
-                return target.rotation * new Vector3(0, -offset, 0f) * Time.deltaTime;
+                return transform.rotation * new Vector3(0, -offset, 0f) * Time.deltaTime;
             return Vector3.zero;
         }
 
