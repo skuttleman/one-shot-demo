@@ -1,34 +1,30 @@
 using OSCore.Data.Enums;
 using OSCore.System.Interfaces.Brains;
-using OSCore.System.Interfaces;
-using OSCore;
+using OSCore.Utils;
 using UnityEngine;
 
 namespace OSFE.Characters.Player {
     public class PlayerAnimationListener : MonoBehaviour {
-        private IGameSystem system;
+        IPlayerController controller;
 
         public void OnStanceChange(PlayerStance stance) =>
-                Brain().OnStanceChanged(stance);
+            controller.OnStanceChanged(stance);
 
         public void OnAttackMode(AttackMode mode) =>
-            Brain().OnAttackModeChanged(mode);
+            controller.OnAttackModeChanged(mode);
 
         public void OnMovement(int moving) =>
-            Brain().OnMovementChanged(moving != 0);
+            controller.OnMovementChanged(moving != 0);
 
         public void OnScope(int enabled) =>
-            Brain().OnScopingChanged(enabled != 0);
+            controller.OnScopingChanged(enabled != 0);
 
         public void OnStep() =>
-            Brain().OnPlayerStep();
+            controller.OnPlayerStep();
 
         private void OnEnable() {
-            system = FindObjectOfType<GameController>();
+            controller = Transforms.Entity(transform)
+                .GetComponent<IPlayerController>();
         }
-
-        private IPlayerStateReducer Brain() =>
-            system.Send<IControllerManager, IPlayerStateReducer>(mngr =>
-                mngr.Ensure<IPlayerStateReducer>(transform.parent));
     }
 }

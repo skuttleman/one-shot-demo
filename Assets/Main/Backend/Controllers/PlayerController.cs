@@ -1,15 +1,26 @@
 ﻿using OSCore.Data.Enums;
+using OSCore.Data.Events.Brains;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces;
 using OSCore.Utils;
 using OSCore;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
+using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers {
-    public class PlayerController : MonoBehaviour, IStateReceiver<PlayerState> {
+    public class PlayerController : MonoBehaviour, IPlayerController {
+        private static readonly string ANIM_STANCE = "stance";
+        private static readonly string ANIM_MOVE = "isMoving";
+        private static readonly string ANIM_SCOPE = "isScoping";
+        private static readonly string ANIM_AIM = "isAiming";
+        private static readonly string ANIM_ATTACK = "isAttacking";
+
         [SerializeField] private PlayerCfgSO cfg;
 
         private IGameSystem system;
@@ -19,19 +30,140 @@ namespace OSBE.Controllers {
         private bool isGrounded = false;
         private RaycastHit ground;
 
-        public void OnStateChange(PlayerState state) =>
-            this.state = state;
+        private GameObject stand;
+        private GameObject crouch;
+        private GameObject crawl;
+
+        public void OnMovementInput(Vector2 direction) {
+            bool isMoving = Vectors.NonZero(direction);
+            anim.SetBool(ANIM_MOVE, isMoving);
+
+            state = state with {
+                isMoving = isMoving,
+                movement = direction,
+                isSprinting = isMoving && state.isSprinting
+            };
+        }
+
+        public void OnSprintInput(bool isSprinting) {
+            if (state.isSprinting && ShouldTransitionToSprint()) {
+                anim.SetInteger(ANIM_STANCE, (int)PlayerStance.STANDING);
+                state = state with {
+                    stance = PlayerStance.STANDING,
+                    isSprinting = true
+                };
+            }
+        }
+
+        public void OnLookInput(Vector2 direction, bool isMouse) {
+            state = state with {
+                facing = direction,
+                isSprinting = false,
+                mouseLookTimer = isMouse && Vectors.NonZero(direction) ? cfg.mouseLookReset : state.mouseLookTimer
+            };
+        }
+
+        public void OnStanceInput(float holdDuration) {
+            PlayerStance nextStance = PCUtils.NextStance(
+                cfg,
+                state.stance,
+                holdDuration);
+            if (!state.isMoving || PCUtils.IsMovable(nextStance, state))
+                anim.SetInteger(ANIM_STANCE, (int)nextStance);
+
+            state = state with { isSprinting = false };
+        }
+
+        public void OnAimInput(bool isAiming) {
+            anim.SetBool(ANIM_AIM, isAiming);
+            state = state with { isSprinting = false };
+        }
+
+        public void OnAttackInput(bool isAttacking) {
+            if (isAttacking && PCUtils.CanAttack(state.attackMode)) {
+                float attackSpeed = state.attackMode == AttackMode.HAND
+                    ? cfg.punchingSpeed
+                    : cfg.firingSpeed;
+                anim.SetBool(ANIM_ATTACK, true);
+
+                state = state with { isSprinting = false };
+
+                StartCoroutine(PCUtils.After(
+                    attackSpeed,
+                    () => anim.SetBool(ANIM_ATTACK, false)));
+            }
+        }
+
+        public void OnScopeInput(bool isScoping) {
+            anim.SetBool(ANIM_SCOPE, isScoping);
+            state = state with { isSprinting = !isScoping && state.isScoping };
+        }
+
+        public void OnStanceChanged(PlayerStance stance) {
+            if (state.stance != stance) {
+                state = state with { stance = stance };
+                ActivateStance();
+                PublishMessage(new StanceChanged(stance));
+            }
+        }
+
+        public void OnAttackModeChanged(AttackMode attackMode) {
+            if (state.attackMode != attackMode) {
+                state = state with { attackMode = attackMode };
+                PublishMessage(new AttackModeChanged(attackMode));
+            }
+        }
+
+        public void OnMovementChanged(bool isMoving) {
+            if (state.isMoving != isMoving) {
+                state = state with { isMoving = isMoving };
+                PublishMessage(new MovementChanged(isMoving));
+            }
+        }
+
+        public void OnScopingChanged(bool isScoping) {
+            if (state.isScoping != isScoping) {
+                state = state with { isScoping = isScoping };
+                PublishMessage(new ScopingChanged(isScoping));
+            }
+        }
+
+        public void OnPlayerStep() { }
 
         private void OnEnable() {
             system = FindObjectOfType<GameController>();
             rb = GetComponent<Rigidbody>();
             anim = GetComponentInChildren<Animator>();
 
-            system.Send<IControllerManager>(mngr =>
-                mngr.Ensure<IPlayerStateReducer>(transform).Init(this, cfg));
+            stand = Transforms
+                .FindInChildren(transform, xform => xform.name == "stand")
+                .First()
+                .gameObject;
+            crouch = Transforms
+                .FindInChildren(transform, xform => xform.name == "crouch")
+                .First()
+                .gameObject;
+            crawl = Transforms
+                .FindInChildren(transform, xform => xform.name == "crawl")
+                .First()
+                .gameObject;
+
+            state = new PlayerState {
+                movement = Vector2.zero,
+                facing = Vector2.zero,
+                stance = PlayerStance.STANDING,
+                attackMode = AttackMode.HAND,
+                mouseLookTimer = 0f,
+                isMoving = false,
+                isSprinting = false,
+                isScoping = false
+            };
+            ActivateStance();
         }
 
         private void Update() {
+            if (state.mouseLookTimer > 0f)
+                state = state with { mouseLookTimer = state.mouseLookTimer - Time.deltaTime };
             RotatePlayer(MoveCfg());
         }
 
@@ -117,5 +249,48 @@ namespace OSBE.Controllers {
                     PlayerStance.CRAWLING => cfg.crawling,
                     _ => state.isSprinting ? cfg.sprinting : cfg.standing
                 };
+
+        private void ActivateStance() {
+            stand.SetActive(state.stance == PlayerStance.STANDING);
+            crouch.SetActive(state.stance == PlayerStance.CROUCHING);
+            crawl.SetActive(state.stance == PlayerStance.CRAWLING);
+        }
+
+        private bool ShouldTransitionToSprint() =>
+                !state.isSprinting && !state.isScoping && !PCUtils.IsAiming(state.attackMode);
+
+        private void PublishMessage(IEvent message) =>
+            system.Send<IPubSub>(pubsub => pubsub.Publish(message));
+
+        private static class PCUtils {
+            public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {
+                bool held = stanceDuration >= cfg.stanceChangeHeldThreshold;
+
+                if (held && stance == PlayerStance.CRAWLING)
+                    return PlayerStance.STANDING;
+                else if (held)
+                    return PlayerStance.CRAWLING;
+                else if (stance == PlayerStance.CROUCHING)
+                    return PlayerStance.STANDING;
+                return PlayerStance.CROUCHING;
+            }
+
+            public static bool IsAiming(AttackMode mode) =>
+                mode == AttackMode.WEAPON || mode == AttackMode.FIRING;
+
+            public static bool IsMovable(PlayerStance stance, PlayerState state) =>
+                stance != PlayerStance.CRAWLING
+                || (!IsAiming(state.attackMode) && !state.isScoping);
+
+            public static bool CanAttack(AttackMode mode) =>
+                mode != AttackMode.NONE
+                    && mode != AttackMode.FIRING
+                    && mode != AttackMode.MELEE;
+
+            public static IEnumerator<YieldInstruction> After(float seconds, Action cb) {
+                yield return new WaitForSeconds(seconds);
+                cb();
+            }
+        }
     }
 }

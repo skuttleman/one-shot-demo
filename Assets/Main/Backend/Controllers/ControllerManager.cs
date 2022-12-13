@@ -41,8 +41,6 @@ namespace OSBE.Controllers {
 
         private IGameSystemComponent Create<T>(Transform target) {
             Type t = typeof(T);
-            if (t == typeof(IPlayerStateReducer))
-                return new PlayerStateReducer(system, target);
             if (t == typeof(IPlayerFOVController))
                 return new PlayerFOVController(system, target);
 

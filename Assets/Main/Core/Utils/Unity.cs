@@ -15,6 +15,12 @@ namespace OSCore.Utils {
                 parent,
                 child => child.gameObject.activeInHierarchy && pred(child));
 
+        public static Transform Entity(Transform transform) {
+            Transform entity = transform;
+            while (entity is not null && entity.name != "Entity") entity = entity.parent;
+            return entity;
+        }
+
         private static ISet<Transform> FindInChildren(
             ISet<Transform> results, Transform parent, Predicate<Transform> pred) {
             foreach (Transform child in parent) {

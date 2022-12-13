@@ -41,8 +41,7 @@ namespace OSCore.System.Interfaces {
             public T Ensure<T>(Transform target) where T : IGameSystemComponent;
         }
 
-        public interface IPlayerStateReducer : IGameSystemComponent {
-            public void Init(IStateReceiver<PlayerState> receiver, PlayerCfgSO cfg);
+        public interface IPlayerController {
             public void OnMovementInput(Vector2 direction);
             public void OnSprintInput(bool isSprinting);
             public void OnLookInput(Vector2 direction, bool isMouse);

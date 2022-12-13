@@ -1,44 +1,40 @@
 using OSCore.System.Interfaces.Brains;
-using OSCore.System.Interfaces;
 using OSCore.Utils;
-using OSCore;
 using UnityEngine.InputSystem;
 using UnityEngine;
 
 namespace OSFE.Characters.Player {
     public class PlayerInputListener : MonoBehaviour {
-        private IGameSystem system;
+        private IPlayerController controller;
 
-        public void OnInputMove(InputValue value) =>
-            Brain().OnMovementInput(value.Get<Vector2>());
-
-        public void OnInputRun(InputValue value) =>
-            Brain().OnSprintInput(value.isPressed);
-
-        public void OnInputLook(InputValue value) =>
-            Brain().OnLookInput(value.Get<Vector2>(), false);
-
-        public void OnInputMouseLook(InputValue value) =>
-            Brain().OnLookInput(value.Get<Vector2>(), true);
-
-        public void OnInputStance(InputValue value) =>
-            Brain().OnStanceInput(value.Get<float>());
-
-        public void OnInputScope(InputValue value) =>
-            Brain().OnScopeInput(Maths.NonZero(value.Get<float>()));
-
-        public void OnInputAim(InputValue value) =>
-            Brain().OnAimInput(Maths.NonZero(value.Get<float>()));
-
-        public void OnInputAttack(InputValue value) =>
-            Brain().OnAttackInput(value.isPressed);
-
-        private void OnEnable() {
-            system = FindObjectOfType<GameController>();
+        public void OnInputMove(InputValue value) {
+            controller.OnMovementInput(value.Get<Vector2>());
         }
 
-        private IPlayerStateReducer Brain() =>
-            system.Send<IControllerManager, IPlayerStateReducer>(mngr =>
-                mngr.Ensure<IPlayerStateReducer>(transform));
+        public void OnInputRun(InputValue value) =>
+            controller.OnSprintInput(value.isPressed);
+
+        public void OnInputLook(InputValue value) =>
+            controller.OnLookInput(value.Get<Vector2>(), false);
+
+        public void OnInputMouseLook(InputValue value) =>
+            controller.OnLookInput(value.Get<Vector2>(), true);
+
+        public void OnInputStance(InputValue value) =>
+            controller.OnStanceInput(value.Get<float>());
+
+        public void OnInputScope(InputValue value) =>
+            controller.OnScopeInput(Maths.NonZero(value.Get<float>()));
+
+        public void OnInputAim(InputValue value) =>
+            controller.OnAimInput(Maths.NonZero(value.Get<float>()));
+
+        public void OnInputAttack(InputValue value) =>
+            controller.OnAttackInput(value.isPressed);
+
+        private void OnEnable() {
+            controller = Transforms.Entity(transform)
+                .GetComponent<IPlayerController>();
+        }
     }
 }
