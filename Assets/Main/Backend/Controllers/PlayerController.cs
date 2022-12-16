@@ -14,6 +14,7 @@ using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers {
     public class PlayerController : ASystemInitializer, IPlayerController {
+        private static readonly string ANIM_GROUNDED = "isGrounded";
         private static readonly string ANIM_STANCE = "stance";
         private static readonly string ANIM_MOVE = "isMoving";
         private static readonly string ANIM_SCOPE = "isScoping";
@@ -34,17 +35,24 @@ namespace OSBE.Controllers {
 
         public void OnMovementInput(Vector2 direction) {
             bool isMoving = Vectors.NonZero(direction);
+            bool isSprinting = isMoving && state.isSprinting;
+            PlayerStance stance = isSprinting ? PlayerStance.STANDING : state.stance;
+            if (stance == PlayerStance.STANDING && !isSprinting)
+                stance = PlayerStance.CROUCHING;
+
             anim.SetBool(ANIM_MOVE, isMoving);
+            anim.SetInteger(ANIM_STANCE, (int)stance);
 
             state = state with {
                 isMoving = isMoving,
                 movement = direction,
-                isSprinting = isMoving && state.isSprinting
+                isSprinting = isSprinting,
+                stance = stance
             };
         }
 
         public void OnSprintInput(bool isSprinting) {
-            if (state.isSprinting && ShouldTransitionToSprint()) {
+            if (isSprinting && ShouldTransitionToSprint()) {
                 anim.SetInteger(ANIM_STANCE, (int)PlayerStance.STANDING);
                 state = state with {
                     stance = PlayerStance.STANDING,
@@ -61,11 +69,8 @@ namespace OSBE.Controllers {
             };
         }
 
-        public void OnStanceInput(float holdDuration) {
-            PlayerStance nextStance = PCUtils.NextStance(
-                cfg,
-                state.stance,
-                holdDuration);
+        public void OnStanceInput() {
+            PlayerStance nextStance = PCUtils.NextStance(state.stance);
             if (!state.isMoving || PCUtils.IsMovable(nextStance, state))
                 anim.SetInteger(ANIM_STANCE, (int)nextStance);
 
@@ -165,18 +170,21 @@ namespace OSBE.Controllers {
         }
 
         private void FixedUpdate() {
+            bool prevGrounded = isGrounded;
             isGrounded = Physics.Raycast(
                 transform.position - new Vector3(0, 0, 0.01f),
                 Vectors.DOWN,
                 out ground,
                 cfg.groundedDist);
 
-            anim.SetBool("isGrounded", isGrounded);
+            anim.SetBool(ANIM_GROUNDED, isGrounded);
 
             if (!isGrounded) {
-                anim.SetBool("isAiming", false);
-                anim.SetBool("isScoping", false);
-                anim.SetInteger("stance", 0);
+                anim.SetBool(ANIM_AIM, false);
+                anim.SetBool(ANIM_SCOPE, false);
+                anim.SetInteger(ANIM_STANCE, (int) PlayerStance.STANDING);
+            } else if (!prevGrounded && isGrounded && !state.isSprinting) {
+                anim.SetInteger(ANIM_STANCE, (int)PlayerStance.CROUCHING);
             }
 
             MovePlayer(MoveCfg());
@@ -260,15 +268,9 @@ namespace OSBE.Controllers {
             system.Send<IPubSub>(pubsub => pubsub.Publish(message));
 
         private static class PCUtils {
-            public static PlayerStance NextStance(PlayerCfgSO cfg, PlayerStance stance, float stanceDuration) {
-                bool held = stanceDuration >= cfg.stanceChangeHeldThreshold;
-
-                if (held && stance == PlayerStance.CRAWLING)
-                    return PlayerStance.STANDING;
-                else if (held)
+            public static PlayerStance NextStance(PlayerStance stance) {
+                if (stance == PlayerStance.CROUCHING)
                     return PlayerStance.CRAWLING;
-                else if (stance == PlayerStance.CROUCHING)
-                    return PlayerStance.STANDING;
                 return PlayerStance.CROUCHING;
             }
 

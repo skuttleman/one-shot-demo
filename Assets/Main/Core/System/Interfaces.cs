@@ -39,7 +39,7 @@ namespace OSCore.System.Interfaces {
             public void OnMovementInput(Vector2 direction);
             public void OnSprintInput(bool isSprinting);
             public void OnLookInput(Vector2 direction, bool isMouse);
-            public void OnStanceInput(float holdDuration);
+            public void OnStanceInput();
             public void OnAimInput(bool isAiming);
             public void OnAttackInput(bool isAttacking);
             public void OnScopeInput(bool isScoping);

@@ -5,7 +5,6 @@ namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/player/general")]
     public class PlayerCfgSO : ScriptableObject {
         [field: Header("Input")]
-        [field: SerializeField] public float stanceChangeHeldThreshold { get; private set; }
         [field: SerializeField] public float mouseLookReset { get; private set; }
         [field: Range(0.1f, 1f)]
         [field: SerializeField]  public float groundedDist { get; private set; }

@@ -8,7 +8,8 @@ namespace OSFE {
     public class Tags : ASystemInitializer {
         [SerializeField] private Tag[] tags;
 
-        private void OnEnable() {
+        protected override void OnEnable() {
+            base.OnEnable();
             system.Send<ITagRegistry>(registry => {
                 foreach (Tag tag in tags)
                     if (tag.isUnique) registry.RegisterUnique(tag.tag, gameObject);

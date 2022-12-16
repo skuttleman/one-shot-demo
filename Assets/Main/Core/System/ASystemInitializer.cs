@@ -9,7 +9,7 @@ namespace OSCore.System {
     public abstract class ASystemInitializer : MonoBehaviour {
         protected IGameSystem system;
 
-        private void OnEnable() {
+        protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
         }
     }
@@ -19,7 +19,7 @@ namespace OSCore.System {
         protected IGameSystem system;
         private IEnumerable<long> subs;
 
-        private void OnEnable() {
+        protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
             subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
                 new long[] {
@@ -27,7 +27,7 @@ namespace OSCore.System {
                 });
         }
 
-        private void OnDisable() {
+        protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }
@@ -41,7 +41,7 @@ namespace OSCore.System {
         protected IGameSystem system;
         private IEnumerable<long> subs;
 
-        private void OnEnable() {
+        protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
             subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
                 new long[] {
@@ -50,7 +50,7 @@ namespace OSCore.System {
                 });
         }
 
-        private void OnDisable() {
+        protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }
@@ -66,7 +66,7 @@ namespace OSCore.System {
         protected IGameSystem system;
         private IEnumerable<long> subs;
 
-        private void OnEnable() {
+        protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
             subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
                 new long[] {
@@ -76,7 +76,7 @@ namespace OSCore.System {
                 });
         }
 
-        private void OnDisable() {
+        protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }
@@ -94,7 +94,7 @@ namespace OSCore.System {
         protected IGameSystem system;
         private IEnumerable<long> subs;
 
-        private void OnEnable() {
+        protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
             subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
                 new long[] {
@@ -105,7 +105,7 @@ namespace OSCore.System {
                 });
         }
 
-        private void OnDisable() {
+        protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }

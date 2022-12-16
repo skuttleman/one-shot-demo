@@ -21,7 +21,7 @@ namespace OSFE.Characters.Player {
             controller.OnLookInput(value.Get<Vector2>(), true);
 
         public void OnInputStance(InputValue value) =>
-            controller.OnStanceInput(value.Get<float>());
+            controller.OnStanceInput();
 
         public void OnInputScope(InputValue value) =>
             controller.OnScopeInput(Maths.NonZero(value.Get<float>()));
