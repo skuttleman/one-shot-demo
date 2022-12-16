@@ -1,20 +1,19 @@
 using OSCore.Data.Enums;
 using OSCore.System.Interfaces.Tagging;
-using OSCore;
 using System;
 using UnityEngine;
+using OSCore.System;
 
 namespace OSFE {
-    public class Tags : MonoBehaviour {
+    public class Tags : ASystemInitializer {
         [SerializeField] private Tag[] tags;
 
         private void OnEnable() {
-            FindObjectOfType<GameController>()
-                .Send<ITagRegistry>(registry => {
-                    foreach (Tag tag in tags)
-                        if (tag.isUnique) registry.RegisterUnique(tag.tag, gameObject);
-                        else registry.Register(tag.tag, gameObject);
-                });
+            system.Send<ITagRegistry>(registry => {
+                foreach (Tag tag in tags)
+                    if (tag.isUnique) registry.RegisterUnique(tag.tag, gameObject);
+                    else registry.Register(tag.tag, gameObject);
+            });
         }
 
         [Serializable]

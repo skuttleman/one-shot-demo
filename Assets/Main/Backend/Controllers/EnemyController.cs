@@ -1,23 +1,23 @@
-using System.Collections.Generic;
-using OSCore;
-using OSCore.Data;
 using OSCore.Data.Enums;
 using OSCore.Data.Patrol;
+using OSCore.Data;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces;
 using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces.Tagging;
+using OSCore.System.Interfaces;
+using OSCore.System;
 using OSCore.Utils;
+using OSCore;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using static OSCore.Data.Patrol.EnemyPatrol;
 
 namespace OSBE.Controllers {
-    public class EnemyController : MonoBehaviour, IEnemyController {
+    public class EnemyController : ASystemInitializer, IEnemyController {
         [SerializeField] private EnemyCfgSO cfg;
         private const float SEEN_THRESHOLD = 5f;
 
-        private IGameSystem system;
         private GameObject player;
         private Animator anim;
         private TextMeshPro speech;
@@ -49,8 +49,7 @@ namespace OSBE.Controllers {
             timeSinceSeenPlayer = 0f;
         }
 
-        private void OnEnable() {
-            system = FindObjectOfType<GameController>();
+        private void Start() {
             anim = GetComponentInChildren<Animator>();
 
             player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
@@ -63,9 +62,7 @@ namespace OSBE.Controllers {
             state = new EnemyState {
                 isPlayerInView = false
             };
-        }
 
-        private void Start() {
             StartCoroutine(DoPatrol());
             StartCoroutine(SpeakUp());
         }

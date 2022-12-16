@@ -1,23 +1,15 @@
-using OSCore;
 using OSCore.Data.Enums;
-using OSCore.System.Interfaces;
-using OSCore.System.Interfaces.Events;
+using OSCore.System;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
-public class PlayerFiring : MonoBehaviour {
-    [SerializeField] private GameObject bulletPrefab;
+namespace OSFE.Characters.Player {
+    public class PlayerFiring : ASystemInitializer<AttackModeChanged> {
+        [SerializeField] private GameObject bulletPrefab;
 
-    private IGameSystem system;
-
-    private void OnEnable() {
-        system = FindObjectOfType<GameController>();
-
-        system.Send<IPubSub>(pubsub => pubsub.Subscribe<AttackModeChanged>(OnFire));
-    }
-
-    private void OnFire(AttackModeChanged ev) {
-        if (ev.mode == AttackMode.FIRING)
-            Instantiate(bulletPrefab, transform.position, transform.rotation);
+        protected override void OnEvent(AttackModeChanged e) {
+            if (e.mode == AttackMode.FIRING)
+                Instantiate(bulletPrefab, transform.position, transform.rotation);
+        }
     }
 }

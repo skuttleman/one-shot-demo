@@ -4,9 +4,8 @@ using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces.Events;
-using OSCore.System.Interfaces;
+using OSCore.System;
 using OSCore.Utils;
-using OSCore;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -14,7 +13,7 @@ using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers {
-    public class PlayerController : MonoBehaviour, IPlayerController {
+    public class PlayerController : ASystemInitializer, IPlayerController {
         private static readonly string ANIM_STANCE = "stance";
         private static readonly string ANIM_MOVE = "isMoving";
         private static readonly string ANIM_SCOPE = "isScoping";
@@ -23,7 +22,6 @@ namespace OSBE.Controllers {
 
         [SerializeField] private PlayerCfgSO cfg;
 
-        private IGameSystem system;
         private Rigidbody rb;
         private Animator anim;
         private PlayerState state;
@@ -130,8 +128,7 @@ namespace OSBE.Controllers {
 
         public void OnPlayerStep() { }
 
-        private void OnEnable() {
-            system = FindObjectOfType<GameController>();
+        private void Start() {
             rb = GetComponent<Rigidbody>();
             anim = GetComponentInChildren<Animator>();
 

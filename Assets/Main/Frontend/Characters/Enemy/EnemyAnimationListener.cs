@@ -16,7 +16,7 @@ namespace OSFE.Characters.Enemy {
         public void OnStep() =>
             controller.OnEnemyStep();
 
-        private void OnEnable() {
+        private void Start() {
             controller = Transforms.Entity(transform).GetComponent<IEnemyController>();
         }
     }

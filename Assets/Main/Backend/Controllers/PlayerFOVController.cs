@@ -9,7 +9,7 @@ namespace OSBE.Controllers {
         private Mesh mesh;
         private float timeout;
 
-        private void OnEnable() {
+        private void Start() {
             mesh = new();
             timeout = 0f;
             GetComponent<MeshFilter>().mesh = mesh;

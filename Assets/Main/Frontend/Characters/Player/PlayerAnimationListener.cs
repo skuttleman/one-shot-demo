@@ -22,7 +22,7 @@ namespace OSFE.Characters.Player {
         public void OnStep() =>
             controller.OnPlayerStep();
 
-        private void OnEnable() {
+        private void Start() {
             controller = Transforms.Entity(transform)
                 .GetComponent<IPlayerController>();
         }

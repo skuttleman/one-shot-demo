@@ -9,7 +9,7 @@ namespace OSFE.Characters.Enemy {
         public void OnAttack(float damage) =>
             controller.OnDamage(damage);
 
-        private void OnEnable() {
+        private void Start() {
             controller = Transforms.Entity(transform)
                 .GetComponent<IEnemyController>();
         }

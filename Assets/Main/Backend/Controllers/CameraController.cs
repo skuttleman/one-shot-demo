@@ -1,30 +1,29 @@
 ﻿using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Events;
-using OSCore.System.Interfaces;
+using OSCore.System;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
-using OSCore;
 
 namespace OSBE.Controllers {
-    public class CameraController : MonoBehaviour {
+    public class CameraController : ASystemInitializer<AttackModeChanged, MovementChanged, ScopingChanged> {
         [SerializeField] private CameraCfgSO cfg;
 
-        private IGameSystem system;
         private CinemachineCameraOffset camOffset = null;
-
         private AttackMode attackMode;
         private bool isMoving;
         private bool isScoping;
 
-        private void OnEnable() {
-            system = FindObjectOfType<GameController>();
+        protected override void OnEvent(AttackModeChanged ev) =>
+            attackMode = ev.mode;
+
+        protected override void OnEvent(MovementChanged ev) =>
+            isMoving = ev.isMoving;
+
+        protected override void OnEvent(ScopingChanged ev) =>
+            isScoping = ev.isScoping;
+
+        private void Start() {
             camOffset = GetComponent<CinemachineCameraOffset>();
-            system.Send<IPubSub>(pubsub => {
-                pubsub.Subscribe<AttackModeChanged>(UpdateState);
-                pubsub.Subscribe<MovementChanged>(UpdateState);
-                pubsub.Subscribe<ScopingChanged>(UpdateState);
-            });
         }
 
         private void Update() {
@@ -40,16 +39,6 @@ namespace OSBE.Controllers {
                 transform.rotation * rotFactor,
                 cfg.orbitSpeed * Time.deltaTime)
                 + ShakeOffset();
-        }
-
-        private void UpdateState(AttackModeChanged ev) =>
-            attackMode = ev.mode;
-
-        private void UpdateState(MovementChanged ev) =>
-            isMoving = ev.isMoving;
-
-        private void UpdateState(ScopingChanged ev) {
-            isScoping = ev.isScoping;
         }
 
         private Vector3 LookAheadOffset() {

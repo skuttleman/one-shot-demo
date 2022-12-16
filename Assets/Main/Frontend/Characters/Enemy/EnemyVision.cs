@@ -1,23 +1,20 @@
 using OSCore.System.Interfaces.Brains;
 using OSCore.System.Interfaces.Tagging;
-using OSCore.System.Interfaces;
-using OSCore;
-using UnityEngine;
 using OSCore.Utils;
 using System.Collections.Generic;
+using UnityEngine;
+using OSCore.System;
 
-public class EnemyVision : MonoBehaviour {
-    private IGameSystem system;
+public class EnemyVision : ASystemInitializer {
     private IEnemyController controller;
     private GameObject player;
     private Renderer rdr;
     private bool seesPlayer = false;
     private float timeSinceSeen = 1f;
 
-    private void OnEnable() {
+    private void Start() {
         Transform entity = Transforms.Entity(transform);
         controller = entity.GetComponent<IEnemyController>();
-        system = FindObjectOfType<GameController>();
         player = system.Send<ITagRegistry, GameObject>(reg =>
             reg.GetUnique(OSCore.Data.Enums.IdTag.PLAYER));
         rdr = entity.GetComponentInChildren<SpriteRenderer>();

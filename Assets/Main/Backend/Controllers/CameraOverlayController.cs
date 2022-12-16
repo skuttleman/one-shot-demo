@@ -1,28 +1,24 @@
 using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces.Tagging;
-using OSCore.System.Interfaces;
+using OSCore.System;
 using OSCore.Utils;
-using OSCore;
 using UnityEngine;
 using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers {
-    public class CameraOverlayController : MonoBehaviour {
+    public class CameraOverlayController : ASystemInitializer<ScopingChanged> {
         [SerializeField] private CameraOverlayCfgSO cfg;
 
-        private IGameSystem system;
         private Transform player;
         private SpriteRenderer rdr;
         private bool isScoping = false;
         private float alpha = 0f;
 
-        private void OnEnable() {
-            system = FindObjectOfType<GameController>();
-            system.Send<IPubSub>(pubsub => {
-                pubsub.Subscribe<ScopingChanged>(ScopeChanged);
-            });
+        protected override void OnEvent(ScopingChanged e) =>
+            isScoping = e.isScoping;
+
+        private void Start() {
             player = system.Send<ITagRegistry, GameObject>(registry =>
                 registry.GetUnique(IdTag.PLAYER)).transform;
             rdr = transform.GetComponent<SpriteRenderer>();
@@ -42,8 +38,5 @@ namespace OSBE.Controllers {
                         Vectors.AngleTo(player.position, transform.parent.position));
             }
         }
-
-        private void ScopeChanged(ScopingChanged ev) =>
-            isScoping = ev.isScoping;
     }
 }
