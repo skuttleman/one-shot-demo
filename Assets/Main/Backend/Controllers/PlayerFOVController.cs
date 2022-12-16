@@ -34,8 +34,12 @@ namespace OSBE.Controllers {
             Vector2[] uv = new Vector2[vertices.Length];
             int[] triangles = new int[cfg.RAY_COUNT * 3];
 
-            vertices[0] = head.position;
-            float facing = head.rotation.eulerAngles.z;
+            vertices[0] = new(
+                head.position.x.RoundTo(100f),
+                head.position.y.RoundTo(100f),
+                head.position.z);
+
+            float facing = angle;
 
             int triangleIdx = -3;
             for (int vertexIdx = 1; vertexIdx < cfg.RAY_COUNT;) {
@@ -44,7 +48,7 @@ namespace OSBE.Controllers {
 
                 float percent = Mathf.Max(0.333f, (180f - diff) / 180f);
                 bool isHit = Physics.Raycast(
-                    head.position,
+                    vertices[0],
                     Vectors.ToVector3(angle + transform.rotation.eulerAngles.z),
                     out RaycastHit hit,
                     cfg.viewDistance,
