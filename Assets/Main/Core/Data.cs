@@ -30,6 +30,23 @@ namespace OSCore.Data {
         public bool isPlayerInView { get; init; }
     }
 
+    namespace Events {
+        public interface IEvent { }
+
+        namespace Controllers {
+            namespace Player {
+                public record AnimationEmittedEvent : IEvent {
+                    public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
+                    public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
+                    public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
+                    public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
+
+                    private AnimationEmittedEvent() { }
+                }
+            }
+        }
+    }
+
     namespace Animations {
         public enum PlayerAnim {
             stand_idle,
@@ -72,6 +89,24 @@ namespace OSCore.Data {
             AIM_OFF,
             ATTACK,
         }
+
+        public enum EnemyAnim {
+            stand_idle,
+            stand_move,
+            stand_toaim,
+            stand_idle_aim,
+            stand_melee,
+            stand_fire,
+            stand_fall,
+        }
+
+        public enum EnemyAnimSignal {
+            MOVE_ON,
+            MOVE_OFF,
+            AIM_ON,
+            AIM_OFF,
+            ATTACK,
+        }
     }
 
     namespace Patrol {
@@ -84,21 +119,5 @@ namespace OSCore.Data {
             private EnemyPatrol() { }
         }
     }
-
-    namespace Events {
-        public interface IEvent { }
-
-        namespace Controllers {
-            namespace Player {
-                public record AnimationEmittedEvent : IEvent {
-                    public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
-                    public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
-                    public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
-                    public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
-
-                    private AnimationEmittedEvent() { }
-                }
-            }
-        }
-    }
 }
+

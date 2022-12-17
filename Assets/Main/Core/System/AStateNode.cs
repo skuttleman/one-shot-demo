@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace OSCore.System {
     public abstract class AStateNode<State, Signal> {
@@ -27,6 +26,7 @@ namespace OSCore.System {
 
     public class StableNode<State, Signal> : AStateNode<State, Signal> {
         public StableNode(State state) : base(state, 0f) { }
+        public StableNode(State state, float minTime) : base(state, minTime) { }
     }
 
     public class TransitionNode<State, Signal> : AStateNode<State, Signal> {
@@ -36,5 +36,32 @@ namespace OSCore.System {
         public TransitionNode(State state, float minTime, AStateNode<State, Signal> target) : base(state, minTime) {
             this.target = target;
         }
+    }
+
+    public static class StateNodeBuilder {
+        public static AStateNode<State, Signal> To<State, Signal>(
+            this AStateNode<State, Signal> node,
+            Signal signal,
+            AStateNode<State, Signal> target) {
+            node.SetEdge(signal, target);
+            return node;
+        }
+
+        public static AStateNode<State, Signal> Through<State, Signal>(
+            this AStateNode<State, Signal> node,
+            Signal signal,
+            State transition,
+            float minTime,
+            AStateNode<State, Signal> target) {
+            node.SetEdge(signal, new TransitionNode<State, Signal>(transition, minTime, target));
+            return node;
+        }
+
+        public static AStateNode<State, Signal> With<State, Signal>(
+            this AStateNode<State, Signal> node,
+            Signal signal,
+            State transition,
+            float minTime) =>
+            node.Through(signal, transition, minTime, node);
     }
 }

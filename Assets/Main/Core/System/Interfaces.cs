@@ -52,8 +52,6 @@ namespace OSCore.System.Interfaces {
         }
 
         public interface IEnemyController {
-            public void OnAttackModeChanged(AttackMode attackMode);
-            public void OnMovementChanged(bool isMoving);
             public void OnEnemyStep();
             public void OnPlayerSightChange(bool isInView);
             public void OnDamage(float damage);

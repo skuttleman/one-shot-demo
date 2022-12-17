@@ -1,9 +1,11 @@
+using OSCore.Data.Animations;
 using OSCore.Data.Enums;
 using OSCore.Data.Patrol;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
 using OSCore.System.Interfaces.Tagging;
+using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
@@ -12,15 +14,15 @@ using UnityEngine;
 using static OSCore.Data.Patrol.EnemyPatrol;
 
 namespace OSBE.Controllers {
-    public class EnemyController : ASystemInitializer, IEnemyController {
+    public class EnemyController : ASystemInitializer, IEnemyController, IStateReceiver<EnemyAnim> {
         [SerializeField] private EnemyCfgSO cfg;
         private const float SEEN_THRESHOLD = 5f;
 
         private GameObject player;
-        private Animator anim;
+        private EnemyAnimator animController;
         private TextMeshPro speech;
         private float timeSinceSeenPlayer = 0f;
-        private EnemyState state;
+        private EnemyState state = null;
 
         public IEnumerable<float> DoPatrolStep(EnemyPatrol step) =>
             step switch {
@@ -30,10 +32,6 @@ namespace OSBE.Controllers {
                 PatrolGoto msg => Goto(msg.position),
                 _ => new float[] { }
             };
-
-        public void OnMovementChanged(bool isMoving) { }
-
-        public void OnAttackModeChanged(AttackMode attackMode) { }
 
         public void OnEnemyStep() { }
 
@@ -48,7 +46,8 @@ namespace OSBE.Controllers {
         }
 
         private void Start() {
-            anim = GetComponentInChildren<Animator>();
+            animController = GetComponentInChildren<EnemyAnimator>();
+            animController.Init(this);
 
             player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
             speech = Transforms.Entity(transform)
@@ -104,7 +103,7 @@ namespace OSBE.Controllers {
                         waitAmount -= Time.fixedDeltaTime;
                         yield return new WaitForFixedUpdate();
                         while (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                            anim.SetBool("isMoving", false);
+                            animController.Send(EnemyAnimSignal.MOVE_OFF);
                             DoFace(player.transform.position);
                             yield return new WaitForFixedUpdate();
                         }
@@ -170,14 +169,16 @@ namespace OSBE.Controllers {
                 float diff = Mathf.Abs(Vectors.AngleTo(transform.position - position) - transform.rotation.eulerAngles.z);
                 diff = diff > 180f ? 360f - diff : diff;
                 if (diff < 45f) {
-                    anim.SetBool("isMoving", true);
+                    animController.Send(EnemyAnimSignal.MOVE_ON);
                     transform.position += direction;
                 }
 
                 yield return 0;
             }
 
-            anim.SetBool("isMoving", false);
+            animController.Send(EnemyAnimSignal.MOVE_OFF);
         }
+
+        public void OnStateEnter(EnemyAnim anim) { }
     }
 }

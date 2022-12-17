@@ -17,7 +17,7 @@ namespace OSCore.ScriptableObjects {
              * TODO - set in editor somehow
              */
             StableNode<PlayerAnim, PlayerAnimSignal> stand_move = new(PlayerAnim.stand_move);
-            StableNode<PlayerAnim, PlayerAnimSignal> stand_falling = new(PlayerAnim.stand_fall);
+            StableNode<PlayerAnim, PlayerAnimSignal> stand_fall = new(PlayerAnim.stand_fall);
             StableNode<PlayerAnim, PlayerAnimSignal> crouch_idle_bino = new(PlayerAnim.crouch_idle_bino);
             StableNode<PlayerAnim, PlayerAnimSignal> crouch_move_bino = new(PlayerAnim.crouch_move_bino);
             StableNode<PlayerAnim, PlayerAnimSignal> crouch_idle = new(PlayerAnim.crouch_idle);
@@ -30,34 +30,34 @@ namespace OSCore.ScriptableObjects {
             StableNode<PlayerAnim, PlayerAnimSignal> crawl_idle_aim = new(PlayerAnim.crawl_idle_aim);
 
             stand_move
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crouch_move)
                 .Through(PlayerAnimSignal.MOVE_OFF, PlayerAnim.stand_idle, defaultSpeed, crouch_idle)
                 .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crouch_tobino, scopingSpeed, crouch_move_bino)
                 .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move_aim)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.stand_punch, punchingSpeed);
-            stand_falling
+            stand_fall
                 .To(PlayerAnimSignal.LAND_MOVING, stand_move)
                 .Through(PlayerAnimSignal.LAND_STILL, PlayerAnim.stand_idle, defaultSpeed, crouch_idle);
 
             crouch_idle_bino
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_idle_bino)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_move_bino)
                 .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crouch_tobino, scopingSpeed, crouch_idle);
             crouch_move_bino
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.MOVE_OFF, crouch_idle_bino)
                 .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crouch_tobino, scopingSpeed, crouch_idle);
             crouch_idle
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_idle)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_move)
                 .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crouch_tobino, scopingSpeed, crouch_idle_bino)
                 .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_idle_aim)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_punch, punchingSpeed);
             crouch_move
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_move)
                 .To(PlayerAnimSignal.MOVE_OFF, crouch_idle)
                 .To(PlayerAnimSignal.SPRINT, stand_move)
@@ -65,13 +65,13 @@ namespace OSCore.ScriptableObjects {
                 .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move_aim)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_punch, punchingSpeed);
             crouch_idle_aim
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_idle_aim)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_move_aim)
                 .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crouch_toaim, aimingSpeed, crouch_idle)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_fire, firingSpeed);
             crouch_move_aim
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, stand_move)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_idle_aim)
                 .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crouch_toaim, aimingSpeed, crouch_idle)
@@ -79,55 +79,28 @@ namespace OSCore.ScriptableObjects {
 
 
             crawl_idle_bino
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crouch_idle_bino)
                 .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crawl_tobino, scopingSpeed, crawl_idle);
             crawl_idle
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crouch_idle)
                 .To(PlayerAnimSignal.MOVE_ON, crawl_move)
                 .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crawl_tobino, scopingSpeed, crawl_idle_bino)
                 .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crawl_toaim, aimingSpeed, crawl_idle_aim)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crawl_punch, punchingSpeed);
             crawl_move
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crouch_move)
                 .Through(PlayerAnimSignal.SPRINT, PlayerAnim.crouch_move, defaultSpeed, stand_move)
                 .To(PlayerAnimSignal.MOVE_OFF, crawl_idle);
             crawl_idle_aim
-                .To(PlayerAnimSignal.FALLING, stand_falling)
+                .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crouch_idle_aim)
                 .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crawl_toaim, aimingSpeed, crawl_idle)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crawl_fire, firingSpeed);
 
             return crouch_idle;
         }
-    }
-
-    public static class StateNodeBuilder {
-        public static AStateNode<PlayerAnim, PlayerAnimSignal> To(
-            this AStateNode<PlayerAnim, PlayerAnimSignal> node,
-            PlayerAnimSignal signal,
-            AStateNode<PlayerAnim, PlayerAnimSignal> target) {
-            node.SetEdge(signal, target);
-            return node;
-        }
-
-        public static AStateNode<PlayerAnim, PlayerAnimSignal> Through(
-            this AStateNode<PlayerAnim, PlayerAnimSignal> node,
-            PlayerAnimSignal signal,
-            PlayerAnim transition,
-            float minTime,
-            AStateNode<PlayerAnim, PlayerAnimSignal> target) {
-            node.SetEdge(signal, new TransitionNode<PlayerAnim, PlayerAnimSignal>(transition, minTime, target));
-            return node;
-        }
-
-        public static AStateNode<PlayerAnim, PlayerAnimSignal> With(
-            this AStateNode<PlayerAnim, PlayerAnimSignal> node,
-            PlayerAnimSignal signal,
-            PlayerAnim transition,
-            float minTime) =>
-            node.Through(signal, transition, minTime, node);
     }
 }

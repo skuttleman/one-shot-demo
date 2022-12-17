@@ -109,6 +109,7 @@ namespace OSBE.Controllers {
         private void Update() {
             if (state.mouseLookTimer > 0f)
                 state = state with { mouseLookTimer = state.mouseLookTimer - Time.deltaTime };
+
             RotatePlayer(MoveCfg());
         }
 
