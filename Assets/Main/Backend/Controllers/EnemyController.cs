@@ -47,7 +47,6 @@ namespace OSBE.Controllers {
 
         private void Start() {
             animController = GetComponentInChildren<EnemyAnimator>();
-            animController.Init(this);
 
             player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
             speech = Transforms.Entity(transform)

@@ -116,7 +116,6 @@ namespace OSBE.Controllers {
                 isScoping = false
             };
             ActivateStance();
-            animController.Init(this);
         }
 
         private void Update() {
