@@ -1,62 +1,48 @@
-﻿using OSCore.Data.Enums;
-using OSCore.Data.Events.Brains;
+﻿using OSCore.Data.Animations;
+using OSCore.Data.Enums;
+using OSCore.Data.Events;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Controllers;
 using OSCore.System.Interfaces.Events;
+using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
-using System.Collections.Generic;
-using System;
 using UnityEngine;
-using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
+using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers {
-    public class PlayerController : ASystemInitializer, IPlayerController {
-        private static readonly string ANIM_GROUNDED = "isGrounded";
-        private static readonly string ANIM_STANCE = "stance";
-        private static readonly string ANIM_MOVE = "isMoving";
-        private static readonly string ANIM_SCOPE = "isScoping";
-        private static readonly string ANIM_AIM = "isAiming";
-        private static readonly string ANIM_ATTACK = "isAttacking";
-
+    public class PlayerController : ASystemInitializer, IPlayerController, IStateReceiver<PlayerAnim> {
         [SerializeField] private PlayerCfgSO cfg;
 
         private Rigidbody rb;
         private Animator anim;
         private PlayerState state;
-        private bool isGrounded = false;
+        private bool isGrounded = true;
         private RaycastHit ground;
 
+        private CharacterAnimationController animController;
         private GameObject stand;
         private GameObject crouch;
         private GameObject crawl;
 
         public void OnMovementInput(Vector2 direction) {
             bool isMoving = Vectors.NonZero(direction);
-            bool isSprinting = isMoving && state.isSprinting;
-            PlayerStance stance = isSprinting ? PlayerStance.STANDING : state.stance;
-            if (stance == PlayerStance.STANDING && !isSprinting)
-                stance = PlayerStance.CROUCHING;
 
-            anim.SetBool(ANIM_MOVE, isMoving);
-            anim.SetInteger(ANIM_STANCE, (int)stance);
-
+            animController.Send(isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF);
             state = state with {
-                isMoving = isMoving,
                 movement = direction,
-                isSprinting = isSprinting,
-                stance = stance
+                isMoving = isMoving
             };
         }
 
         public void OnSprintInput(bool isSprinting) {
             if (isSprinting && ShouldTransitionToSprint()) {
-                anim.SetInteger(ANIM_STANCE, (int)PlayerStance.STANDING);
+                animController.Send(PlayerAnimSignal.SPRINT);
                 state = state with {
                     stance = PlayerStance.STANDING,
-                    isSprinting = true
+                    isMoving = true,
                 };
             }
         }
@@ -64,71 +50,29 @@ namespace OSBE.Controllers {
         public void OnLookInput(Vector2 direction, bool isMouse) {
             state = state with {
                 facing = direction,
-                isSprinting = false,
+                stance = state.stance == PlayerStance.STANDING ? PlayerStance.CROUCHING : state.stance,
                 mouseLookTimer = isMouse && Vectors.NonZero(direction) ? cfg.mouseLookReset : state.mouseLookTimer
             };
         }
 
         public void OnStanceInput() {
             PlayerStance nextStance = PCUtils.NextStance(state.stance);
-            if (!state.isMoving || PCUtils.IsMovable(nextStance, state))
-                anim.SetInteger(ANIM_STANCE, (int)nextStance);
-
-            state = state with { isSprinting = false };
+            if (!state.isMoving || PCUtils.IsMovable(nextStance, state)) {
+                animController.Send(PlayerAnimSignal.STANCE);
+            }
         }
 
         public void OnAimInput(bool isAiming) {
-            anim.SetBool(ANIM_AIM, isAiming);
-            state = state with { isSprinting = false };
+            animController.Send(isAiming ? PlayerAnimSignal.AIM_ON : PlayerAnimSignal.AIM_OFF);
         }
 
         public void OnAttackInput(bool isAttacking) {
-            if (isAttacking && PCUtils.CanAttack(state.attackMode)) {
-                float attackSpeed = state.attackMode == AttackMode.HAND
-                    ? cfg.punchingSpeed
-                    : cfg.firingSpeed;
-                anim.SetBool(ANIM_ATTACK, true);
-
-                state = state with { isSprinting = false };
-
-                StartCoroutine(PCUtils.After(
-                    attackSpeed,
-                    () => anim.SetBool(ANIM_ATTACK, false)));
-            }
+            if (isAttacking && PCUtils.CanAttack(state.attackMode))
+                animController.Send(PlayerAnimSignal.ATTACK);
         }
 
         public void OnScopeInput(bool isScoping) {
-            anim.SetBool(ANIM_SCOPE, isScoping);
-            state = state with { isSprinting = !isScoping && state.isScoping };
-        }
-
-        public void OnStanceChanged(PlayerStance stance) {
-            if (state.stance != stance) {
-                state = state with { stance = stance };
-                ActivateStance();
-                PublishMessage(new StanceChanged(stance));
-            }
-        }
-
-        public void OnAttackModeChanged(AttackMode attackMode) {
-            if (state.attackMode != attackMode) {
-                state = state with { attackMode = attackMode };
-                PublishMessage(new AttackModeChanged(attackMode));
-            }
-        }
-
-        public void OnMovementChanged(bool isMoving) {
-            if (state.isMoving != isMoving) {
-                state = state with { isMoving = isMoving };
-                PublishMessage(new MovementChanged(isMoving));
-            }
-        }
-
-        public void OnScopingChanged(bool isScoping) {
-            if (state.isScoping != isScoping) {
-                state = state with { isScoping = isScoping };
-                PublishMessage(new ScopingChanged(isScoping));
-            }
+            animController.Send(isScoping ? PlayerAnimSignal.SCOPE_ON : PlayerAnimSignal.SCOPE_OFF);
         }
 
         public void OnPlayerStep() { }
@@ -136,6 +80,7 @@ namespace OSBE.Controllers {
         private void Start() {
             rb = GetComponent<Rigidbody>();
             anim = GetComponentInChildren<Animator>();
+            animController = GetComponentInChildren<CharacterAnimationController>();
 
             stand = Transforms
                 .FindInChildren(transform, xform => xform.name == "stand")
@@ -157,10 +102,10 @@ namespace OSBE.Controllers {
                 attackMode = AttackMode.HAND,
                 mouseLookTimer = 0f,
                 isMoving = false,
-                isSprinting = false,
                 isScoping = false
             };
             ActivateStance();
+            animController.Init(this);
         }
 
         private void Update() {
@@ -177,14 +122,11 @@ namespace OSBE.Controllers {
                 out ground,
                 cfg.groundedDist);
 
-            anim.SetBool(ANIM_GROUNDED, isGrounded);
-
-            if (!isGrounded) {
-                anim.SetBool(ANIM_AIM, false);
-                anim.SetBool(ANIM_SCOPE, false);
-                anim.SetInteger(ANIM_STANCE, (int) PlayerStance.STANDING);
-            } else if (!prevGrounded && isGrounded && !state.isSprinting) {
-                anim.SetInteger(ANIM_STANCE, (int)PlayerStance.CROUCHING);
+            if (prevGrounded && !isGrounded) {
+                animController.Send(PlayerAnimSignal.FALLING);
+            } else if (!prevGrounded && isGrounded) {
+                if (state.isMoving) animController.Send(PlayerAnimSignal.LAND_MOVING);
+                else animController.Send(PlayerAnimSignal.LAND_STILL);
             }
 
             MovePlayer(MoveCfg());
@@ -241,7 +183,7 @@ namespace OSBE.Controllers {
                 if (isForceable && Vectors.NonZero(state.movement)) {
                     anim.speed = movementSpeed * speed * Time.fixedDeltaTime * moveCfg.animFactor;
 
-                    if (state.isSprinting)
+                    if (state.stance == PlayerStance.STANDING)
                         rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);
                     else rb.AddForce(dir);
                 }
@@ -249,11 +191,11 @@ namespace OSBE.Controllers {
         }
 
         private MoveConfig MoveCfg() =>
-                state.stance switch {
-                    PlayerStance.CROUCHING => cfg.crouching,
-                    PlayerStance.CRAWLING => cfg.crawling,
-                    _ => state.isSprinting ? cfg.sprinting : cfg.standing
-                };
+            state.stance switch {
+                PlayerStance.CROUCHING => cfg.crouching,
+                PlayerStance.CRAWLING => cfg.crawling,
+                _ => cfg.sprinting
+            };
 
         private void ActivateStance() {
             stand.SetActive(state.stance == PlayerStance.STANDING);
@@ -262,7 +204,7 @@ namespace OSBE.Controllers {
         }
 
         private bool ShouldTransitionToSprint() =>
-                !state.isSprinting && !state.isScoping && !PCUtils.IsAiming(state.attackMode);
+            !state.isScoping && !PCUtils.IsAiming(state.attackMode);
 
         private void PublishMessage(IEvent message) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(message));
@@ -285,11 +227,135 @@ namespace OSBE.Controllers {
                 mode != AttackMode.NONE
                     && mode != AttackMode.FIRING
                     && mode != AttackMode.MELEE;
+        }
 
-            public static IEnumerator<YieldInstruction> After(float seconds, Action cb) {
-                yield return new WaitForSeconds(seconds);
-                cb();
-            }
+        public void OnStateEnter(PlayerAnim anim) {
+            this.anim.Play(anim.ToString());
+            PlayerState prevState = state;
+
+            state = anim switch {
+                PlayerAnim.stand_idle => state with {
+                    stance = PlayerStance.STANDING,
+                    attackMode = AttackMode.HAND,
+                    isMoving = false,
+                },
+                PlayerAnim.stand_move => state with {
+                    stance = PlayerStance.STANDING,
+                    attackMode = AttackMode.HAND,
+                    isMoving = true,
+                    isScoping = false,
+                },
+                PlayerAnim.stand_punch => state with {
+                    stance = PlayerStance.STANDING,
+                    attackMode = AttackMode.MELEE,
+                },
+                PlayerAnim.stand_fall => state with {
+                    stance = PlayerStance.STANDING,
+                    attackMode = AttackMode.NONE,
+                    isScoping = false,
+                },
+
+                PlayerAnim.crouch_idle_bino => state with {
+                    stance = PlayerStance.CROUCHING,
+                    isMoving = false,
+                    isScoping = true,
+                },
+                PlayerAnim.crouch_move_bino => state with {
+                    stance = PlayerStance.CROUCHING,
+                    isMoving = true,
+                    isScoping = true,
+                },
+                PlayerAnim.crouch_tobino => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.NONE,
+                    isScoping = true,
+                },
+                PlayerAnim.crouch_idle => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.HAND,
+                    isMoving = false,
+                    isScoping = false,
+                },
+                PlayerAnim.crouch_move => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.HAND,
+                    isMoving = true,
+                    isScoping = false,
+                },
+                PlayerAnim.crouch_punch => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.MELEE,
+                },
+                PlayerAnim.crouch_toaim => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.NONE,
+                },
+                PlayerAnim.crouch_idle_aim => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.WEAPON,
+                    isMoving = false,
+                },
+                PlayerAnim.crouch_move_aim => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.WEAPON,
+                    isMoving = true,
+                },
+                PlayerAnim.crouch_fire => state with {
+                    stance = PlayerStance.CROUCHING,
+                    attackMode = AttackMode.FIRING,
+                },
+
+                PlayerAnim.crawl_idle_bino => state with {
+                    stance = PlayerStance.CRAWLING,
+                },
+                PlayerAnim.crawl_tobino => state with {
+                    stance = PlayerStance.CRAWLING,
+                    attackMode = AttackMode.NONE,
+                    isScoping = true,
+                },
+                PlayerAnim.crawl_idle => state with {
+                    stance = PlayerStance.CRAWLING,
+                    attackMode = AttackMode.HAND,
+                    isMoving = false,
+                },
+                PlayerAnim.crawl_move => state with {
+                    stance = PlayerStance.CRAWLING,
+                    attackMode = AttackMode.HAND,
+                    isMoving = true,
+                    isScoping = false,
+                },
+                PlayerAnim.crawl_punch => state with {
+                    stance = PlayerStance.CRAWLING,
+                    attackMode = AttackMode.MELEE,
+                },
+                PlayerAnim.crawl_toaim => state with {
+                    stance = PlayerStance.CRAWLING,
+                    attackMode = AttackMode.NONE,
+                },
+                PlayerAnim.crawl_idle_aim => state with {
+                    stance = PlayerStance.CRAWLING,
+                    attackMode = AttackMode.WEAPON,
+                    isMoving = false,
+                },
+                PlayerAnim.crawl_fire => state with {
+                    stance = PlayerStance.CRAWLING,
+                    attackMode = AttackMode.FIRING,
+                },
+
+                _ => state
+            };
+
+            ActivateStance();
+
+            PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
+            PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
+            PublishChanged(prevState.isMoving, state.isMoving, new MovementChanged(state.isMoving));
+            PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
+        }
+
+        private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
+            if (!oldValue.Equals(newValue))
+                PublishMessage(e);
         }
     }
 }

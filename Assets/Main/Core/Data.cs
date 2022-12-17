@@ -4,15 +4,15 @@ using UnityEngine;
 namespace OSCore.Data {
     namespace Enums {
         public enum IdTag {
-            PLAYER, ENEMY
+            PLAYER, ENEMY,
         }
 
         public enum PlayerStance {
-            STANDING, CROUCHING, CRAWLING
+            STANDING, CROUCHING, CRAWLING,
         }
 
         public enum AttackMode {
-            NONE, HAND, WEAPON, MELEE, FIRING
+            NONE, HAND, WEAPON, MELEE, FIRING,
         }
     }
 
@@ -23,12 +23,55 @@ namespace OSCore.Data {
         public AttackMode attackMode { get; init; }
         public float mouseLookTimer { get; init; }
         public bool isMoving { get; init; }
-        public bool isSprinting { get; init; }
         public bool isScoping { get; init; }
     }
 
     public record EnemyState {
         public bool isPlayerInView { get; init; }
+    }
+
+    namespace Animations {
+        public enum PlayerAnim {
+            stand_idle,
+            stand_move,
+            stand_punch,
+            stand_fall,
+
+            crouch_idle_bino,
+            crouch_move_bino,
+            crouch_tobino,
+            crouch_idle,
+            crouch_move,
+            crouch_punch,
+            crouch_toaim,
+            crouch_idle_aim,
+            crouch_move_aim,
+            crouch_fire,
+
+            crawl_idle_bino,
+            crawl_tobino,
+            crawl_idle,
+            crawl_move,
+            crawl_punch,
+            crawl_toaim,
+            crawl_idle_aim,
+            crawl_fire,
+        }
+
+        public enum PlayerAnimSignal {
+            FALLING,
+            LAND_MOVING,
+            LAND_STILL,
+            STANCE,
+            MOVE_ON,
+            MOVE_OFF,
+            SPRINT,
+            SCOPE_ON,
+            SCOPE_OFF,
+            AIM_ON,
+            AIM_OFF,
+            ATTACK,
+        }
     }
 
     namespace Patrol {
@@ -42,20 +85,19 @@ namespace OSCore.Data {
         }
     }
 
-
-    namespace Events.Brains {
+    namespace Events {
         public interface IEvent { }
 
-        public record InitEvent<T>(T cfg) : IEvent;
+        namespace Controllers {
+            namespace Player {
+                public record AnimationEmittedEvent : IEvent {
+                    public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
+                    public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
+                    public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
+                    public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
 
-        namespace Player {
-            public record AnimationEmittedEvent : IEvent {
-                public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
-                public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
-                public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
-                public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
-
-                private AnimationEmittedEvent() { }
+                    private AnimationEmittedEvent() { }
+                }
             }
         }
     }

@@ -1,4 +1,4 @@
-using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Controllers;
 using OSCore.Utils;
 using UnityEngine.InputSystem;
 using UnityEngine;

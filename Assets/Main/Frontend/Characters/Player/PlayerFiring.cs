@@ -1,7 +1,7 @@
 using OSCore.Data.Enums;
 using OSCore.System;
 using UnityEngine;
-using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
+using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSFE.Characters.Player {
     public class PlayerFiring : ASystemInitializer<AttackModeChanged> {

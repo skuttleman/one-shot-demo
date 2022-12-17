@@ -1,5 +1,5 @@
 using OSCore.Data.Enums;
-using OSCore.Data.Events.Brains;
+using OSCore.Data.Events;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -34,7 +34,12 @@ namespace OSCore.System.Interfaces {
         }
     }
 
-    namespace Brains {
+    public interface IStateReceiver<State> {
+        public void OnStateEnter(State state) { }
+        public void OnStateExit(State state) { }
+    }
+
+    namespace Controllers {
         public interface IPlayerController {
             public void OnMovementInput(Vector2 direction);
             public void OnSprintInput(bool isSprinting);
@@ -43,10 +48,6 @@ namespace OSCore.System.Interfaces {
             public void OnAimInput(bool isAiming);
             public void OnAttackInput(bool isAttacking);
             public void OnScopeInput(bool isScoping);
-            public void OnStanceChanged(PlayerStance stance);
-            public void OnAttackModeChanged(AttackMode attackMode);
-            public void OnMovementChanged(bool isMoving);
-            public void OnScopingChanged(bool isScoping);
             public void OnPlayerStep();
         }
 

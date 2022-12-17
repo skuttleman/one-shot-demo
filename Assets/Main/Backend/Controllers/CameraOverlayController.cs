@@ -4,7 +4,7 @@ using OSCore.System.Interfaces.Tagging;
 using OSCore.System;
 using OSCore.Utils;
 using UnityEngine;
-using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
+using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers {
     public class CameraOverlayController : ASystemInitializer<ScopingChanged> {
@@ -24,18 +24,24 @@ namespace OSBE.Controllers {
             rdr = transform.GetComponent<SpriteRenderer>();
         }
 
-        private void Update() {
+        private void LateUpdate() {
             if (cfg != null) {
-                if (isScoping) alpha += Time.deltaTime;
-                else alpha -= Time.deltaTime;
+                float delta = Time.deltaTime / 2;
+                if (isScoping) alpha += delta;
+                else alpha -= delta;
+                alpha = Mathf.Clamp(alpha, -0.1f, cfg.maxOverlayAlpha);
 
-                alpha = Mathf.Clamp(alpha, 0f, cfg.maxOverlayAlpha);
-                rdr.color = new(rdr.color.r, rdr.color.g, rdr.color.b, alpha);
-                if (isScoping)
+                float overlayAngle = Vectors.AngleTo(player.position, transform.parent.position);
+                if (Vectors.NonZero(player.position.Downgrade() - transform.parent.position.Downgrade())) {
                     transform.rotation = Quaternion.Euler(
                         0f,
                         0f,
-                        Vectors.AngleTo(player.position, transform.parent.position));
+                        overlayAngle);
+                } else {
+                    transform.rotation = player.rotation;
+                }
+
+                rdr.color = new(rdr.color.r, rdr.color.g, rdr.color.b, Mathf.Max(0f, alpha));
             }
         }
     }

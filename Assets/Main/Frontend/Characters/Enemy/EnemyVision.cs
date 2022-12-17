@@ -1,4 +1,4 @@
-using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Controllers;
 using OSCore.System.Interfaces.Tagging;
 using OSCore.Utils;
 using System.Collections.Generic;

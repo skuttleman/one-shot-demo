@@ -1,5 +1,5 @@
 using OSCore.Data.Enums;
-using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Controllers;
 using OSCore.Utils;
 using UnityEngine;
 

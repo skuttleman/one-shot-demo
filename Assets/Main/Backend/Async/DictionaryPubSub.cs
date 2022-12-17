@@ -1,4 +1,4 @@
-﻿using OSCore.Data.Events.Brains;
+﻿using OSCore.Data.Events;
 using OSCore.System.Interfaces.Events;
 using OSCore.Utils;
 using System.Collections.Concurrent;

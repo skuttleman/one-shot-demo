@@ -2,7 +2,7 @@ using OSCore.Data.Enums;
 using OSCore.Data.Patrol;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Brains;
+using OSCore.System.Interfaces.Controllers;
 using OSCore.System.Interfaces.Tagging;
 using OSCore.System;
 using OSCore.Utils;

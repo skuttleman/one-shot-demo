@@ -12,40 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c3b44c4a478c4b00a5d77c3b1530611, type: 3}
   m_Name: PlayerMovementCfg
   m_EditorClassIdentifier: 
-  <stanceChangeHeldThreshold>k__BackingField: 0.35
   <mouseLookReset>k__BackingField: 0.75
   <groundedDist>k__BackingField: 1
   <sprinting>k__BackingField:
     <moveSpeed>k__BackingField: 75
-    <rotationSpeed>k__BackingField: 10
+    <rotationSpeed>k__BackingField: 11
     <animFactor>k__BackingField: 0.65
     <maxVelocity>k__BackingField: 5
     <maxVelocitydamper>k__BackingField: 1
     <lookSpeedInhibiter>k__BackingField: 0
-  <standing>k__BackingField:
-    <moveSpeed>k__BackingField: 20
-    <rotationSpeed>k__BackingField: 15
-    <animFactor>k__BackingField: 1
-    <maxVelocity>k__BackingField: 2
-    <maxVelocitydamper>k__BackingField: 0.25
-    <lookSpeedInhibiter>k__BackingField: 0.33
   <crouching>k__BackingField:
-    <moveSpeed>k__BackingField: 25
+    <moveSpeed>k__BackingField: 75
     <rotationSpeed>k__BackingField: 12
     <animFactor>k__BackingField: 0.75
-    <maxVelocity>k__BackingField: 1.05
-    <maxVelocitydamper>k__BackingField: 0.25
+    <maxVelocity>k__BackingField: 2
+    <maxVelocitydamper>k__BackingField: 1
     <lookSpeedInhibiter>k__BackingField: 0.25
   <crawling>k__BackingField:
-    <moveSpeed>k__BackingField: 15
+    <moveSpeed>k__BackingField: 20
     <rotationSpeed>k__BackingField: 5
     <animFactor>k__BackingField: 1.25
-    <maxVelocity>k__BackingField: 0.75
+    <maxVelocity>k__BackingField: 0.85
     <maxVelocitydamper>k__BackingField: 0.25
     <lookSpeedInhibiter>k__BackingField: 0
-  <scopingSpeed>k__BackingField: 0.15
   <scopeFactor>k__BackingField: 0.75
   <aimFactor>k__BackingField: 0.9
-  <aimingSpeed>k__BackingField: 0.2
-  <punchingSpeed>k__BackingField: 0.175
-  <firingSpeed>k__BackingField: 0.1

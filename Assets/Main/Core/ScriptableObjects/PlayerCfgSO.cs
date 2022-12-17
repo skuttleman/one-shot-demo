@@ -11,21 +11,12 @@ namespace OSCore.ScriptableObjects {
 
         [field: Header("Stance")]
         [field: SerializeField] public MoveConfig sprinting { get; private set; }
-        [field: SerializeField] public MoveConfig standing { get; private set; }
         [field: SerializeField] public MoveConfig crouching { get; private set; }
         [field: SerializeField] public MoveConfig crawling { get; private set; }
 
-        [field: Header("Scoping")]
-        [field: SerializeField] public float scopingSpeed { get; private set; }
+        [field: Header("Movement")]
         [field: SerializeField] public float scopeFactor { get; private set; }
-
-        [field: Header("Aiming")]
         [field: SerializeField] public float aimFactor { get; private set; }
-        [field: SerializeField] public float aimingSpeed { get; private set; }
-
-        [field: Header("Attacking")]
-        [field: SerializeField] public float punchingSpeed { get; private set; }
-        [field: SerializeField] public float firingSpeed { get; private set; }
 
         [Serializable]
         public struct MoveConfig {

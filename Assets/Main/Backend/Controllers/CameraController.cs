@@ -2,7 +2,7 @@
 using OSCore.ScriptableObjects;
 using OSCore.System;
 using UnityEngine;
-using static OSCore.Data.Events.Brains.Player.AnimationEmittedEvent;
+using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers {
     public class CameraController : ASystemInitializer<AttackModeChanged, MovementChanged, ScopingChanged> {

@@ -61,6 +61,12 @@ namespace OSCore.Utils {
                 || Maths.NonZero(vector.z);
         }
 
+        public static bool NonZero(Vector3 vector, float offset) {
+            return Maths.NonZero(vector.x, offset)
+                || Maths.NonZero(vector.y, offset)
+                || Maths.NonZero(vector.z, offset);
+        }
+
         public static Vector3 ToVector3(float angle) {
             float angleRad = angle * (Mathf.PI / 180f);
             return new(Mathf.Cos(angleRad), Mathf.Sin(angleRad));

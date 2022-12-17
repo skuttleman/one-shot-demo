@@ -30,4 +30,12 @@ namespace OSCore.Utils {
             return results;
         }
     }
+
+    public static class Monos {
+        public static IEnumerator<YieldInstruction> After(float seconds, Action cb) {
+            yield return new WaitForSeconds(seconds);
+            cb();
+            yield break;
+        }
+    }
 }
