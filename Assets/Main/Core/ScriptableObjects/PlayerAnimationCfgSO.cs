@@ -4,18 +4,14 @@ using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/player/animator")]
-    public class PlayerAnimationCfgSO : ScriptableObject {
-        [field: Header("Transition speeds")]
+    public class PlayerAnimationCfgSO : ACharacterAnimatorCfgSO<PlayerAnim, PlayerAnimSignal> {
         [field: SerializeField] public float defaultSpeed { get; private set; }
         [field: SerializeField] public float aimingSpeed { get; private set; }
         [field: SerializeField] public float scopingSpeed { get; private set; }
         [field: SerializeField] public float punchingSpeed { get; private set; }
         [field: SerializeField] public float firingSpeed { get; private set; }
 
-        public AStateNode<PlayerAnim, PlayerAnimSignal> Init() {
-            /*
-             * TODO - set in editor somehow
-             */
+        public override AStateNode<PlayerAnim, PlayerAnimSignal> Init() {
             StableNode<PlayerAnim, PlayerAnimSignal> stand_move = new(PlayerAnim.stand_move);
             StableNode<PlayerAnim, PlayerAnimSignal> stand_fall = new(PlayerAnim.stand_fall);
             StableNode<PlayerAnim, PlayerAnimSignal> crouch_idle_bino = new(PlayerAnim.crouch_idle_bino);
