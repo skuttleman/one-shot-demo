@@ -17,7 +17,6 @@ namespace OSBE.Controllers {
         [SerializeField] private PlayerCfgSO cfg;
 
         private Rigidbody rb;
-        private Animator anim;
         private PlayerState state;
         private bool isGrounded = true;
         private RaycastHit ground;
@@ -79,7 +78,6 @@ namespace OSBE.Controllers {
 
         private void Start() {
             rb = GetComponent<Rigidbody>();
-            anim = GetComponentInChildren<Animator>();
             animController = GetComponentInChildren<PlayerAnimator>();
 
             stand = Transforms
@@ -181,7 +179,7 @@ namespace OSBE.Controllers {
                     dir *= velocityDiff / moveCfg.maxVelocitydamper;
 
                 if (isForceable && Vectors.NonZero(state.movement)) {
-                    anim.speed = movementSpeed * speed * Time.fixedDeltaTime * moveCfg.animFactor;
+                    animController.SetSpeed(movementSpeed * speed * Time.fixedDeltaTime * moveCfg.animFactor);
 
                     if (state.stance == PlayerStance.STANDING)
                         rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);
@@ -230,7 +228,6 @@ namespace OSBE.Controllers {
         }
 
         public void OnStateEnter(PlayerAnim anim) {
-            this.anim.Play(anim.ToString());
             PlayerState prevState = state;
 
             state = anim switch {
