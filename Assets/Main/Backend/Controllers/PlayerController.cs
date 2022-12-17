@@ -22,7 +22,7 @@ namespace OSBE.Controllers {
         private bool isGrounded = true;
         private RaycastHit ground;
 
-        private CharacterAnimationController animController;
+        private PlayerAnimator animController;
         private GameObject stand;
         private GameObject crouch;
         private GameObject crawl;
@@ -80,7 +80,7 @@ namespace OSBE.Controllers {
         private void Start() {
             rb = GetComponent<Rigidbody>();
             anim = GetComponentInChildren<Animator>();
-            animController = GetComponentInChildren<CharacterAnimationController>();
+            animController = GetComponentInChildren<PlayerAnimator>();
 
             stand = Transforms
                 .FindInChildren(transform, xform => xform.name == "stand")

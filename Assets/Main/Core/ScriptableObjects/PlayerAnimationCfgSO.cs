@@ -12,9 +12,7 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public float punchingSpeed { get; private set; }
         [field: SerializeField] public float firingSpeed { get; private set; }
 
-        public AStateNode<PlayerAnim, PlayerAnimSignal> tree { get; private set; }
-
-        public void Init() {
+        public AStateNode<PlayerAnim, PlayerAnimSignal> Init() {
             /*
              * TODO - set in editor somehow
              */
@@ -101,7 +99,8 @@ namespace OSCore.ScriptableObjects {
                 .To(PlayerAnimSignal.STANCE, crouch_idle_aim)
                 .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crawl_toaim, aimingSpeed, crawl_idle)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crawl_fire, firingSpeed);
-            tree = crouch_idle;
+
+            return crouch_idle;
         }
     }
 
