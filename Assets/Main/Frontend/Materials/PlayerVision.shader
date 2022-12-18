@@ -16,6 +16,8 @@ Shader "Custom/PlayerVision"
             "RenderType"="Transparent"
             "PreviewType"="Plane"
             "CanUseSpriteAtlas"="True"
+
+            "RenderPipeline" = "UniversalPipeline"
         }
  
         Cull Off
@@ -38,8 +40,7 @@ Shader "Custom/PlayerVision"
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile _ PIXELSNAP_ON
-            #include "UnityCG.cginc"
- 
+
             struct appdata_t
             {
                 float4 vertex   : POSITION;
