@@ -8,9 +8,9 @@ using OSCore.System;
 public class EnemyVision : ASystemInitializer {
     private IEnemyController controller;
     private GameObject player;
-    private Renderer rdr;
+    private SpriteRenderer rdr;
     private bool seesPlayer = false;
-    private float timeSinceSeen = 1f;
+    private float timeSinceSeeable = -0.25f;
 
     private void Start() {
         Transform entity = Transforms.Entity(transform);
@@ -22,7 +22,8 @@ public class EnemyVision : ASystemInitializer {
 
     private void FixedUpdate() {
         bool los = false;
-        Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.25f);
+        Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.1f); // TODON'T
+        rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
 
         IEnumerable<RaycastHit> hits = Physics.RaycastAll(
             transform.parent.position,
@@ -34,10 +35,21 @@ public class EnemyVision : ASystemInitializer {
 
         controller.OnPlayerSightChange(seesPlayer && los);
 
-        if (!los) {
-            timeSinceSeen += Time.fixedDeltaTime;
-            if (timeSinceSeen > 1f) rdr.enabled = false;
-        } else rdr.enabled = true;
+        Vector3 position = transform.parent.parent.position + new Vector3(0, 0, -0.1f); // TODON'T
+        Vector3 playerEyes = Transforms.FindInActiveChildren(
+            player.transform,
+            xform => xform.name == "head")
+            .First().position;
+
+        bool isBlocked = Physics.Raycast(
+            playerEyes,
+            position - playerEyes,
+            out RaycastHit hit,
+            Vector3.Distance(transform.parent.parent.position, playerEyes),
+            1 << LayerMask.NameToLayer("Walls"));
+
+        if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
+        else timeSinceSeeable = -0.25f;
     }
 
     private void OnTriggerStay(Collider other) {
