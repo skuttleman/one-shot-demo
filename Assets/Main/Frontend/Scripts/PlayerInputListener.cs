@@ -7,29 +7,29 @@ namespace OSFE.Scripts {
     public class PlayerInputListener : MonoBehaviour {
         private IPlayerController controller;
 
-        public void OnInputMove(InputValue value) {
+        public void OnMove(InputValue value) {
             controller.OnMovementInput(value.Get<Vector2>());
         }
 
-        public void OnInputRun(InputValue value) =>
+        public void OnRun(InputValue value) =>
             controller.OnSprintInput(value.isPressed);
 
-        public void OnInputLook(InputValue value) =>
+        public void OnLook(InputValue value) =>
             controller.OnLookInput(value.Get<Vector2>(), false);
 
-        public void OnInputMouseLook(InputValue value) =>
+        public void OnMouseLook(InputValue value) =>
             controller.OnLookInput(value.Get<Vector2>(), true);
 
-        public void OnInputStance(InputValue value) =>
+        public void OnStance(InputValue _) =>
             controller.OnStanceInput();
 
-        public void OnInputScope(InputValue value) =>
+        public void OnScope(InputValue value) =>
             controller.OnScopeInput(Maths.NonZero(value.Get<float>()));
 
-        public void OnInputAim(InputValue value) =>
+        public void OnAim(InputValue value) =>
             controller.OnAimInput(Maths.NonZero(value.Get<float>()));
 
-        public void OnInputAttack(InputValue value) =>
+        public void OnAttack(InputValue value) =>
             controller.OnAttackInput(value.isPressed);
 
         private void Start() {
