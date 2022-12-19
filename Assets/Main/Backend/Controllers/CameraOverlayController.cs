@@ -18,9 +18,13 @@ namespace OSBE.Controllers {
         protected override void OnEvent(ScopingChanged e) =>
             isScoping = e.isScoping;
 
-        private void Start() {
+        protected override void OnEnable() {
+            base.OnEnable();
             player = system.Send<ITagRegistry, GameObject>(registry =>
                 registry.GetUnique(IdTag.PLAYER)).transform;
+        }
+
+        private void Start() {
             rdr = transform.GetComponent<SpriteRenderer>();
         }
 

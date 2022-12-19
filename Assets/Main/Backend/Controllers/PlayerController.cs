@@ -20,6 +20,7 @@ namespace OSBE.Controllers {
         private Rigidbody rb;
         private PlayerState state;
         private bool isGrounded = true;
+        private float animSpeed;
         private RaycastHit ground;
 
         private PlayerAnimator animController;
@@ -85,7 +86,6 @@ namespace OSBE.Controllers {
             ActivateStance();
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
             PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
-            PublishChanged(prevState.isMoving, state.isMoving, new MovementChanged(state.isMoving));
             PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
         }
 
@@ -191,8 +191,11 @@ namespace OSBE.Controllers {
                 if (velocityDiff < moveCfg.maxVelocitydamper)
                     dir *= velocityDiff / moveCfg.maxVelocitydamper;
 
+                float currSpeed = animSpeed;
+                animSpeed = state.isMoving ? movementSpeed * speed * moveCfg.animFactor : 0;
+                PublishChanged(currSpeed, animSpeed, new MovementChanged(animSpeed));
                 if (isForceable && Vectors.NonZero(state.movement)) {
-                    animController.SetSpeed(movementSpeed * speed * Time.fixedDeltaTime * moveCfg.animFactor);
+                    animController.SetSpeed(animSpeed * Time.fixedDeltaTime);
 
                     if (state.stance == PlayerStance.STANDING)
                         rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);

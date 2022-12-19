@@ -1,6 +1,7 @@
 ﻿using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
 using OSCore.System;
+using OSCore.Utils;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
@@ -17,7 +18,7 @@ namespace OSBE.Controllers {
             attackMode = ev.mode;
 
         protected override void OnEvent(MovementChanged ev) =>
-            isMoving = ev.isMoving;
+            isMoving = Maths.NonZero(ev.speed);
 
         protected override void OnEvent(ScopingChanged ev) =>
             isScoping = ev.isScoping;

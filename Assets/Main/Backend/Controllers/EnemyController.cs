@@ -12,16 +12,20 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using static OSCore.Data.Patrol.EnemyPatrol;
+using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers {
-    public class EnemyController : ASystemInitializer, IEnemyController, IStateReceiver<EnemyAnim> {
+    public class EnemyController : ASystemInitializer<MovementChanged>, IEnemyController, IStateReceiver<EnemyAnim> {
         [SerializeField] private EnemyCfgSO cfg;
-        private const float SEEN_THRESHOLD = 5f;
+        [SerializeField] GameObject footstep;
+        private static readonly float SEEN_THRESHOLD = 5f;
 
         private GameObject player;
         private EnemyAnimator animController;
         private TextMeshPro speech;
         private float timeSinceSeenPlayer = 0f;
+        private float timeSincePlayerMoved = 0f;
+        private bool isPlayerMoving = false;
         private EnemyState state = null;
 
         public IEnumerable<float> DoPatrolStep(EnemyPatrol step) =>
@@ -33,7 +37,10 @@ namespace OSBE.Controllers {
                 _ => new float[] { }
             };
 
-        public void OnEnemyStep() { }
+        public void OnEnemyStep() {
+            if (timeSincePlayerMoved > 0.5f)
+                Instantiate(footstep, transform.position, Quaternion.identity);
+        }
 
         public void OnPlayerSightChange(bool isInView) {
             state = state with { isPlayerInView = isInView };
@@ -45,10 +52,18 @@ namespace OSBE.Controllers {
             timeSinceSeenPlayer = 0f;
         }
 
+        public void OnStateEnter(EnemyAnim anim) { }
+
+        protected override void OnEvent(MovementChanged e) =>
+            isPlayerMoving = Maths.NonZero(e.speed);
+
+        protected override void OnEnable() {
+            base.OnEnable();
+            player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
+        }
+
         private void Start() {
             animController = GetComponentInChildren<EnemyAnimator>();
-
-            player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
             speech = Transforms.Entity(transform)
                 .parent
                 .gameObject
@@ -66,6 +81,8 @@ namespace OSBE.Controllers {
         private void FixedUpdate() {
             speech.transform.position = transform.position + new Vector3(0f, 0.75f, 0f);
             if (!state.isPlayerInView) timeSinceSeenPlayer += Time.fixedDeltaTime;
+            if (isPlayerMoving) timeSincePlayerMoved = 0f;
+            else timeSincePlayerMoved += Time.fixedDeltaTime;
         }
 
         private IEnumerator<YieldInstruction> SpeakUp() {
@@ -169,6 +186,7 @@ namespace OSBE.Controllers {
                 diff = diff > 180f ? 360f - diff : diff;
                 if (diff < 45f) {
                     animController.Send(EnemyAnimSignal.MOVE_ON);
+                    animController.SetSpeed(0.5f);
                     transform.position += direction;
                 }
 
@@ -177,7 +195,5 @@ namespace OSBE.Controllers {
 
             animController.Send(EnemyAnimSignal.MOVE_OFF);
         }
-
-        public void OnStateEnter(EnemyAnim anim) { }
     }
 }

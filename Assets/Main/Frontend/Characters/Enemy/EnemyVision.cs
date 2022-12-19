@@ -12,11 +12,15 @@ public class EnemyVision : ASystemInitializer {
     private bool seesPlayer = false;
     private float timeSinceSeeable = -0.25f;
 
+    protected override void OnEnable() {
+        base.OnEnable();
+        player = system.Send<ITagRegistry, GameObject>(reg =>
+            reg.GetUnique(OSCore.Data.Enums.IdTag.PLAYER));
+    }
+
     private void Start() {
         Transform entity = Transforms.Entity(transform);
         controller = entity.GetComponent<IEnemyController>();
-        player = system.Send<ITagRegistry, GameObject>(reg =>
-            reg.GetUnique(OSCore.Data.Enums.IdTag.PLAYER));
         rdr = entity.GetComponentInChildren<SpriteRenderer>();
     }
 

@@ -38,7 +38,7 @@ namespace OSCore.Data {
                 public record AnimationEmittedEvent : IEvent {
                     public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
                     public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
-                    public record MovementChanged(bool isMoving) : AnimationEmittedEvent();
+                    public record MovementChanged(float speed) : AnimationEmittedEvent();
                     public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
 
                     private AnimationEmittedEvent() { }

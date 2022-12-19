@@ -1,12 +1,10 @@
 using OSCore.Data.Enums;
 using OSCore.System.Interfaces.Tagging;
-using OSCore.System.Interfaces;
-using OSCore;
-using UnityEngine.Tilemaps;
-using UnityEngine;
+using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
-using OSCore.System;
+using UnityEngine.Tilemaps;
+using UnityEngine;
 
 namespace OSFE.Levels {
     public class CeilingAlpha : ASystemInitializer {
@@ -14,13 +12,17 @@ namespace OSFE.Levels {
         private GameObject player;
         private Transform fov;
 
-        private void Start() {
-            maps = transform.parent.GetComponentsInChildren<Tilemap>()
-                .Filter(map => !map.transform.name.Contains("seethrough"));
+        protected override void OnEnable() {
+            base.OnEnable();
             player = system.Send<ITagRegistry, GameObject>(reg =>
                 reg.GetUnique(IdTag.PLAYER));
             fov = Transforms.FindInChildren(player.transform.parent, child => child.name == "fov")
                 .First();
+        }
+
+        private void Start() {
+            maps = transform.parent.GetComponentsInChildren<Tilemap>()
+                .Filter(map => !map.transform.name.Contains("seethrough"));
         }
 
         private void OnTriggerStay(Collider other) {
