@@ -3,7 +3,7 @@ using OSCore.Utils;
 using UnityEngine.InputSystem;
 using UnityEngine;
 
-namespace OSFE.Characters.Player {
+namespace OSFE.Scripts {
     public class PlayerInputListener : MonoBehaviour {
         private IPlayerController controller;
 

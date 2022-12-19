@@ -2,7 +2,7 @@ using OSCore.System.Interfaces.Controllers;
 using OSCore.Utils;
 using UnityEngine;
 
-namespace OSFE.Characters.Player {
+namespace OSFE.Scripts {
     public class PlayerAnimationListener : MonoBehaviour {
         IPlayerController controller;
 

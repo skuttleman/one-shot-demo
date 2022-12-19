@@ -2,7 +2,7 @@ using OSCore.System.Interfaces.Controllers;
 using OSCore.Utils;
 using UnityEngine;
 
-namespace OSFE.Characters.Enemy {
+namespace OSFE.Scripts {
     public class EnemyAnimationListener : MonoBehaviour {
         private IEnemyController controller;
 

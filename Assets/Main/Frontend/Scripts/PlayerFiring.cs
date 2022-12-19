@@ -3,7 +3,7 @@ using OSCore.System;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
-namespace OSFE.Characters.Player {
+namespace OSFE.Scripts {
     public class PlayerFiring : ASystemInitializer<AttackModeChanged> {
         [SerializeField] private GameObject bulletPrefab;
 

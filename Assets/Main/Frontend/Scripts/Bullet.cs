@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using OSCore.Utils;
-using OSFE.Characters.Enemy;
 using UnityEngine;
 
-namespace OSFE {
+namespace OSFE.Scripts {
     public class Bullet : MonoBehaviour {
         private Rigidbody rb;
 

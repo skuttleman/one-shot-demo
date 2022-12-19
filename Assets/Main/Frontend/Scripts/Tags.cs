@@ -1,10 +1,10 @@
 using OSCore.Data.Enums;
 using OSCore.System.Interfaces.Tagging;
+using OSCore.System;
 using System;
 using UnityEngine;
-using OSCore.System;
 
-namespace OSFE {
+namespace OSFE.Scripts {
     public class Tags : ASystemInitializer {
         [SerializeField] private Tag[] tags;
 

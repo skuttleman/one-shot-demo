@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 using UnityEngine;
 
-namespace OSFE.Levels {
+namespace OSFE.Scripts {
     public class CeilingAlpha : ASystemInitializer {
         private IEnumerable<Tilemap> maps;
         private GameObject player;
