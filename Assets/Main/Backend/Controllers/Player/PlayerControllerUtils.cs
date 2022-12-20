@@ -22,7 +22,7 @@ namespace OSBE.Controllers.Player {
                 && mode != AttackMode.FIRING
                 && mode != AttackMode.MELEE;
 
-        public static PlayerState UpdateState(this PlayerState state, PlayerAnim anim) =>
+        public static PlayerState UpdateState(PlayerState state, PlayerAnim anim) =>
             anim switch {
                 PlayerAnim.stand_idle => state with {
                     stance = PlayerStance.STANDING,

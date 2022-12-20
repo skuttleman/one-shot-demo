@@ -7,9 +7,8 @@ namespace OSFE.Scripts {
     public class PlayerInputListener : MonoBehaviour {
         private IPlayerController controller;
 
-        public void OnMove(InputValue value) {
-            controller.OnMovementInput(value.Get<Vector2>());
-        }
+        public void OnMove(InputValue value) =>
+             controller.OnMovementInput(value.Get<Vector2>());
 
         public void OnSprint(InputValue value) =>
             controller.OnSprintInput(value.isPressed);

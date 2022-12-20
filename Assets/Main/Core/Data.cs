@@ -1,3 +1,4 @@
+using OSCore.Data.Animations;
 using OSCore.Data.Enums;
 using UnityEngine;
 
@@ -17,13 +18,21 @@ namespace OSCore.Data {
     }
 
     public record PlayerState {
-        public Vector2 movement { get; init; }
-        public Vector2 facing { get; init; }
+        public PlayerInputState input { get; init; }
         public PlayerStance stance { get; init; }
         public AttackMode attackMode { get; init; }
+        public PlayerAnim anim { get; init; }
+        public float animSpeed { get; init; }
         public float mouseLookTimer { get; init; }
         public bool isMoving { get; init; }
         public bool isScoping { get; init; }
+        public bool isGrounded { get; init; }
+        public RaycastHit ground { get; init; }
+    }
+
+    public record PlayerInputState {
+        public Vector2 movement { get; init; }
+        public Vector2 facing { get; init; }
     }
 
     public record EnemyState {

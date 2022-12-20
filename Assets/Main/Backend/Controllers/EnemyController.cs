@@ -70,7 +70,7 @@ namespace OSBE.Controllers {
                 .GetComponentInChildren<TextMeshPro>();
             speech.text = "";
 
-            state = new EnemyState {
+            state = new() {
                 isPlayerInView = false
             };
 
