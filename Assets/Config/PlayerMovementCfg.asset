@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerMovementCfg
   m_EditorClassIdentifier: 
   <mouseLookReset>k__BackingField: 0.75
-  <groundedDist>k__BackingField: 1
+  <groundedDist>k__BackingField: 0.25
   <sprinting>k__BackingField:
     <moveSpeed>k__BackingField: 75
     <rotationSpeed>k__BackingField: 11

@@ -11,7 +11,7 @@ namespace OSFE.Scripts {
             controller.OnMovementInput(value.Get<Vector2>());
         }
 
-        public void OnRun(InputValue value) =>
+        public void OnSprint(InputValue value) =>
             controller.OnSprintInput(value.isPressed);
 
         public void OnLook(InputValue value) =>
