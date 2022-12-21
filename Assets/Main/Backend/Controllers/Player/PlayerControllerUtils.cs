@@ -1,8 +1,8 @@
 ﻿using OSCore.Data.Animations;
 using OSCore.Data.Enums;
 using OSCore.Data;
-using static OSCore.ScriptableObjects.PlayerCfgSO;
 using OSCore.ScriptableObjects;
+using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers.Player {
     public static class PlayerControllerUtils {
@@ -34,12 +34,13 @@ namespace OSBE.Controllers.Player {
         public static bool ShouldTransitionToSprint(PlayerState state) =>
             !state.isScoping && !IsAiming(state.attackMode);
 
-        public static PlayerState UpdateState(PlayerState state, PlayerAnim anim) =>
-            anim switch {
+        public static PlayerState TransitionState(PlayerState state, PlayerAnim anim) {
+            PlayerState result = anim switch {
                 PlayerAnim.stand_idle => state with {
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.HAND,
                     isMoving = false,
+                    isSprinting = false,
                 },
                 PlayerAnim.stand_move => state with {
                     stance = PlayerStance.STANDING,
@@ -70,6 +71,7 @@ namespace OSBE.Controllers.Player {
                 PlayerAnim.crouch_tobino => state with {
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.NONE,
+                    isSprinting = false,
                     isScoping = true,
                 },
                 PlayerAnim.crouch_idle => state with {
@@ -82,6 +84,7 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.HAND,
                     isMoving = true,
+                    isSprinting = false,
                     isScoping = false,
                 },
                 PlayerAnim.crouch_punch => state with {
@@ -91,6 +94,7 @@ namespace OSBE.Controllers.Player {
                 PlayerAnim.crouch_toaim => state with {
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.NONE,
+                    isSprinting = false,
                 },
                 PlayerAnim.crouch_idle_aim => state with {
                     stance = PlayerStance.CROUCHING,
@@ -146,5 +150,11 @@ namespace OSBE.Controllers.Player {
 
                 _ => state
             };
+
+            return result with {
+                anim = anim,
+                isSprinting = result.isSprinting && result.isMoving,
+            };
+        }
     }
 }

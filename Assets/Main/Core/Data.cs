@@ -25,6 +25,7 @@ namespace OSCore.Data {
         public float animSpeed { get; init; }
         public float mouseLookTimer { get; init; }
         public bool isMoving { get; init; }
+        public bool isSprinting { get; init; }
         public bool isScoping { get; init; }
         public bool isGrounded { get; init; }
         public RaycastHit ground { get; init; }
@@ -86,8 +87,9 @@ namespace OSCore.Data {
 
         public enum PlayerAnimSignal {
             FALLING,
-            LAND_MOVING,
-            LAND_STILL,
+            LAND_IDLE,
+            LAND_MOVE,
+            LAND_SPRINT,
             STANCE,
             MOVE_ON,
             MOVE_OFF,

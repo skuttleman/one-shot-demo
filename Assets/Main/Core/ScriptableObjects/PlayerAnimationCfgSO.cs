@@ -33,8 +33,9 @@ namespace OSCore.ScriptableObjects {
                 .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move_aim)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.stand_punch, punchingSpeed);
             stand_fall
-                .To(PlayerAnimSignal.LAND_MOVING, stand_move)
-                .Through(PlayerAnimSignal.LAND_STILL, PlayerAnim.stand_idle, defaultSpeed, crouch_idle);
+                .Through(PlayerAnimSignal.LAND_SPRINT, PlayerAnim.stand_idle, defaultSpeed, stand_move)
+                .Through(PlayerAnimSignal.LAND_MOVE, PlayerAnim.stand_idle, defaultSpeed, crouch_move)
+                .Through(PlayerAnimSignal.LAND_IDLE, PlayerAnim.stand_idle, defaultSpeed, crouch_idle);
 
             crouch_idle_bino
                 .To(PlayerAnimSignal.FALLING, stand_fall)

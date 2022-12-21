@@ -24,9 +24,10 @@ namespace OSBE.Controllers {
             stance = PlayerStance.STANDING,
             attackMode = AttackMode.HAND,
             mouseLookTimer = 0f,
-            isGrounded = true,
             isMoving = false,
+            isSprinting = false,
             isScoping = false,
+            isGrounded = true,
         };
 
         [SerializeField] private PlayerCfgSO cfg;
@@ -54,9 +55,11 @@ namespace OSBE.Controllers {
         public void OnSprintInput(bool isSprinting) {
             if (isSprinting && PlayerControllerUtils.ShouldTransitionToSprint(state)) {
                 animController.Send(PlayerAnimSignal.SPRINT);
+
                 UpdateState(state => state with {
                     stance = PlayerStance.STANDING,
                     isMoving = true,
+                    isSprinting = true,
                 });
             }
         }
@@ -96,7 +99,7 @@ namespace OSBE.Controllers {
         public void OnStateEnter(PlayerAnim anim) {
             PlayerState prevState = state;
 
-            UpdateState(state => PlayerControllerUtils.UpdateState(state, anim));
+            UpdateState(state => PlayerControllerUtils.TransitionState(state, anim));
 
             ActivateStance();
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
@@ -140,8 +143,9 @@ namespace OSBE.Controllers {
             if (prevGrounded && !isGrounded) {
                 animController.Send(PlayerAnimSignal.FALLING);
             } else if (!prevGrounded && isGrounded) {
-                if (state.isMoving) animController.Send(PlayerAnimSignal.LAND_MOVING);
-                else animController.Send(PlayerAnimSignal.LAND_STILL);
+                if (state.isSprinting && state.isMoving) animController.Send(PlayerAnimSignal.LAND_SPRINT);
+                else if (state.isMoving) animController.Send(PlayerAnimSignal.LAND_MOVE);
+                else animController.Send(PlayerAnimSignal.LAND_IDLE);
             }
 
             MovePlayer(PlayerControllerUtils.MoveCfg(cfg, state));
@@ -165,7 +169,7 @@ namespace OSBE.Controllers {
         }
 
         private void MovePlayer(MoveConfig moveCfg) {
-            if (state.isGrounded && PlayerControllerUtils.IsMovable(state.stance, state)) {
+            if (state.isGrounded && state.isMoving && PlayerControllerUtils.IsMovable(state.stance, state)) {
                 float speed = moveCfg.moveSpeed;
                 float forceZ = state.ground.transform.rotation != Quaternion.identity && Vectors.NonZero(state.input.movement)
                     ? (Vector3.Angle(state.ground.normal, state.input.movement) - 90f) / 90f
