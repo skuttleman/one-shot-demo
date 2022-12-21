@@ -17,3 +17,4 @@ MonoBehaviour:
   <scopingSpeed>k__BackingField: 0.15
   <punchingSpeed>k__BackingField: 0.175
   <firingSpeed>k__BackingField: 0.1
+  <landingSpeed>k__BackingField: 0.1

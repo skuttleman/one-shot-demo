@@ -10,6 +10,7 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public float scopingSpeed { get; private set; }
         [field: SerializeField] public float punchingSpeed { get; private set; }
         [field: SerializeField] public float firingSpeed { get; private set; }
+        [field: SerializeField] public float landingSpeed { get; private set; }
 
         public override AStateNode<PlayerAnim, PlayerAnimSignal> Init() {
             StableNode<PlayerAnim, PlayerAnimSignal> stand_move = new(PlayerAnim.stand_move);
@@ -33,9 +34,9 @@ namespace OSCore.ScriptableObjects {
                 .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move_aim)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.stand_punch, punchingSpeed);
             stand_fall
-                .Through(PlayerAnimSignal.LAND_SPRINT, PlayerAnim.stand_idle, defaultSpeed, stand_move)
-                .Through(PlayerAnimSignal.LAND_MOVE, PlayerAnim.stand_idle, defaultSpeed, crouch_move)
-                .Through(PlayerAnimSignal.LAND_IDLE, PlayerAnim.stand_idle, defaultSpeed, crouch_idle);
+                .To(PlayerAnimSignal.LAND_SPRINT, stand_move)
+                .Through(PlayerAnimSignal.LAND_MOVE, PlayerAnim.stand_idle, landingSpeed, crouch_move)
+                .Through(PlayerAnimSignal.LAND_IDLE, PlayerAnim.stand_idle, landingSpeed, crouch_idle);
 
             crouch_idle_bino
                 .To(PlayerAnimSignal.FALLING, stand_fall)

@@ -1,4 +1,5 @@
-﻿using OSBE.Controllers.Player;
+﻿using OSBE.Controllers.Player.Interfaces;
+using OSBE.Controllers.Player;
 using OSCore.Data.Animations;
 using OSCore.Data.Enums;
 using OSCore.Data.Events;
@@ -12,10 +13,9 @@ using OSCore.Utils;
 using System;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
-using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers {
-    public class PlayerController : ASystemInitializer, IPlayerController, IStateReceiver<PlayerAnim> {
+    public class PlayerController : ASystemInitializer, IPlayerController, IPlayerMainController, IStateReceiver<PlayerAnim> {
         private static readonly PlayerState DEFAULT_STATE = new() {
             input = new() {
                 movement = Vector2.zero,
@@ -32,13 +32,19 @@ namespace OSBE.Controllers {
 
         [SerializeField] private PlayerCfgSO cfg;
 
-        private Rigidbody rb;
         private PlayerState state;
-
         private PlayerAnimator animController;
+        private IPlayerInputController stdInput;
+
         private GameObject stand;
         private GameObject crouch;
         private GameObject crawl;
+
+        public void Publish(IEvent e) =>
+            system.Send<IPubSub>(pubsub => pubsub.Publish(e));
+
+        public PlayerState UpdateState(Func<PlayerState, PlayerState> updateFn) =>
+            state = updateFn(state);
 
         public void OnMovementInput(Vector2 direction) {
             bool isMoving = Vectors.NonZero(direction);
@@ -47,8 +53,7 @@ namespace OSBE.Controllers {
             UpdateState(state => state with {
                 input = state.input with {
                     movement = direction,
-                },
-                isMoving = isMoving
+                }
             });
         }
 
@@ -108,7 +113,7 @@ namespace OSBE.Controllers {
         }
 
         private void Start() {
-            rb = GetComponent<Rigidbody>();
+            stdInput = new StandardInputController(this, cfg, transform);
             animController = GetComponentInChildren<PlayerAnimator>();
 
             stand = FindStance("stand");
@@ -120,107 +125,12 @@ namespace OSBE.Controllers {
         }
 
         private void Update() {
-            if (state.mouseLookTimer > 0f)
-                UpdateState(stte => state with {
-                    mouseLookTimer = state.mouseLookTimer - Time.deltaTime
-                });
-
-            RotatePlayer(PlayerControllerUtils.MoveCfg(cfg, state));
+            stdInput.OnUpdate(state);
         }
 
         private void FixedUpdate() {
-            bool prevGrounded = state.isGrounded;
-            bool isGrounded = Physics.Raycast(
-                transform.position - new Vector3(0, 0, 0.01f),
-                Vectors.DOWN,
-                out RaycastHit ground,
-                cfg.groundedDist);
-            UpdateState(state => state with {
-                isGrounded = isGrounded,
-                ground = ground,
-            });
-
-            if (prevGrounded && !isGrounded) {
-                animController.Send(PlayerAnimSignal.FALLING);
-            } else if (!prevGrounded && isGrounded) {
-                if (state.isSprinting && state.isMoving) animController.Send(PlayerAnimSignal.LAND_SPRINT);
-                else if (state.isMoving) animController.Send(PlayerAnimSignal.LAND_MOVE);
-                else animController.Send(PlayerAnimSignal.LAND_IDLE);
-            }
-
-            MovePlayer(PlayerControllerUtils.MoveCfg(cfg, state));
+            stdInput.OnFixedUpdate(state);
         }
-
-        private void RotatePlayer(MoveConfig moveCfg) {
-            Vector2 direction;
-
-            if (Vectors.NonZero(state.input.facing)
-                && (state.stance != PlayerStance.CRAWLING || !Vectors.NonZero(state.input.movement)))
-                direction = state.input.facing;
-            else if (state.mouseLookTimer <= 0f && Vectors.NonZero(state.input.movement))
-                direction = state.input.movement;
-            else return;
-
-            float rotationZ = Vectors.AngleTo(Vector2.zero, direction);
-            transform.rotation = Quaternion.Lerp(
-                    transform.rotation,
-                    Quaternion.Euler(0f, 0f, rotationZ),
-                    moveCfg.rotationSpeed * Time.deltaTime);
-        }
-
-        private void MovePlayer(MoveConfig moveCfg) {
-            if (state.isGrounded && state.isMoving && PlayerControllerUtils.IsMovable(state.stance, state)) {
-                float speed = moveCfg.moveSpeed;
-                float forceZ = state.ground.transform.rotation != Quaternion.identity && Vectors.NonZero(state.input.movement)
-                    ? (Vector3.Angle(state.ground.normal, state.input.movement) - 90f) / 90f
-                    : 0f;
-
-                if (PlayerControllerUtils.IsAiming(state.attackMode)) speed *= cfg.aimFactor;
-                else if (state.isScoping) speed *= cfg.scopeFactor;
-
-                float movementSpeed = Mathf.Max(
-                    Mathf.Abs(state.input.movement.x),
-                    Mathf.Abs(state.input.movement.y));
-                bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
-
-                if (Vectors.NonZero(state.input.facing)) {
-                    float mov = (360f + Vectors.AngleTo(transform.position, transform.position - state.input.movement.Upgrade())) % 360;
-                    float fac = (360f + Vectors.AngleTo(transform.position, transform.position - state.input.facing.Upgrade())) % 360;
-                    float diff = Mathf.Abs(mov - fac);
-
-                    if (diff > 180f) diff = Mathf.Abs(diff - 360f);
-
-                    speed *= Mathf.Lerp(moveCfg.lookSpeedInhibiter, 1f, 1f - diff / 180f);
-                }
-
-                Vector3 dir = speed * state.input.movement.Upgrade(-forceZ);
-
-                float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
-                if (velocityDiff < moveCfg.maxVelocitydamper)
-                    dir *= velocityDiff / moveCfg.maxVelocitydamper;
-
-                float currSpeed = state.animSpeed;
-                UpdateState(state => state with {
-                    animSpeed = state.isMoving ? movementSpeed * speed * moveCfg.animFactor : 0
-                });
-                PublishChanged(currSpeed, state.animSpeed, new MovementChanged(state.animSpeed));
-                if (isForceable && Vectors.NonZero(state.input.movement)) {
-                    animController.SetSpeed(state.animSpeed * Time.fixedDeltaTime);
-
-                    if (state.stance == PlayerStance.STANDING)
-                        rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);
-                    else rb.AddForce(dir);
-                }
-            }
-        }
-
-        private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
-            if (!oldValue.Equals(newValue))
-                system.Send<IPubSub>(pubsub => pubsub.Publish(e));
-        }
-
-        private void UpdateState(Func<PlayerState, PlayerState> updateFn) =>
-            state = updateFn(state);
 
         private GameObject FindStance(string name) =>
             Transforms
@@ -232,6 +142,10 @@ namespace OSBE.Controllers {
             stand.SetActive(state.stance == PlayerStance.STANDING);
             crouch.SetActive(state.stance == PlayerStance.CROUCHING);
             crawl.SetActive(state.stance == PlayerStance.CRAWLING);
+        }
+
+        private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
+            if (!oldValue.Equals(newValue)) Publish(e);
         }
     }
 }
