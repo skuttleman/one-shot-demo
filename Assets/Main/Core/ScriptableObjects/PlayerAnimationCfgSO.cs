@@ -29,6 +29,7 @@ namespace OSCore.ScriptableObjects {
             stand_move
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crouch_move)
+                .To(PlayerAnimSignal.LOOK, crouch_move)
                 .Through(PlayerAnimSignal.MOVE_OFF, PlayerAnim.stand_idle, defaultSpeed, crouch_idle)
                 .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crouch_tobino, scopingSpeed, crouch_move_bino)
                 .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move_aim)
@@ -46,7 +47,7 @@ namespace OSCore.ScriptableObjects {
             crouch_move_bino
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.MOVE_OFF, crouch_idle_bino)
-                .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crouch_tobino, scopingSpeed, crouch_idle);
+                .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crouch_tobino, scopingSpeed, crouch_move);
             crouch_idle
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_idle)
@@ -72,9 +73,8 @@ namespace OSCore.ScriptableObjects {
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, stand_move)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_idle_aim)
-                .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crouch_toaim, aimingSpeed, crouch_idle)
+                .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move)
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_fire, firingSpeed);
-
 
             crawl_idle_bino
                 .To(PlayerAnimSignal.FALLING, stand_fall)

@@ -20,10 +20,10 @@ namespace OSBE.Controllers {
             input = new() {
                 movement = Vector2.zero,
                 facing = Vector2.zero,
+                mouseLookTimer = 0f,
             },
             stance = PlayerStance.STANDING,
             attackMode = AttackMode.HAND,
-            mouseLookTimer = 0f,
             isMoving = false,
             isSprinting = false,
             isScoping = false,
@@ -43,8 +43,10 @@ namespace OSBE.Controllers {
         public void Publish(IEvent e) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(e));
 
-        public PlayerState UpdateState(Func<PlayerState, PlayerState> updateFn) =>
-            state = updateFn(state);
+        public PlayerState UpdateState(Func<PlayerState, PlayerState> updateFn) {
+            PlayerState nextState = updateFn(state);
+            return state = nextState;
+        }
 
         public void OnMovementInput(Vector2 direction) {
             bool isMoving = Vectors.NonZero(direction);
@@ -52,30 +54,25 @@ namespace OSBE.Controllers {
             animController.Send(isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF);
             UpdateState(state => state with {
                 input = state.input with {
-                    movement = direction,
+                    movement = direction
                 }
             });
         }
 
         public void OnSprintInput(bool isSprinting) {
-            if (isSprinting && PlayerControllerUtils.ShouldTransitionToSprint(state)) {
+            if (isSprinting && PlayerControllerUtils.ShouldTransitionToSprint(state))
                 animController.Send(PlayerAnimSignal.SPRINT);
-
-                UpdateState(state => state with {
-                    stance = PlayerStance.STANDING,
-                    isMoving = true,
-                    isSprinting = true,
-                });
-            }
         }
 
         public void OnLookInput(Vector2 direction, bool isMouse) {
+            animController.Send(PlayerAnimSignal.LOOK);
             UpdateState(state => state with {
                 input = state.input with {
                     facing = direction,
-                },
-                stance = state.stance == PlayerStance.STANDING ? PlayerStance.CROUCHING : state.stance,
-                mouseLookTimer = isMouse && Vectors.NonZero(direction) ? cfg.mouseLookReset : state.mouseLookTimer
+                    mouseLookTimer = isMouse && Vectors.NonZero(direction)
+                        ? cfg.mouseLookReset
+                        : state.input.mouseLookTimer
+                }
             });
         }
 

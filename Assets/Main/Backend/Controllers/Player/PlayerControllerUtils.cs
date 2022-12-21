@@ -46,6 +46,7 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.HAND,
                     isMoving = true,
+                    isSprinting = true,
                     isScoping = false,
                 },
                 PlayerAnim.stand_punch => state with {

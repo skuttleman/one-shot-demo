@@ -27,9 +27,11 @@ namespace OSBE.Controllers.Player {
         }
 
         public void OnUpdate(PlayerState state) {
-            if (state.mouseLookTimer > 0f)
+            if (state.input.mouseLookTimer > 0f)
                 controller.UpdateState(stte => state with {
-                    mouseLookTimer = state.mouseLookTimer - Time.deltaTime
+                    input = state.input with {
+                        mouseLookTimer = state.input.mouseLookTimer - Time.deltaTime
+                    }
                 });
 
             RotatePlayer(state, PlayerControllerUtils.MoveCfg(cfg, state));
@@ -64,7 +66,7 @@ namespace OSBE.Controllers.Player {
             if (Vectors.NonZero(state.input.facing)
                 && (state.stance != PlayerStance.CRAWLING || !Vectors.NonZero(state.input.movement)))
                 direction = state.input.facing;
-            else if (state.mouseLookTimer <= 0f && Vectors.NonZero(state.input.movement))
+            else if (state.input.mouseLookTimer <= 0f && Vectors.NonZero(state.input.movement))
                 direction = state.input.movement;
             else return;
 

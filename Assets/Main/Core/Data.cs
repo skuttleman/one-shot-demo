@@ -23,7 +23,6 @@ namespace OSCore.Data {
         public AttackMode attackMode { get; init; }
         public PlayerAnim anim { get; init; }
         public float animSpeed { get; init; }
-        public float mouseLookTimer { get; init; }
         public bool isMoving { get; init; }
         public bool isSprinting { get; init; }
         public bool isScoping { get; init; }
@@ -34,6 +33,7 @@ namespace OSCore.Data {
     public record PlayerInputState {
         public Vector2 movement { get; init; }
         public Vector2 facing { get; init; }
+        public float mouseLookTimer { get; init; }
     }
 
     public record EnemyState {
@@ -90,6 +90,7 @@ namespace OSCore.Data {
             LAND_IDLE,
             LAND_MOVE,
             LAND_SPRINT,
+            LOOK,
             STANCE,
             MOVE_ON,
             MOVE_OFF,
