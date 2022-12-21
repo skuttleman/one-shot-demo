@@ -1,6 +1,8 @@
 ﻿using OSCore.Data.Animations;
 using OSCore.Data.Enums;
 using OSCore.Data;
+using static OSCore.ScriptableObjects.PlayerCfgSO;
+using OSCore.ScriptableObjects;
 
 namespace OSBE.Controllers.Player {
     public static class PlayerControllerUtils {
@@ -21,6 +23,16 @@ namespace OSBE.Controllers.Player {
             mode != AttackMode.NONE
                 && mode != AttackMode.FIRING
                 && mode != AttackMode.MELEE;
+
+        public static MoveConfig MoveCfg(PlayerCfgSO cfg, PlayerState state) =>
+            state.stance switch {
+                PlayerStance.CROUCHING => cfg.crouching,
+                PlayerStance.CRAWLING => cfg.crawling,
+                _ => cfg.sprinting
+            };
+
+        public static bool ShouldTransitionToSprint(PlayerState state) =>
+            !state.isScoping && !IsAiming(state.attackMode);
 
         public static PlayerState UpdateState(PlayerState state, PlayerAnim anim) =>
             anim switch {

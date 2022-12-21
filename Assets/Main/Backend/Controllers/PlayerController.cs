@@ -9,10 +9,10 @@ using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
+using System;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
-using System;
 
 namespace OSBE.Controllers {
     public class PlayerController : ASystemInitializer, IPlayerController, IStateReceiver<PlayerAnim> {
@@ -24,8 +24,9 @@ namespace OSBE.Controllers {
             stance = PlayerStance.STANDING,
             attackMode = AttackMode.HAND,
             mouseLookTimer = 0f,
+            isGrounded = true,
             isMoving = false,
-            isScoping = false
+            isScoping = false,
         };
 
         [SerializeField] private PlayerCfgSO cfg;
@@ -51,7 +52,7 @@ namespace OSBE.Controllers {
         }
 
         public void OnSprintInput(bool isSprinting) {
-            if (isSprinting && ShouldTransitionToSprint()) {
+            if (isSprinting && PlayerControllerUtils.ShouldTransitionToSprint(state)) {
                 animController.Send(PlayerAnimSignal.SPRINT);
                 UpdateState(state => state with {
                     stance = PlayerStance.STANDING,
@@ -107,18 +108,9 @@ namespace OSBE.Controllers {
             rb = GetComponent<Rigidbody>();
             animController = GetComponentInChildren<PlayerAnimator>();
 
-            stand = Transforms
-                .FindInChildren(transform, xform => xform.name == "stand")
-                .First()
-                .gameObject;
-            crouch = Transforms
-                .FindInChildren(transform, xform => xform.name == "crouch")
-                .First()
-                .gameObject;
-            crawl = Transforms
-                .FindInChildren(transform, xform => xform.name == "crawl")
-                .First()
-                .gameObject;
+            stand = FindStance("stand");
+            crouch = FindStance("crouch");
+            crawl = FindStance("crawl");
 
             state = DEFAULT_STATE;
             ActivateStance();
@@ -130,7 +122,7 @@ namespace OSBE.Controllers {
                     mouseLookTimer = state.mouseLookTimer - Time.deltaTime
                 });
 
-            RotatePlayer(MoveCfg());
+            RotatePlayer(PlayerControllerUtils.MoveCfg(cfg, state));
         }
 
         private void FixedUpdate() {
@@ -152,7 +144,7 @@ namespace OSBE.Controllers {
                 else animController.Send(PlayerAnimSignal.LAND_STILL);
             }
 
-            MovePlayer(MoveCfg());
+            MovePlayer(PlayerControllerUtils.MoveCfg(cfg, state));
         }
 
         private void RotatePlayer(MoveConfig moveCfg) {
@@ -218,22 +210,6 @@ namespace OSBE.Controllers {
             }
         }
 
-        private MoveConfig MoveCfg() =>
-            state.stance switch {
-                PlayerStance.CROUCHING => cfg.crouching,
-                PlayerStance.CRAWLING => cfg.crawling,
-                _ => cfg.sprinting
-            };
-
-        private void ActivateStance() {
-            stand.SetActive(state.stance == PlayerStance.STANDING);
-            crouch.SetActive(state.stance == PlayerStance.CROUCHING);
-            crawl.SetActive(state.stance == PlayerStance.CRAWLING);
-        }
-
-        private bool ShouldTransitionToSprint() =>
-            !state.isScoping && !PlayerControllerUtils.IsAiming(state.attackMode);
-
         private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
             if (!oldValue.Equals(newValue))
                 system.Send<IPubSub>(pubsub => pubsub.Publish(e));
@@ -241,5 +217,17 @@ namespace OSBE.Controllers {
 
         private void UpdateState(Func<PlayerState, PlayerState> updateFn) =>
             state = updateFn(state);
+
+        private GameObject FindStance(string name) =>
+            Transforms
+                .FindInChildren(transform, xform => xform.name == name)
+                .First()
+                .gameObject;
+
+        private void ActivateStance() {
+            stand.SetActive(state.stance == PlayerStance.STANDING);
+            crouch.SetActive(state.stance == PlayerStance.CROUCHING);
+            crawl.SetActive(state.stance == PlayerStance.CRAWLING);
+        }
     }
 }
