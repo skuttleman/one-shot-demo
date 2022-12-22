@@ -1,3 +1,4 @@
+using System;
 using OSCore.Data.Animations;
 using OSCore.Data.Enums;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace OSCore.Data {
         }
 
         public enum PlayerStance {
-            STANDING, CROUCHING, CRAWLING,
+            STANDING, CROUCHING, CRAWLING, HANGING,
         }
 
         public enum AttackMode {
@@ -32,7 +33,7 @@ namespace OSCore.Data {
         public bool isScoping { get; init; }
         public bool isGrounded { get; init; }
         public RaycastHit ground { get; init; }
-
+        public Collider ledge { get; init; }
     }
 
     public record PlayerInputState {

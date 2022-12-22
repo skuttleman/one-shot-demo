@@ -52,8 +52,6 @@ namespace OSBE.Controllers {
             timeSinceSeenPlayer = 0f;
         }
 
-        public void OnStateEnter(EnemyAnim anim) { }
-
         protected override void OnEvent(MovementChanged e) =>
             isPlayerMoving = Maths.NonZero(e.speed);
 

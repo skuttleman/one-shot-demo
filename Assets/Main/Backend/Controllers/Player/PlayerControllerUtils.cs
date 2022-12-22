@@ -153,6 +153,7 @@ namespace OSBE.Controllers.Player {
                 },
 
                 PlayerAnim.hang_lunge => state with {
+                    stance = PlayerStance.HANGING,
                     input = state.input with {
                         controls = PlayerInputControlMap.LedgeHang,
                     },

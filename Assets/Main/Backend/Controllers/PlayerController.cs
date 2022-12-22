@@ -43,6 +43,7 @@ namespace OSBE.Controllers {
         private GameObject stand;
         private GameObject crouch;
         private GameObject crawl;
+        private GameObject hang;
 
         public void Publish(IEvent e) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(e));
@@ -99,36 +100,48 @@ namespace OSBE.Controllers {
         }
 
         public void OnClimbInput(bool isClimbing) {
-            if (isClimbing)
+            if (isClimbing) {
                 animController.Send(PlayerAnimSignal.LEDGE_CLIMB);
+                transform.position -= new Vector3(0, 0, 0.1f);
+            }
         }
 
         public void OnDropInput(bool isDropping) {
-            if (isDropping)
+            if (isDropping) {
                 animController.Send(PlayerAnimSignal.LEDGE_DROP);
+                UpdateState(state => state with {
+                    input = state.input with {
+                        facing = Vector3.zero,
+                    }
+                });
+            }
         }
 
         public void OnPlayerStep() { }
 
-        public void OnStateEnter(PlayerAnim anim) {
+        public void OnStateEnter(PlayerAnim prev, PlayerAnim curr) {
             PlayerState prevState = state;
+            UpdateState(state => PlayerControllerUtils.TransitionState(state, curr));
 
-            UpdateState(state => PlayerControllerUtils.TransitionState(state, anim));
-
-            switch (state.anim) {
-                case PlayerAnim.hang_lunge:
-                    rb.isKinematic = true;
-                    break;
-                case PlayerAnim.hang_climb:
-                case PlayerAnim.stand_fall:
-                    rb.isKinematic = false;
-                    break;
-            }
+            string controls = state.input.controls.ToString();
+            if (input.currentActionMap.name != controls)
+                input.SwitchCurrentActionMap(controls);
 
             ActivateStance();
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
             PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
             PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
+        }
+
+        public void OnStateExit(PlayerAnim prev, PlayerAnim curr) {
+            if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
+                rb.isKinematic = false;
+                UpdateState(state => state with {
+                    input = state.input with {
+                        controls = PlayerInputControlMap.Standard
+                    }
+                });
+            }
         }
 
         private void Start() {
@@ -140,6 +153,7 @@ namespace OSBE.Controllers {
             stand = FindStance("stand");
             crouch = FindStance("crouch");
             crawl = FindStance("crawl");
+            hang = FindStance("hang");
 
             state = DEFAULT_STATE;
             ActivateStance();
@@ -147,20 +161,34 @@ namespace OSBE.Controllers {
 
         private void Update() {
             stdInput.OnUpdate(state);
-
-            string controls = state.input.controls.ToString();
-            if (input.currentActionMap.name != controls)
-                input.SwitchCurrentActionMap(controls);
         }
 
         private void FixedUpdate() {
             bool prevGrounded = state.isGrounded;
-            PlayerStance prevStance = state.stance;
+            Collider ledge = state.ground.collider;
+            bool wasCrouching = state.stance == PlayerStance.CROUCHING;
+
             stdInput.OnFixedUpdate(state);
 
-            if (prevGrounded && !state.isGrounded && prevStance == PlayerStance.CROUCHING) {
-                animController.SetSpeed(0.1f);
+            bool isFallStart = prevGrounded && !state.isGrounded;
+
+            if (isFallStart && ledge != null && wasCrouching) {
+                animController.SetSpeed(0.5f);
                 animController.Send(PlayerAnimSignal.FALLING_LUNGE);
+                rb.velocity = Vector3.zero;
+                rb.isKinematic = true;
+                Vector3 pt = ledge.ClosestPoint(transform.position);
+                Vector3 diff = transform.position - pt;
+                Vector2 direction = diff.normalized;
+                transform.position += (direction * 0.25f).Upgrade();
+
+                UpdateState(state => state with {
+                    input = state.input with {
+                        movement = Vector3.zero,
+                        facing = pt - transform.position,
+                    },
+                    ledge = ledge,
+                });
             }
         }
 
@@ -174,6 +202,7 @@ namespace OSBE.Controllers {
             stand.SetActive(state.stance == PlayerStance.STANDING);
             crouch.SetActive(state.stance == PlayerStance.CROUCHING);
             crawl.SetActive(state.stance == PlayerStance.CRAWLING);
+            hang.SetActive(state.stance == PlayerStance.HANGING);
         }
 
         private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {

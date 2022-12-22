@@ -35,8 +35,8 @@ namespace OSCore.System.Interfaces {
     }
 
     public interface IStateReceiver<State> {
-        public void OnStateEnter(State state) { }
-        public void OnStateExit(State state) { }
+        public void OnStateEnter(State prev, State curr) { }
+        public void OnStateExit(State prev, State curr) { }
     }
 
     namespace Controllers {

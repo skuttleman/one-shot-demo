@@ -78,7 +78,10 @@ namespace OSBE.Controllers.Player {
         }
 
         private void MovePlayer(PlayerState state, MoveConfig moveCfg) {
-            if (state.isGrounded && state.isMoving && PlayerControllerUtils.IsMovable(state.stance, state)) {
+            if (state.isGrounded
+                && state.ground.collider != null
+                && state.isMoving
+                && PlayerControllerUtils.IsMovable(state.stance, state)) {
                 float speed = moveCfg.moveSpeed;
                 float forceZ = state.ground.transform.rotation != Quaternion.identity && Vectors.NonZero(state.input.movement)
                     ? (Vector3.Angle(state.ground.normal, state.input.movement) - 90f) / 90f

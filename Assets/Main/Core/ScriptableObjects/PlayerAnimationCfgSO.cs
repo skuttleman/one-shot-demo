@@ -37,7 +37,7 @@ namespace OSCore.ScriptableObjects {
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.stand_punch, punchingSpeed);
             stand_fall
                 .To(PlayerAnimSignal.LAND_SPRINT, stand_move)
-                .To(PlayerAnimSignal.FALLING_LUNGE, hang_idle, (PlayerAnim.hang_lunge, 1f))
+                .To(PlayerAnimSignal.FALLING_LUNGE, hang_idle, (PlayerAnim.hang_lunge, 0.75f))
                 .To(PlayerAnimSignal.LAND_MOVE, crouch_move, (PlayerAnim.stand_idle, landingSpeed))
                 .To(PlayerAnimSignal.LAND_IDLE, crouch_idle, (PlayerAnim.stand_idle, landingSpeed));
 
