@@ -21,7 +21,7 @@ namespace OSBE.Controllers {
         private static readonly float SEEN_THRESHOLD = 5f;
 
         private GameObject player;
-        private EnemyAnimator animController;
+        private EnemyAnimator anim;
         private TextMeshPro speech;
         private float timeSinceSeenPlayer = 0f;
         private float timeSincePlayerMoved = 0f;
@@ -61,7 +61,7 @@ namespace OSBE.Controllers {
         }
 
         private void Start() {
-            animController = GetComponentInChildren<EnemyAnimator>();
+            anim = GetComponentInChildren<EnemyAnimator>();
             speech = Transforms.Entity(transform)
                 .parent
                 .gameObject
@@ -117,7 +117,7 @@ namespace OSBE.Controllers {
                         waitAmount -= Time.fixedDeltaTime;
                         yield return new WaitForFixedUpdate();
                         while (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                            animController.Send(EnemyAnimSignal.MOVE_OFF);
+                            anim.Send(EnemyAnimSignal.MOVE_OFF);
                             DoFace(player.transform.position);
                             yield return new WaitForFixedUpdate();
                         }
@@ -183,15 +183,15 @@ namespace OSBE.Controllers {
                 float diff = Mathf.Abs(Vectors.AngleTo(transform.position - position) - transform.rotation.eulerAngles.z);
                 diff = diff > 180f ? 360f - diff : diff;
                 if (diff < 45f) {
-                    animController.Send(EnemyAnimSignal.MOVE_ON);
-                    animController.SetSpeed(0.5f);
+                    anim.Send(EnemyAnimSignal.MOVE_ON);
+                    anim.SetSpeed(0.5f);
                     transform.position += direction;
                 }
 
                 yield return 0;
             }
 
-            animController.Send(EnemyAnimSignal.MOVE_OFF);
+            anim.Send(EnemyAnimSignal.MOVE_OFF);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace OSCore.Data {
         }
 
         public enum PlayerInputControlMap {
-            Standard, LedgeHang,
+            None, Standard, LedgeHang,
         }
     }
 

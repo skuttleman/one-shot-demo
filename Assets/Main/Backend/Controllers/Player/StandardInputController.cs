@@ -15,7 +15,7 @@ namespace OSBE.Controllers.Player {
         private readonly PlayerCfgSO cfg;
         private readonly Transform transform;
         private readonly Rigidbody rb;
-        private readonly PlayerAnimator animController;
+        private readonly PlayerAnimator anim;
 
         public StandardInputController(IPlayerMainController controller, PlayerCfgSO cfg, Transform transform) {
             this.controller = controller;
@@ -23,7 +23,7 @@ namespace OSBE.Controllers.Player {
             this.transform = transform;
 
             rb = transform.GetComponent<Rigidbody>();
-            animController = transform.GetComponentInChildren<PlayerAnimator>();
+            anim = transform.GetComponentInChildren<PlayerAnimator>();
         }
 
         public void OnUpdate(PlayerState state) {
@@ -50,11 +50,11 @@ namespace OSBE.Controllers.Player {
             });
 
             if (prevGrounded && !isGrounded) {
-                animController.Send(PlayerAnimSignal.FALLING);
+                anim.Send(PlayerAnimSignal.FALLING);
             } else if (!prevGrounded && isGrounded) {
-                if (state.isSprinting && state.isMoving) animController.Send(PlayerAnimSignal.LAND_SPRINT);
-                else if (state.isMoving) animController.Send(PlayerAnimSignal.LAND_MOVE);
-                else animController.Send(PlayerAnimSignal.LAND_IDLE);
+                if (state.isSprinting && state.isMoving) anim.Send(PlayerAnimSignal.LAND_SPRINT);
+                else if (state.isMoving) anim.Send(PlayerAnimSignal.LAND_MOVE);
+                else anim.Send(PlayerAnimSignal.LAND_IDLE);
             }
 
             MovePlayer(state, PlayerControllerUtils.MoveCfg(cfg, state));
@@ -117,7 +117,7 @@ namespace OSBE.Controllers.Player {
                 });
                 PublishChanged(currSpeed, state.animSpeed, new MovementChanged(state.animSpeed));
                 if (isForceable && Vectors.NonZero(state.input.movement)) {
-                    animController.SetSpeed(state.animSpeed * Time.fixedDeltaTime);
+                    anim.SetSpeed(state.animSpeed * Time.fixedDeltaTime);
 
                     if (state.stance == PlayerStance.STANDING)
                         rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);

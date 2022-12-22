@@ -10,6 +10,7 @@ using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
+using System.Collections.Generic;
 using System;
 using UnityEngine.InputSystem;
 using UnityEngine;
@@ -35,9 +36,9 @@ namespace OSBE.Controllers {
         [SerializeField] private PlayerCfgSO cfg;
 
         private PlayerState state;
-        private PlayerAnimator animController;
+        private PlayerAnimator anim;
         private PlayerInput input;
-        private IPlayerInputController stdInput;
+        private IDictionary<PlayerInputControlMap, IPlayerInputController> controllers;
 
         private Rigidbody rb;
         private GameObject stand;
@@ -53,8 +54,10 @@ namespace OSBE.Controllers {
 
         public void OnMovementInput(Vector2 direction) {
             bool isMoving = Vectors.NonZero(direction);
+            PlayerAnimSignal signal = isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF;
+            if (anim.CanTransition(signal))
+                anim.Send(signal);
 
-            animController.Send(isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF);
             UpdateState(state => state with {
                 input = state.input with {
                     movement = direction
@@ -63,52 +66,66 @@ namespace OSBE.Controllers {
         }
 
         public void OnSprintInput(bool isSprinting) {
-            if (isSprinting && PlayerControllerUtils.ShouldTransitionToSprint(state))
-                animController.Send(PlayerAnimSignal.SPRINT);
+            PlayerAnimSignal signal = PlayerAnimSignal.SPRINT;
+            if (isSprinting && PlayerControllerUtils.CanSprint(state) && anim.CanTransition(signal))
+                anim.Send(signal);
         }
 
         public void OnLookInput(Vector2 direction, bool isMouse) {
-            animController.Send(PlayerAnimSignal.LOOK);
+            PlayerAnimSignal signal = PlayerAnimSignal.LOOK;
+            if (anim.CanTransition(signal))
+                anim.Send(signal);
+
             UpdateState(state => state with {
                 input = state.input with {
                     facing = direction,
                     mouseLookTimer = isMouse && Vectors.NonZero(direction)
-                        ? cfg.mouseLookReset
-                        : state.input.mouseLookTimer
+                            ? cfg.mouseLookReset
+                            : state.input.mouseLookTimer
                 }
             });
         }
 
         public void OnStanceInput() {
+            PlayerAnimSignal signal = PlayerAnimSignal.STANCE;
             PlayerStance nextStance = PlayerControllerUtils.NextStance(state.stance);
-            if (!state.isMoving || PlayerControllerUtils.IsMovable(nextStance, state)) {
-                animController.Send(PlayerAnimSignal.STANCE);
-            }
+            if (anim.CanTransition(signal)
+                && (!state.isMoving || PlayerControllerUtils.IsMovable(nextStance, state)))
+                anim.Send(signal);
         }
 
         public void OnAimInput(bool isAiming) {
-            animController.Send(isAiming ? PlayerAnimSignal.AIM_ON : PlayerAnimSignal.AIM_OFF);
+            PlayerAnimSignal signal = isAiming ? PlayerAnimSignal.AIM_ON : PlayerAnimSignal.AIM_OFF;
+            if (anim.CanTransition(signal))
+                anim.Send(signal);
         }
 
         public void OnAttackInput(bool isAttacking) {
-            if (isAttacking && PlayerControllerUtils.CanAttack(state.attackMode))
-                animController.Send(PlayerAnimSignal.ATTACK);
+            PlayerAnimSignal signal = PlayerAnimSignal.ATTACK;
+            if (isAttacking
+                && anim.CanTransition(signal)
+                && PlayerControllerUtils.CanAttack(state.attackMode))
+                anim.Send(signal);
         }
 
         public void OnScopeInput(bool isScoping) {
-            animController.Send(isScoping ? PlayerAnimSignal.SCOPE_ON : PlayerAnimSignal.SCOPE_OFF);
+            PlayerAnimSignal signal = isScoping ? PlayerAnimSignal.SCOPE_ON : PlayerAnimSignal.SCOPE_OFF;
+            if (anim.CanTransition(signal))
+                anim.Send(signal);
         }
 
         public void OnClimbInput(bool isClimbing) {
-            if (isClimbing) {
-                animController.Send(PlayerAnimSignal.LEDGE_CLIMB);
+            PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_CLIMB;
+            if (isClimbing && anim.CanTransition(signal)) {
+                anim.Send(signal);
                 transform.position -= new Vector3(0, 0, 0.1f);
             }
         }
 
         public void OnDropInput(bool isDropping) {
-            if (isDropping) {
-                animController.Send(PlayerAnimSignal.LEDGE_DROP);
+            PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_DROP;
+            if (isDropping && anim.CanTransition(signal)) {
+                anim.Send(signal);
                 UpdateState(state => state with {
                     input = state.input with {
                         facing = Vector3.zero,
@@ -145,8 +162,12 @@ namespace OSBE.Controllers {
         }
 
         private void Start() {
-            stdInput = new StandardInputController(this, cfg, transform);
-            animController = GetComponentInChildren<PlayerAnimator>();
+            controllers = new Dictionary<PlayerInputControlMap, IPlayerInputController>() {
+                { PlayerInputControlMap.None, new NoopInputController() },
+                { PlayerInputControlMap.Standard, new StandardInputController(this, cfg, transform) },
+                { PlayerInputControlMap.LedgeHang, new LedgeHangInputController(this, cfg, transform) }
+            };
+            anim = GetComponentInChildren<PlayerAnimator>();
             input = GetComponent<PlayerInput>();
             rb = GetComponent<Rigidbody>();
 
@@ -160,7 +181,7 @@ namespace OSBE.Controllers {
         }
 
         private void Update() {
-            stdInput.OnUpdate(state);
+            controllers.Get(state.input.controls).OnUpdate(state);
         }
 
         private void FixedUpdate() {
@@ -168,19 +189,19 @@ namespace OSBE.Controllers {
             Collider ledge = state.ground.collider;
             bool wasCrouching = state.stance == PlayerStance.CROUCHING;
 
-            stdInput.OnFixedUpdate(state);
+            controllers.Get(state.input.controls).OnFixedUpdate(state);
 
             bool isFallStart = prevGrounded && !state.isGrounded;
 
             if (isFallStart && ledge != null && wasCrouching) {
-                animController.SetSpeed(0.5f);
-                animController.Send(PlayerAnimSignal.FALLING_LUNGE);
+                anim.SetSpeed(0.5f);
+                anim.Send(PlayerAnimSignal.FALLING_LUNGE);
                 rb.velocity = Vector3.zero;
                 rb.isKinematic = true;
                 Vector3 pt = ledge.ClosestPoint(transform.position);
                 Vector3 diff = transform.position - pt;
                 Vector2 direction = diff.normalized;
-                transform.position += (direction * 0.25f).Upgrade();
+                transform.position += (direction * 0.275f).Upgrade();
 
                 UpdateState(state => state with {
                     input = state.input with {
@@ -209,4 +230,6 @@ namespace OSBE.Controllers {
             if (!oldValue.Equals(newValue)) Publish(e);
         }
     }
+
+    internal class NoopInputController : IPlayerInputController { }
 }

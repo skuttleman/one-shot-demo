@@ -2,6 +2,7 @@
 using OSCore.Data.Enums;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
+using UnityEngine;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers.Player {
@@ -31,7 +32,7 @@ namespace OSBE.Controllers.Player {
                 _ => cfg.sprinting
             };
 
-        public static bool ShouldTransitionToSprint(PlayerState state) =>
+        public static bool CanSprint(PlayerState state) =>
             !state.isScoping && !IsAiming(state.attackMode);
 
         public static PlayerState TransitionState(PlayerState state, PlayerAnim anim) {
@@ -153,10 +154,20 @@ namespace OSBE.Controllers.Player {
                 },
 
                 PlayerAnim.hang_lunge => state with {
-                    stance = PlayerStance.HANGING,
                     input = state.input with {
                         controls = PlayerInputControlMap.LedgeHang,
                     },
+                    stance = PlayerStance.HANGING,
+                    isMoving = false,
+                    isSprinting = false,
+                },
+                PlayerAnim.hang_idle => state with {
+                    stance = PlayerStance.HANGING,
+                    isMoving = false,
+                },
+                PlayerAnim.hang_move => state with {
+                    stance = PlayerStance.HANGING,
+                    isMoving = true,
                 },
 
                 _ => state

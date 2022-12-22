@@ -29,6 +29,9 @@ namespace OSBE.Controllers {
         public void Send(Signal signal) =>
             signals.Enqueue(signal);
 
+        public bool CanTransition(Signal signal) =>
+            state != state.Next(signal);
+
         private void Update() {
             if (state is null) return;
             timeInState += Time.deltaTime;
