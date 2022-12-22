@@ -37,10 +37,11 @@ namespace OSCore.Data {
     }
 
     public record PlayerInputState {
+        public PlayerInputControlMap controls { get; init; }
+        public Vector3 hangingPoint { get; init; }
         public Vector2 movement { get; init; }
         public Vector2 facing { get; init; }
         public float mouseLookTimer { get; init; }
-        public PlayerInputControlMap controls { get; init; }
     }
 
     public record EnemyState {

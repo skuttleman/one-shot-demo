@@ -24,6 +24,7 @@ namespace OSBE.Controllers {
                 facing = Vector2.zero,
                 mouseLookTimer = 0f,
                 controls = PlayerInputControlMap.Standard,
+                hangingPoint = Vector3.zero,
             },
             stance = PlayerStance.STANDING,
             attackMode = AttackMode.HAND,
@@ -193,24 +194,8 @@ namespace OSBE.Controllers {
 
             bool isFallStart = prevGrounded && !state.isGrounded;
 
-            if (isFallStart && ledge != null && wasCrouching) {
-                anim.SetSpeed(0.5f);
-                anim.Send(PlayerAnimSignal.FALLING_LUNGE);
-                rb.velocity = Vector3.zero;
-                rb.isKinematic = true;
-                Vector3 pt = ledge.ClosestPoint(transform.position);
-                Vector3 diff = transform.position - pt;
-                Vector2 direction = diff.normalized;
-                transform.position += (direction * 0.275f).Upgrade();
-
-                UpdateState(state => state with {
-                    input = state.input with {
-                        movement = Vector3.zero,
-                        facing = pt - transform.position,
-                    },
-                    ledge = ledge,
-                });
-            }
+            if (isFallStart && ledge != null && wasCrouching)
+                TransitionToLedgeHang(ledge);
         }
 
         private GameObject FindStance(string name) =>
@@ -228,6 +213,34 @@ namespace OSBE.Controllers {
 
         private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
             if (!oldValue.Equals(newValue)) Publish(e);
+        }
+
+        private void TransitionToLedgeHang(Collider ledge) {
+            float distanceToGround = float.PositiveInfinity;
+            if (Physics.Raycast(
+                transform.position - new Vector3(0, 0, 0.01f),
+                Vectors.DOWN,
+                out RaycastHit ground,
+                1000f))
+                distanceToGround = ground.distance;
+
+            anim.SetSpeed(0.5f);
+            anim.Send(PlayerAnimSignal.FALLING_LUNGE);
+            rb.velocity = Vector3.zero;
+            rb.isKinematic = true;
+
+            Vector3 pt = ledge.ClosestPoint(transform.position);
+            Vector2 direction = (transform.position - pt).normalized;
+            transform.position += (direction * 0.275f).Upgrade();
+
+            UpdateState(state => state with {
+                input = state.input with {
+                    movement = Vector3.zero,
+                    facing = pt - transform.position,
+                    hangingPoint = pt,
+                },
+                ledge = ledge,
+            });
         }
     }
 
