@@ -31,6 +31,13 @@ namespace OSFE.Scripts {
         public void OnAttack(InputValue value) =>
             controller.OnAttackInput(value.isPressed);
 
+        public void OnClimb(InputValue value) =>
+            controller.OnClimbInput(value.isPressed);
+
+        public void OnDrop(InputValue value) {
+            controller.OnDropInput(value.isPressed);
+        }
+
         private void Start() {
             controller = Transforms.Entity(transform)
                 .GetComponent<IPlayerController>();

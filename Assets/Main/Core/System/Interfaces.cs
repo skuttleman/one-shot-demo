@@ -48,6 +48,8 @@ namespace OSCore.System.Interfaces {
             public void OnAimInput(bool isAiming);
             public void OnAttackInput(bool isAttacking);
             public void OnScopeInput(bool isScoping);
+            public void OnClimbInput(bool isClimbing);
+            public void OnDropInput(bool isDropping);
             public void OnPlayerStep();
         }
 

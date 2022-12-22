@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using OSCore.Utils;
 
 namespace OSCore.System {
     public abstract class AStateNode<State, Signal> {
@@ -42,18 +43,11 @@ namespace OSCore.System {
         public static AStateNode<State, Signal> To<State, Signal>(
             this AStateNode<State, Signal> node,
             Signal signal,
-            AStateNode<State, Signal> target) {
-            node.SetEdge(signal, target);
-            return node;
-        }
-
-        public static AStateNode<State, Signal> Through<State, Signal>(
-            this AStateNode<State, Signal> node,
-            Signal signal,
-            State transition,
-            float minTime,
-            AStateNode<State, Signal> target) {
-            node.SetEdge(signal, new TransitionNode<State, Signal>(transition, minTime, target));
+            AStateNode<State, Signal> target,
+            params (State transition, float minTime)[] comps) {
+            node.SetEdge(signal, comps.Reduce((target, comp) =>
+                new TransitionNode<State, Signal>(comp.transition, comp.minTime, target)
+                , target));
             return node;
         }
 
@@ -62,6 +56,6 @@ namespace OSCore.System {
             Signal signal,
             State transition,
             float minTime) =>
-            node.Through(signal, transition, minTime, node);
+            node.To(signal, node, (transition, minTime));
     }
 }

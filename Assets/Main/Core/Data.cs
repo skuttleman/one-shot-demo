@@ -15,6 +15,10 @@ namespace OSCore.Data {
         public enum AttackMode {
             NONE, HAND, WEAPON, MELEE, FIRING,
         }
+
+        public enum PlayerInputControlMap {
+            Standard, LedgeHang,
+        }
     }
 
     public record PlayerState {
@@ -28,12 +32,14 @@ namespace OSCore.Data {
         public bool isScoping { get; init; }
         public bool isGrounded { get; init; }
         public RaycastHit ground { get; init; }
+
     }
 
     public record PlayerInputState {
         public Vector2 movement { get; init; }
         public Vector2 facing { get; init; }
         public float mouseLookTimer { get; init; }
+        public PlayerInputControlMap controls { get; init; }
     }
 
     public record EnemyState {
@@ -83,10 +89,16 @@ namespace OSCore.Data {
             crawl_toaim,
             crawl_idle_aim,
             crawl_fire,
+
+            hang_lunge,
+            hang_idle,
+            hang_move,
+            hang_climb,
         }
 
         public enum PlayerAnimSignal {
             FALLING,
+            FALLING_LUNGE,
             LAND_IDLE,
             LAND_MOVE,
             LAND_SPRINT,
@@ -100,6 +112,8 @@ namespace OSCore.Data {
             AIM_ON,
             AIM_OFF,
             ATTACK,
+            LEDGE_CLIMB,
+            LEDGE_DROP,
         }
 
         public enum EnemyAnim {

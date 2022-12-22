@@ -11,6 +11,7 @@ using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
 using System;
+using UnityEngine.InputSystem;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
@@ -21,6 +22,7 @@ namespace OSBE.Controllers {
                 movement = Vector2.zero,
                 facing = Vector2.zero,
                 mouseLookTimer = 0f,
+                controls = PlayerInputControlMap.Standard,
             },
             stance = PlayerStance.STANDING,
             attackMode = AttackMode.HAND,
@@ -34,8 +36,10 @@ namespace OSBE.Controllers {
 
         private PlayerState state;
         private PlayerAnimator animController;
+        private PlayerInput input;
         private IPlayerInputController stdInput;
 
+        private Rigidbody rb;
         private GameObject stand;
         private GameObject crouch;
         private GameObject crawl;
@@ -43,10 +47,8 @@ namespace OSBE.Controllers {
         public void Publish(IEvent e) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(e));
 
-        public PlayerState UpdateState(Func<PlayerState, PlayerState> updateFn) {
-            PlayerState nextState = updateFn(state);
-            return state = nextState;
-        }
+        public PlayerState UpdateState(Func<PlayerState, PlayerState> updateFn) =>
+            state = updateFn(state);
 
         public void OnMovementInput(Vector2 direction) {
             bool isMoving = Vectors.NonZero(direction);
@@ -96,12 +98,32 @@ namespace OSBE.Controllers {
             animController.Send(isScoping ? PlayerAnimSignal.SCOPE_ON : PlayerAnimSignal.SCOPE_OFF);
         }
 
+        public void OnClimbInput(bool isClimbing) {
+            if (isClimbing)
+                animController.Send(PlayerAnimSignal.LEDGE_CLIMB);
+        }
+
+        public void OnDropInput(bool isDropping) {
+            if (isDropping)
+                animController.Send(PlayerAnimSignal.LEDGE_DROP);
+        }
+
         public void OnPlayerStep() { }
 
         public void OnStateEnter(PlayerAnim anim) {
             PlayerState prevState = state;
 
             UpdateState(state => PlayerControllerUtils.TransitionState(state, anim));
+
+            switch (state.anim) {
+                case PlayerAnim.hang_lunge:
+                    rb.isKinematic = true;
+                    break;
+                case PlayerAnim.hang_climb:
+                case PlayerAnim.stand_fall:
+                    rb.isKinematic = false;
+                    break;
+            }
 
             ActivateStance();
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
@@ -112,6 +134,8 @@ namespace OSBE.Controllers {
         private void Start() {
             stdInput = new StandardInputController(this, cfg, transform);
             animController = GetComponentInChildren<PlayerAnimator>();
+            input = GetComponent<PlayerInput>();
+            rb = GetComponent<Rigidbody>();
 
             stand = FindStance("stand");
             crouch = FindStance("crouch");
@@ -123,10 +147,21 @@ namespace OSBE.Controllers {
 
         private void Update() {
             stdInput.OnUpdate(state);
+
+            string controls = state.input.controls.ToString();
+            if (input.currentActionMap.name != controls)
+                input.SwitchCurrentActionMap(controls);
         }
 
         private void FixedUpdate() {
+            bool prevGrounded = state.isGrounded;
+            PlayerStance prevStance = state.stance;
             stdInput.OnFixedUpdate(state);
+
+            if (prevGrounded && !state.isGrounded && prevStance == PlayerStance.CROUCHING) {
+                animController.SetSpeed(0.1f);
+                animController.Send(PlayerAnimSignal.FALLING_LUNGE);
+            }
         }
 
         private GameObject FindStance(string name) =>

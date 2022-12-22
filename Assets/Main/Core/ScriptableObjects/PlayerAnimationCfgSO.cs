@@ -25,78 +25,85 @@ namespace OSCore.ScriptableObjects {
             StableNode<PlayerAnim, PlayerAnimSignal> crawl_idle = new(PlayerAnim.crawl_idle);
             StableNode<PlayerAnim, PlayerAnimSignal> crawl_move = new(PlayerAnim.crawl_move);
             StableNode<PlayerAnim, PlayerAnimSignal> crawl_idle_aim = new(PlayerAnim.crawl_idle_aim);
+            StableNode<PlayerAnim, PlayerAnimSignal> hang_idle = new(PlayerAnim.hang_idle);
 
             stand_move
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crouch_move)
                 .To(PlayerAnimSignal.LOOK, crouch_move)
-                .Through(PlayerAnimSignal.MOVE_OFF, PlayerAnim.stand_idle, defaultSpeed, crouch_idle)
-                .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crouch_tobino, scopingSpeed, crouch_move_bino)
-                .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move_aim)
+                .To(PlayerAnimSignal.MOVE_OFF, crouch_idle, (PlayerAnim.stand_idle, defaultSpeed))
+                .To(PlayerAnimSignal.SCOPE_ON, crouch_move_bino, (PlayerAnim.crouch_tobino, scopingSpeed))
+                .To(PlayerAnimSignal.AIM_ON, crouch_move_aim, (PlayerAnim.crouch_toaim, aimingSpeed))
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.stand_punch, punchingSpeed);
             stand_fall
                 .To(PlayerAnimSignal.LAND_SPRINT, stand_move)
-                .Through(PlayerAnimSignal.LAND_MOVE, PlayerAnim.stand_idle, landingSpeed, crouch_move)
-                .Through(PlayerAnimSignal.LAND_IDLE, PlayerAnim.stand_idle, landingSpeed, crouch_idle);
+                .To(PlayerAnimSignal.FALLING_LUNGE, hang_idle, (PlayerAnim.hang_lunge, 1f))
+                .To(PlayerAnimSignal.LAND_MOVE, crouch_move, (PlayerAnim.stand_idle, landingSpeed))
+                .To(PlayerAnimSignal.LAND_IDLE, crouch_idle, (PlayerAnim.stand_idle, landingSpeed));
 
             crouch_idle_bino
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_idle_bino)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_move_bino)
-                .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crouch_tobino, scopingSpeed, crouch_idle);
+                .To(PlayerAnimSignal.SCOPE_OFF, crouch_idle, (PlayerAnim.crouch_tobino, scopingSpeed));
             crouch_move_bino
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.MOVE_OFF, crouch_idle_bino)
-                .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crouch_tobino, scopingSpeed, crouch_move);
+                .To(PlayerAnimSignal.SCOPE_OFF, crouch_move, (PlayerAnim.crouch_tobino, scopingSpeed));
             crouch_idle
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_idle)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_move)
-                .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crouch_tobino, scopingSpeed, crouch_idle_bino)
-                .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_idle_aim)
+                .To(PlayerAnimSignal.SCOPE_ON, crouch_idle_bino, (PlayerAnim.crouch_tobino, scopingSpeed))
+                .To(PlayerAnimSignal.AIM_ON, crouch_idle_aim, (PlayerAnim.crouch_toaim, aimingSpeed))
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_punch, punchingSpeed);
             crouch_move
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_move)
                 .To(PlayerAnimSignal.MOVE_OFF, crouch_idle)
                 .To(PlayerAnimSignal.SPRINT, stand_move)
-                .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crouch_tobino, scopingSpeed, crouch_move_bino)
-                .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move_aim)
+                .To(PlayerAnimSignal.SCOPE_ON, crouch_move_bino, (PlayerAnim.crouch_tobino, scopingSpeed))
+                .To(PlayerAnimSignal.AIM_ON, crouch_move_aim, (PlayerAnim.crouch_toaim, aimingSpeed))
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_punch, punchingSpeed);
             crouch_idle_aim
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, crawl_idle_aim)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_move_aim)
-                .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crouch_toaim, aimingSpeed, crouch_idle)
+                .To(PlayerAnimSignal.AIM_OFF, crouch_idle, (PlayerAnim.crouch_toaim, aimingSpeed))
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_fire, firingSpeed);
             crouch_move_aim
                 .To(PlayerAnimSignal.FALLING, stand_fall)
                 .To(PlayerAnimSignal.STANCE, stand_move)
                 .To(PlayerAnimSignal.MOVE_ON, crouch_idle_aim)
-                .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crouch_toaim, aimingSpeed, crouch_move)
+                .To(PlayerAnimSignal.AIM_OFF, crouch_move, (PlayerAnim.crouch_toaim, aimingSpeed))
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crouch_fire, firingSpeed);
 
             crawl_idle_bino
-                .To(PlayerAnimSignal.FALLING, stand_fall)
+                .To(PlayerAnimSignal.FALLING, stand_fall, (PlayerAnim.crouch_idle, defaultSpeed))
                 .To(PlayerAnimSignal.STANCE, crouch_idle_bino)
-                .Through(PlayerAnimSignal.SCOPE_OFF, PlayerAnim.crawl_tobino, scopingSpeed, crawl_idle);
+                .To(PlayerAnimSignal.SCOPE_OFF, crawl_idle, (PlayerAnim.crawl_tobino, scopingSpeed));
             crawl_idle
-                .To(PlayerAnimSignal.FALLING, stand_fall)
+                .To(PlayerAnimSignal.FALLING, stand_fall, (PlayerAnim.crouch_idle, defaultSpeed))
                 .To(PlayerAnimSignal.STANCE, crouch_idle)
                 .To(PlayerAnimSignal.MOVE_ON, crawl_move)
-                .Through(PlayerAnimSignal.SCOPE_ON, PlayerAnim.crawl_tobino, scopingSpeed, crawl_idle_bino)
-                .Through(PlayerAnimSignal.AIM_ON, PlayerAnim.crawl_toaim, aimingSpeed, crawl_idle_aim)
+                .To(PlayerAnimSignal.SCOPE_ON, crawl_idle_bino, (PlayerAnim.crawl_tobino, scopingSpeed))
+                .To(PlayerAnimSignal.AIM_ON, crawl_idle_aim, (PlayerAnim.crawl_toaim, aimingSpeed))
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crawl_punch, punchingSpeed);
             crawl_move
-                .To(PlayerAnimSignal.FALLING, stand_fall)
+                .To(PlayerAnimSignal.FALLING, stand_fall, (PlayerAnim.crouch_idle, defaultSpeed))
                 .To(PlayerAnimSignal.STANCE, crouch_move)
-                .Through(PlayerAnimSignal.SPRINT, PlayerAnim.crouch_move, defaultSpeed, stand_move)
+                .To(PlayerAnimSignal.SPRINT, stand_move, (PlayerAnim.crouch_move, defaultSpeed))
                 .To(PlayerAnimSignal.MOVE_OFF, crawl_idle);
             crawl_idle_aim
-                .To(PlayerAnimSignal.FALLING, stand_fall)
+                .To(PlayerAnimSignal.FALLING, stand_fall, (PlayerAnim.crouch_idle, defaultSpeed))
                 .To(PlayerAnimSignal.STANCE, crouch_idle_aim)
-                .Through(PlayerAnimSignal.AIM_OFF, PlayerAnim.crawl_toaim, aimingSpeed, crawl_idle)
+                .To(PlayerAnimSignal.AIM_OFF, crawl_idle, (PlayerAnim.crawl_toaim, aimingSpeed))
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crawl_fire, firingSpeed);
+
+            hang_idle
+                .With(PlayerAnimSignal.MOVE_ON, PlayerAnim.hang_move, 0.8f)
+                .To(PlayerAnimSignal.LEDGE_CLIMB, crouch_idle, (PlayerAnim.hang_climb, defaultSpeed))
+                .To(PlayerAnimSignal.LEDGE_DROP, stand_fall);
 
             return crouch_idle;
         }

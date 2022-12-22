@@ -54,6 +54,9 @@ namespace OSBE.Controllers.Player {
                     attackMode = AttackMode.MELEE,
                 },
                 PlayerAnim.stand_fall => state with {
+                    input = state.input with {
+                        controls = PlayerInputControlMap.Standard,
+                    },
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.NONE,
                     isScoping = false,
@@ -147,6 +150,12 @@ namespace OSBE.Controllers.Player {
                 PlayerAnim.crawl_fire => state with {
                     stance = PlayerStance.CRAWLING,
                     attackMode = AttackMode.FIRING,
+                },
+
+                PlayerAnim.hang_lunge => state with {
+                    input = state.input with {
+                        controls = PlayerInputControlMap.LedgeHang,
+                    },
                 },
 
                 _ => state
