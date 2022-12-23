@@ -1,6 +1,4 @@
-using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
-using OSCore.System.Interfaces.Tagging;
 using OSCore.System;
 using OSCore.Utils;
 using UnityEngine;
@@ -20,8 +18,7 @@ namespace OSBE.Controllers {
 
         protected override void OnEnable() {
             base.OnEnable();
-            player = system.Send<ITagRegistry, GameObject>(registry =>
-                registry.GetUnique(IdTag.PLAYER)).transform;
+            player = system.Player().transform;
         }
 
         private void Start() {

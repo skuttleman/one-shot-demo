@@ -22,7 +22,7 @@ namespace OSBE.Controllers {
             anim.speed = animSpeed;
             state = tree;
             timeInState = 0f;
-            receiver.OnStateEnter(default, state.state);
+            receiver.OnStateEnter(state.state);
         }
 
         public void SetSpeed(float speed) {
@@ -55,12 +55,13 @@ namespace OSBE.Controllers {
         private void Transition(AStateNode<State, Signal> state) {
             if (this.state != state) {
                 State curr = this.state.state;
-                receiver.OnStateExit(curr, state.state);
+                receiver.OnStateExit(curr);
                 this.state = state;
                 timeInState = 0f;
+                receiver.OnStateTransition(curr, state.state);
                 anim.speed = animSpeed * state.animSpeed;
                 anim.Play(state.state.ToString());
-                receiver.OnStateEnter(curr, state.state);
+                receiver.OnStateEnter(state.state);
             }
         }
     }

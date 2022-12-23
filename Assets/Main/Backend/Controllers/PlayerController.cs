@@ -141,9 +141,32 @@ namespace OSBE.Controllers {
 
         public void OnPlayerStep() { }
 
-        public void OnStateEnter(PlayerAnim prev, PlayerAnim curr) {
+        public void OnStateExit(PlayerAnim state) {
+            switch (state) {
+                case PlayerAnim.stand_move:
+                case PlayerAnim.crouch_move:
+                case PlayerAnim.crouch_move_aim:
+                case PlayerAnim.crouch_move_bino:
+                case PlayerAnim.crawl_move:
+                    anim.SetSpeed(1f);
+                    break;
+            }
+        }
+
+        public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
+            if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
+                rb.isKinematic = false;
+                UpdateState(state => state with {
+                    input = state.input with {
+                        controls = PlayerInputControlMap.Standard
+                    }
+                });
+            }
+        }
+
+        public void OnStateEnter(PlayerAnim anim) {
             PlayerState prevState = state;
-            UpdateState(state => PlayerControllerUtils.TransitionState(state, curr));
+            UpdateState(state => PlayerControllerUtils.TransitionState(state, anim));
 
             string controls = state.input.controls.ToString();
             if (input.currentActionMap.name != controls)
@@ -153,17 +176,6 @@ namespace OSBE.Controllers {
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
             PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
             PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
-        }
-
-        public void OnStateExit(PlayerAnim prev, PlayerAnim curr) {
-            if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
-                rb.isKinematic = false;
-                UpdateState(state => state with {
-                    input = state.input with {
-                        controls = PlayerInputControlMap.Standard
-                    }
-                });
-            }
         }
 
         private void Start() {

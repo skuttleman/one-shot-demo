@@ -57,7 +57,7 @@ namespace OSBE.Controllers {
 
         protected override void OnEnable() {
             base.OnEnable();
-            player = system.Send<ITagRegistry, GameObject>(reg => reg.GetUnique(IdTag.PLAYER));
+            player = system.Player();
         }
 
         private void Start() {

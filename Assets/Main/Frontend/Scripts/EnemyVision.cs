@@ -1,9 +1,8 @@
 using OSCore.System.Interfaces.Controllers;
-using OSCore.System.Interfaces.Tagging;
+using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using OSCore.System;
 
 namespace OSFE.Scripts {
     public class EnemyVision : ASystemInitializer {
@@ -15,8 +14,7 @@ namespace OSFE.Scripts {
 
         protected override void OnEnable() {
             base.OnEnable();
-            player = system.Send<ITagRegistry, GameObject>(reg =>
-                reg.GetUnique(OSCore.Data.Enums.IdTag.PLAYER));
+            player = system.Player();
         }
 
         private void Start() {

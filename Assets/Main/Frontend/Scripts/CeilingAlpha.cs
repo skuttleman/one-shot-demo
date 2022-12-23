@@ -1,5 +1,3 @@
-using OSCore.Data.Enums;
-using OSCore.System.Interfaces.Tagging;
 using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
@@ -14,8 +12,7 @@ namespace OSFE.Scripts {
 
         protected override void OnEnable() {
             base.OnEnable();
-            player = system.Send<ITagRegistry, GameObject>(reg =>
-                reg.GetUnique(IdTag.PLAYER));
+            player = system.Player();
             fov = Transforms.FindInChildren(player.transform.parent, child => child.name == "fov")
                 .First();
         }
