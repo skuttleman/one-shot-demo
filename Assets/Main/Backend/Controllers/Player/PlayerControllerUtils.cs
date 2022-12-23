@@ -79,6 +79,9 @@ namespace OSBE.Controllers.Player {
                     isScoping = true,
                 },
                 PlayerAnim.crouch_idle => state with {
+                    input = state.input with {
+                        controls = PlayerInputControlMap.Standard,
+                    },
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.HAND,
                     isMoving = false,
@@ -154,19 +157,27 @@ namespace OSBE.Controllers.Player {
 
                 PlayerAnim.hang_lunge => state with {
                     input = state.input with {
-                        controls = PlayerInputControlMap.LedgeHang,
+                        controls = PlayerInputControlMap.None,
                     },
                     stance = PlayerStance.HANGING,
                     isMoving = false,
                     isSprinting = false,
                 },
                 PlayerAnim.hang_idle => state with {
+                    input = state.input with {
+                        controls = PlayerInputControlMap.LedgeHang,
+                    },
                     stance = PlayerStance.HANGING,
                     isMoving = false,
                 },
                 PlayerAnim.hang_move => state with {
                     stance = PlayerStance.HANGING,
                     isMoving = true,
+                },
+                PlayerAnim.hang_climb => state with {
+                    input = state.input with {
+                        controls = PlayerInputControlMap.None,
+                    },
                 },
 
                 _ => state

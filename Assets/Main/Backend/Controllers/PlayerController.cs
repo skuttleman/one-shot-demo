@@ -99,9 +99,11 @@ namespace OSBE.Controllers {
             PlayerState prevState = state;
             UpdateState(state => PlayerControllerUtils.TransitionState(state, anim));
 
-            string controls = state.input.controls.ToString();
-            if (input.currentActionMap.name != controls)
-                input.SwitchCurrentActionMap(controls);
+            if (state.input.controls != PlayerInputControlMap.None) {
+                string controls = state.input.controls.ToString();
+                if (input.currentActionMap.name != controls)
+                    input.SwitchCurrentActionMap(controls);
+            }
 
             ActivateStance();
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
@@ -175,9 +177,8 @@ namespace OSBE.Controllers {
                 1000f))
                 distanceToGround = ground.distance;
 
-            if (distanceToGround > 0.6f) {
+            if (distanceToGround >= 0.6f) {
                 anim.Send(PlayerAnimSignal.FALLING_LUNGE);
-                anim.SetSpeed(1f);
                 rb.velocity = Vector3.zero;
                 rb.isKinematic = true;
 

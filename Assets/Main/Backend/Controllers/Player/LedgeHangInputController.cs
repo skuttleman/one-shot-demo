@@ -6,6 +6,7 @@ using OSCore.ScriptableObjects;
 using OSCore.Utils;
 using UnityEngine;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
+using static OSCore.Data.Controllers.PlayerControllerInput;
 
 namespace OSBE.Controllers.Player {
     public class LedgeHangInputController : IPlayerInputController {
@@ -37,9 +38,9 @@ namespace OSBE.Controllers.Player {
 
             float rotationZ = Vectors.AngleTo(Vector2.zero, direction);
             transform.rotation = Quaternion.Lerp(
-                    transform.rotation,
-                    Quaternion.Euler(0f, 0f, rotationZ),
-                    moveCfg.rotationSpeed * Time.deltaTime);
+                transform.rotation,
+                Quaternion.Euler(0f, 0f, rotationZ),
+                moveCfg.rotationSpeed * Time.deltaTime);
         }
     }
 }
