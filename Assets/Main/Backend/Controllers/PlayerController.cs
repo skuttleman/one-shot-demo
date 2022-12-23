@@ -1,12 +1,14 @@
 ﻿using OSBE.Controllers.Player.Interfaces;
 using OSBE.Controllers.Player;
 using OSCore.Data.Animations;
+using OSCore.Data.Controllers;
 using OSCore.Data.Enums;
 using OSCore.Data.Events;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
 using OSCore.System.Interfaces.Events;
+using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
@@ -15,10 +17,10 @@ using System;
 using UnityEngine.InputSystem;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
-using OSCore.System.Interfaces.Tagging;
+using static OSCore.Data.Controllers.PlayerControllerInput;
 
 namespace OSBE.Controllers {
-    public class PlayerController : ASystemInitializer, IPlayerController, IPlayerMainController, IStateReceiver<PlayerAnim> {
+    public class PlayerController : ASystemInitializer, IController<PlayerControllerInput>, IPlayerMainController, IStateReceiver<PlayerAnim> {
         private static readonly PlayerState DEFAULT_STATE = new() {
             input = new() {
                 movement = Vector2.zero,
@@ -48,98 +50,103 @@ namespace OSBE.Controllers {
         private GameObject crawl;
         private GameObject hang;
 
+        public void On(PlayerControllerInput e) {
+            PlayerAnimSignal signal;
+
+            switch (e) {
+                case MovementInput ev:
+                    bool isMoving = Vectors.NonZero(ev.direction);
+                    signal = isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF;
+                    if (anim.CanTransition(signal))
+                        anim.Send(signal);
+
+                    UpdateState(state => state with {
+                        input = state.input with {
+                            movement = ev.direction
+                        }
+                    });
+                    break;
+
+                case SprintInput ev:
+                    signal = PlayerAnimSignal.SPRINT;
+                    if (ev.isSprinting && PlayerControllerUtils.CanSprint(state) && anim.CanTransition(signal))
+                        anim.Send(signal);
+                    break;
+
+                case LookInput ev:
+                    signal = PlayerAnimSignal.LOOK;
+                    if (anim.CanTransition(signal))
+                        anim.Send(signal);
+
+                    UpdateState(state => state with {
+                        input = state.input with {
+                            facing = ev.direction,
+                            mouseLookTimer = ev.isMouse && Vectors.NonZero(ev.direction)
+                                ? cfg.mouseLookReset
+                                : state.input.mouseLookTimer
+                        }
+                    });
+                    break;
+
+                case StanceInput ev:
+                    signal = PlayerAnimSignal.STANCE;
+                    PlayerStance nextStance = PlayerControllerUtils.NextStance(state.stance);
+                    if (anim.CanTransition(signal)
+                        && (!state.isMoving || PlayerControllerUtils.IsMovable(nextStance, state)))
+                        anim.Send(signal);
+                    break;
+
+                case AimInput ev:
+                    signal = ev.isAiming ? PlayerAnimSignal.AIM_ON : PlayerAnimSignal.AIM_OFF;
+                    if (anim.CanTransition(signal))
+                        anim.Send(signal);
+                    break;
+
+                case AttackInput ev:
+                    signal = PlayerAnimSignal.ATTACK;
+                    if (ev.isAttacking
+                        && anim.CanTransition(signal)
+                        && PlayerControllerUtils.CanAttack(state.attackMode))
+                        anim.Send(signal);
+                    break;
+
+                case ClimbInput ev:
+                    if (ev.direction == ClimbDirection.UP) {
+                        signal = PlayerAnimSignal.LEDGE_CLIMB;
+                        if (anim.CanTransition(signal)) {
+                            anim.Send(signal);
+                            transform.position -= new Vector3(0, 0, 0.1f);
+                        }
+                    } else {
+                        signal = PlayerAnimSignal.LEDGE_DROP;
+                        if (anim.CanTransition(signal)) {
+                            anim.Send(signal);
+
+                            float pointZ = state.input.hangingPoint.z;
+                            transform.position = transform.position.WithZ(pointZ + 0.55f);
+                            UpdateState(state => state with {
+                                input = state.input with {
+                                    facing = Vector3.zero,
+                                }
+                            });
+                        }
+                    }
+                    break;
+            }
+        }
+
         public void Publish(IEvent e) =>
             system.Send<IPubSub>(pubsub => pubsub.Publish(e));
 
         public PlayerState UpdateState(Func<PlayerState, PlayerState> updateFn) =>
             state = updateFn(state);
 
-        public void OnMovementInput(Vector2 direction) {
-            bool isMoving = Vectors.NonZero(direction);
-            PlayerAnimSignal signal = isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF;
-            if (anim.CanTransition(signal))
-                anim.Send(signal);
-
-            UpdateState(state => state with {
-                input = state.input with {
-                    movement = direction
-                }
-            });
-        }
-
-        public void OnSprintInput(bool isSprinting) {
-            PlayerAnimSignal signal = PlayerAnimSignal.SPRINT;
-            if (isSprinting && PlayerControllerUtils.CanSprint(state) && anim.CanTransition(signal))
-                anim.Send(signal);
-        }
-
-        public void OnLookInput(Vector2 direction, bool isMouse) {
-            PlayerAnimSignal signal = PlayerAnimSignal.LOOK;
-            if (anim.CanTransition(signal))
-                anim.Send(signal);
-
-            UpdateState(state => state with {
-                input = state.input with {
-                    facing = direction,
-                    mouseLookTimer = isMouse && Vectors.NonZero(direction)
-                            ? cfg.mouseLookReset
-                            : state.input.mouseLookTimer
-                }
-            });
-        }
-
-        public void OnStanceInput() {
-            PlayerAnimSignal signal = PlayerAnimSignal.STANCE;
-            PlayerStance nextStance = PlayerControllerUtils.NextStance(state.stance);
-            if (anim.CanTransition(signal)
-                && (!state.isMoving || PlayerControllerUtils.IsMovable(nextStance, state)))
-                anim.Send(signal);
-        }
-
-        public void OnAimInput(bool isAiming) {
-            PlayerAnimSignal signal = isAiming ? PlayerAnimSignal.AIM_ON : PlayerAnimSignal.AIM_OFF;
-            if (anim.CanTransition(signal))
-                anim.Send(signal);
-        }
-
-        public void OnAttackInput(bool isAttacking) {
-            PlayerAnimSignal signal = PlayerAnimSignal.ATTACK;
-            if (isAttacking
-                && anim.CanTransition(signal)
-                && PlayerControllerUtils.CanAttack(state.attackMode))
-                anim.Send(signal);
-        }
 
         public void OnScopeInput(bool isScoping) {
             PlayerAnimSignal signal = isScoping ? PlayerAnimSignal.SCOPE_ON : PlayerAnimSignal.SCOPE_OFF;
             if (anim.CanTransition(signal))
                 anim.Send(signal);
         }
-
-        public void OnClimbInput(bool isClimbing) {
-            PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_CLIMB;
-            if (isClimbing && anim.CanTransition(signal)) {
-                anim.Send(signal);
-                transform.position -= new Vector3(0, 0, 0.1f);
-            }
-        }
-
-        public void OnDropInput(bool isDropping) {
-            PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_DROP;
-            if (isDropping && anim.CanTransition(signal)) {
-                anim.Send(signal);
-
-                float pointZ = state.input.hangingPoint.z;
-                transform.position = transform.position.WithZ(pointZ + 0.55f);
-                UpdateState(state => state with {
-                    input = state.input with {
-                        facing = Vector3.zero,
-                    }
-                });
-            }
-        }
-
-        public void OnPlayerStep() { }
 
         public void OnStateExit(PlayerAnim state) {
             switch (state) {
@@ -266,5 +273,7 @@ namespace OSBE.Controllers {
         }
     }
 
-    internal class NoopInputController : IPlayerInputController { }
+    internal class NoopInputController : IPlayerInputController {
+        public void On(PlayerControllerInput e) { }
+    }
 }

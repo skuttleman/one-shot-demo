@@ -1,21 +1,21 @@
 using OSCore.Data.Animations;
-using OSCore.Data.Enums;
+using OSCore.Data.Controllers;
 using OSCore.Data.Patrol;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
-using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using static OSCore.Data.Patrol.EnemyPatrol;
+using static OSCore.Data.Controllers.EnemyControllerInput;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
+using static OSCore.Data.Patrol.EnemyPatrol;
 
 namespace OSBE.Controllers {
-    public class EnemyController : ASystemInitializer<MovementChanged>, IEnemyController, IStateReceiver<EnemyAnim> {
+    public class EnemyController : ASystemInitializer<MovementChanged>, IController<EnemyControllerInput>, IStateReceiver<EnemyAnim> {
         [SerializeField] private EnemyCfgSO cfg;
         [SerializeField] GameObject footstep;
         private static readonly float SEEN_THRESHOLD = 5f;
@@ -37,19 +37,22 @@ namespace OSBE.Controllers {
                 _ => new float[] { }
             };
 
-        public void OnEnemyStep() {
+        public void On(EnemyControllerInput e) {
+            switch (e) {
+                case DamageInput:
+                    state = state with { isPlayerInView = true };
+                    timeSinceSeenPlayer = 0f;
+                    break;
+                case PlayerLOS ev:
+                    state = state with { isPlayerInView = ev.isInView };
+                    if (ev.isInView) timeSinceSeenPlayer = 0f;
+                    break;
+            }
+        }
+
+        public void OnStep() {
             if (timeSincePlayerMoved > 0.5f)
                 Instantiate(footstep, transform.position, Quaternion.identity);
-        }
-
-        public void OnPlayerSightChange(bool isInView) {
-            state = state with { isPlayerInView = isInView };
-            if (isInView) timeSinceSeenPlayer = 0f;
-        }
-
-        public void OnDamage(float damage) {
-            state = state with { isPlayerInView = true };
-            timeSinceSeenPlayer = 0f;
         }
 
         protected override void OnEvent(MovementChanged e) =>

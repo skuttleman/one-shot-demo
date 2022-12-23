@@ -1,4 +1,5 @@
 ﻿using OSBE.Controllers.Player.Interfaces;
+using OSCore.Data.Controllers;
 using OSCore.Data.Enums;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
@@ -17,6 +18,8 @@ namespace OSBE.Controllers.Player {
             this.cfg = cfg;
             this.transform = transform;
         }
+
+        public void On(PlayerControllerInput e) { }
 
         public void OnUpdate(PlayerState state) {
             RotatePlayer(state, PlayerControllerUtils.MoveCfg(cfg, state));

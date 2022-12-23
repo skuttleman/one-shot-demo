@@ -41,23 +41,9 @@ namespace OSCore.System.Interfaces {
     }
 
     namespace Controllers {
-        public interface IPlayerController {
-            public void OnMovementInput(Vector2 direction);
-            public void OnSprintInput(bool isSprinting);
-            public void OnLookInput(Vector2 direction, bool isMouse);
-            public void OnStanceInput();
-            public void OnAimInput(bool isAiming);
-            public void OnAttackInput(bool isAttacking);
-            public void OnScopeInput(bool isScoping);
-            public void OnClimbInput(bool isClimbing);
-            public void OnDropInput(bool isDropping);
-            public void OnPlayerStep();
-        }
-
-        public interface IEnemyController {
-            public void OnEnemyStep();
-            public void OnPlayerSightChange(bool isInView);
-            public void OnDamage(float damage);
+        public interface IController<E> {
+            public void On(E e);
+            public void OnStep() { }
         }
 
         public interface IDamage {

@@ -1,12 +1,14 @@
+using OSCore.Data.Controllers;
 using OSCore.System.Interfaces.Controllers;
 using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using static OSCore.Data.Controllers.EnemyControllerInput;
 
 namespace OSFE.Scripts {
     public class EnemyVision : ASystemInitializer {
-        private IEnemyController controller;
+        private IController<EnemyControllerInput> controller;
         private GameObject player;
         private SpriteRenderer rdr;
         private bool seesPlayer = false;
@@ -19,7 +21,7 @@ namespace OSFE.Scripts {
 
         private void Start() {
             Transform entity = Transforms.Entity(transform);
-            controller = entity.GetComponent<IEnemyController>();
+            controller = entity.GetComponent<IController<EnemyControllerInput>>();
             rdr = entity.GetComponentInChildren<SpriteRenderer>();
         }
 
@@ -36,7 +38,7 @@ namespace OSFE.Scripts {
             if (!hits.IsEmpty() && hits.First().transform.IsChildOf(player.transform))
                 los = true;
 
-            controller.OnPlayerSightChange(seesPlayer && los);
+            controller.On(new PlayerLOS(seesPlayer && los));
 
             Vector3 position = transform.parent.parent.position + new Vector3(0, 0, -0.1f); // TODON'T
             Vector3 playerEyes = Transforms.FindInActiveChildren(

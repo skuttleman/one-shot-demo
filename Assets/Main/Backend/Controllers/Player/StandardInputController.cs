@@ -1,5 +1,6 @@
 ﻿using OSBE.Controllers.Player.Interfaces;
 using OSCore.Data.Animations;
+using OSCore.Data.Controllers;
 using OSCore.Data.Enums;
 using OSCore.Data.Events;
 using OSCore.Data;
@@ -25,6 +26,8 @@ namespace OSBE.Controllers.Player {
             rb = transform.GetComponent<Rigidbody>();
             anim = transform.GetComponentInChildren<PlayerAnimator>();
         }
+
+        public void On(PlayerControllerInput e) { }
 
         public void OnUpdate(PlayerState state) {
             if (state.input.mouseLookTimer > 0f)
@@ -52,9 +55,12 @@ namespace OSBE.Controllers.Player {
             if (prevGrounded && !isGrounded) {
                 anim.Send(PlayerAnimSignal.FALLING);
             } else if (!prevGrounded && isGrounded) {
-                if (state.isSprinting && state.isMoving) anim.Send(PlayerAnimSignal.LAND_SPRINT);
-                else if (state.isMoving) anim.Send(PlayerAnimSignal.LAND_MOVE);
-                else anim.Send(PlayerAnimSignal.LAND_IDLE);
+                if (state.isSprinting && Vectors.NonZero(state.input.movement))
+                    anim.Send(PlayerAnimSignal.LAND_SPRINT);
+                else if (Vectors.NonZero(state.input.movement))
+                    anim.Send(PlayerAnimSignal.LAND_MOVE);
+                else
+                    anim.Send(PlayerAnimSignal.LAND_IDLE);
             }
 
             MovePlayer(state, PlayerControllerUtils.MoveCfg(cfg, state));

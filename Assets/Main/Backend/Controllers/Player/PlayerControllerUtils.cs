@@ -59,7 +59,6 @@ namespace OSBE.Controllers.Player {
                     },
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.NONE,
-                    isMoving = false,
                     isScoping = false,
                 },
 

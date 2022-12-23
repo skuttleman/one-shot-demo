@@ -20,6 +20,10 @@ namespace OSCore.Data {
         public enum PlayerInputControlMap {
             None, Standard, LedgeHang,
         }
+
+        public enum ClimbDirection {
+            UP, DOWN,
+        }
     }
 
     public record PlayerState {
@@ -46,6 +50,33 @@ namespace OSCore.Data {
 
     public record EnemyState {
         public bool isPlayerInView { get; init; }
+    }
+
+    namespace Controllers {
+        public record PlayerControllerInput {
+            public record MovementInput(Vector2 direction) : PlayerControllerInput();
+            public record SprintInput(bool isSprinting) : PlayerControllerInput();
+            public record LookInput(Vector2 direction, bool isMouse) : PlayerControllerInput();
+            public record AimInput(bool isAiming) : PlayerControllerInput();
+            public record AttackInput(bool isAttacking) : PlayerControllerInput();
+            public record DamageInput(float damage) : PlayerControllerInput();
+            public record StanceInput() : PlayerControllerInput();
+            public record ScopeInput(bool isScoping) : PlayerControllerInput();
+            public record ClimbInput(ClimbDirection direction) : PlayerControllerInput();
+
+            private PlayerControllerInput() { }
+        }
+
+        public record EnemyControllerInput {
+            public record MovementInput(Vector2 direction) : EnemyControllerInput();
+            public record SprintInput(bool isSprinting) : EnemyControllerInput();
+            public record LookInput(Vector2 direction) : EnemyControllerInput();
+            public record AimInput(bool isAiming) : EnemyControllerInput();
+            public record DamageInput(float damage) : EnemyControllerInput();
+            public record PlayerLOS(bool isInView) : EnemyControllerInput();
+
+            private EnemyControllerInput() { }
+        }
     }
 
     namespace Events {
