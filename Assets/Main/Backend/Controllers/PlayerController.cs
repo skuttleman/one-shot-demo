@@ -15,6 +15,7 @@ using System;
 using UnityEngine.InputSystem;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
+using OSCore.System.Interfaces.Tagging;
 
 namespace OSBE.Controllers {
     public class PlayerController : ASystemInitializer, IPlayerController, IPlayerMainController, IStateReceiver<PlayerAnim> {
@@ -127,6 +128,9 @@ namespace OSBE.Controllers {
             PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_DROP;
             if (isDropping && anim.CanTransition(signal)) {
                 anim.Send(signal);
+
+                float pointZ = state.input.hangingPoint.z;
+                transform.position = transform.position.WithZ(pointZ + 0.55f);
                 UpdateState(state => state with {
                     input = state.input with {
                         facing = Vector3.zero,
@@ -193,8 +197,12 @@ namespace OSBE.Controllers {
             controllers.Get(state.input.controls).OnFixedUpdate(state);
 
             bool isFallStart = prevGrounded && !state.isGrounded;
+            bool isCatchable = ledge != null
+                && system.Send<ITagRegistry, ISet<GameObject>>(tags =>
+                    tags.Get(IdTag.PLATFORM_CATCHABLE))
+                    .Contains(ledge.gameObject);
 
-            if (isFallStart && ledge != null && wasCrouching)
+            if (isFallStart && isCatchable && wasCrouching)
                 TransitionToLedgeHang(ledge);
         }
 
@@ -224,23 +232,25 @@ namespace OSBE.Controllers {
                 1000f))
                 distanceToGround = ground.distance;
 
-            anim.Send(PlayerAnimSignal.FALLING_LUNGE);
-            anim.SetSpeed(1f);
-            rb.velocity = Vector3.zero;
-            rb.isKinematic = true;
+            if (distanceToGround > 0.6f) {
+                anim.Send(PlayerAnimSignal.FALLING_LUNGE);
+                anim.SetSpeed(1f);
+                rb.velocity = Vector3.zero;
+                rb.isKinematic = true;
 
-            Vector3 pt = ledge.ClosestPoint(transform.position);
-            Vector2 direction = (transform.position - pt).normalized;
-            transform.position += (direction * 0.275f).Upgrade();
+                Vector3 pt = ledge.ClosestPoint(transform.position);
+                Vector2 direction = (transform.position - pt).normalized;
+                transform.position += (direction * 0.275f).Upgrade();
 
-            UpdateState(state => state with {
-                input = state.input with {
-                    movement = Vector3.zero,
-                    facing = pt - transform.position,
-                    hangingPoint = pt,
-                },
-                ledge = ledge,
-            });
+                UpdateState(state => state with {
+                    input = state.input with {
+                        movement = Vector3.zero,
+                        facing = pt - transform.position,
+                        hangingPoint = pt,
+                    },
+                    ledge = ledge,
+                });
+            }
         }
     }
 

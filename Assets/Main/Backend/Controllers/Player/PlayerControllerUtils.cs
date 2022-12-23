@@ -2,7 +2,6 @@
 using OSCore.Data.Enums;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
-using UnityEngine;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers.Player {
@@ -60,6 +59,7 @@ namespace OSBE.Controllers.Player {
                     },
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.NONE,
+                    isMoving = false,
                     isScoping = false,
                 },
 
