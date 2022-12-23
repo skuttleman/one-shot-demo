@@ -223,6 +223,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: hanging_5
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 90c2b21b9430849118fc98c285f29199
+      internalID: -2003232399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -237,6 +258,7 @@ TextureImporter:
       hanging_3: 320565201
       hanging_0: 619348888
       hanging_1: 2075719815
+      hanging_5: -2003232399
       hanging_4: 1661255247
       hanging_2: -637025386
   mipmapLimitGroupName: 

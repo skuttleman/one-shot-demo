@@ -61,7 +61,7 @@ namespace OSBE.Controllers {
                 case AttackInput ev: OnAttackInput(ev.isAttacking); break;
                 case ClimbInput ev:
                     if (ev.direction == ClimbDirection.UP) OnClimbUp();
-                    else OnClimbUp();
+                    else OnClimbDown();
                     break;
             }
         }
@@ -262,7 +262,14 @@ namespace OSBE.Controllers {
             PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_CLIMB;
             if (anim.CanTransition(signal)) {
                 anim.Send(signal);
-                transform.position -= new Vector3(0, 0, 0.1f);
+
+                Vector3 diff = (state.input.hangingPoint - transform.position) * 1.2f;
+                transform.position += diff;
+                UpdateState(state => state with {
+                    input = state.input with {
+                        facing = Vector3.zero,
+                    }
+                });
             }
         }
 

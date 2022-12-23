@@ -403,7 +403,7 @@
                 {
                     "name": "",
                     "id": "ff7c06f9-b320-4381-a981-f192ff73f925",
-                    "path": "<Gamepad>/buttonEast",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -414,7 +414,7 @@
                 {
                     "name": "",
                     "id": "d461f8e6-8aa8-414c-8d16-cad3fd43e566",
-                    "path": "<Keyboard>/z",
+                    "path": "<Keyboard>/x",
                     "interactions": "",
                     "processors": "",
                     "groups": "Mouse + Keyboard",
