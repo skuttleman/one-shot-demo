@@ -174,7 +174,6 @@ namespace OSBE.Controllers.Player {
 
             return result with {
                 anim = anim,
-                isSprinting = result.isSprinting && result.isMoving,
             };
         }
     }
