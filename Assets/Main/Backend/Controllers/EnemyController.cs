@@ -184,7 +184,6 @@ namespace OSBE.Controllers {
                 diff = diff > 180f ? 360f - diff : diff;
                 if (diff < 45f) {
                     anim.Send(EnemyAnimSignal.MOVE_ON);
-                    anim.SetSpeed(0.5f);
                     transform.position += direction;
                 }
 

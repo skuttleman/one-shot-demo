@@ -11,6 +11,8 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public float punchingSpeed { get; private set; }
         [field: SerializeField] public float firingSpeed { get; private set; }
         [field: SerializeField] public float landingSpeed { get; private set; }
+        [field: SerializeField] public float lungingSpeed { get; private set; }
+        [field: SerializeField] public float ledgeShimmySpeed { get; private set; }
 
         public override AStateNode<PlayerAnim, PlayerAnimSignal> Init() {
             StableNode<PlayerAnim, PlayerAnimSignal> stand_move = new(PlayerAnim.stand_move);
@@ -37,7 +39,7 @@ namespace OSCore.ScriptableObjects {
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.stand_punch, punchingSpeed);
             stand_fall
                 .To(PlayerAnimSignal.LAND_SPRINT, stand_move)
-                .To(PlayerAnimSignal.FALLING_LUNGE, hang_idle, (PlayerAnim.hang_lunge, 0.75f))
+                .To(PlayerAnimSignal.FALLING_LUNGE, hang_idle, (PlayerAnim.hang_lunge, 0f, lungingSpeed))
                 .To(PlayerAnimSignal.LAND_MOVE, crouch_move, (PlayerAnim.stand_idle, landingSpeed))
                 .To(PlayerAnimSignal.LAND_IDLE, crouch_idle, (PlayerAnim.stand_idle, landingSpeed));
 
@@ -101,7 +103,7 @@ namespace OSCore.ScriptableObjects {
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crawl_fire, firingSpeed);
 
             hang_idle
-                .With(PlayerAnimSignal.MOVE_ON, PlayerAnim.hang_move, 0.8f)
+                .With(PlayerAnimSignal.MOVE_ON, PlayerAnim.hang_move, 0.8f, ledgeShimmySpeed)
                 .To(PlayerAnimSignal.LEDGE_CLIMB, crouch_idle, (PlayerAnim.hang_climb, defaultSpeed))
                 .To(PlayerAnimSignal.LEDGE_DROP, stand_fall);
 

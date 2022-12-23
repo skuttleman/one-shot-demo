@@ -10,6 +10,7 @@ namespace OSBE.Controllers {
         private AStateNode<State, Signal> state = null;
         private IStateReceiver<State> receiver;
         private float timeInState;
+        private float animSpeed = 1f;
 
         public ACharacterAnimator() {
             signals = new();
@@ -18,13 +19,16 @@ namespace OSBE.Controllers {
         protected void Init(IStateReceiver<State> receiver, AStateNode<State, Signal> tree) {
             this.receiver = receiver;
             anim = GetComponent<Animator>();
+            anim.speed = animSpeed;
             state = tree;
             timeInState = 0f;
             receiver.OnStateEnter(default, state.state);
         }
 
-        public void SetSpeed(float speed) =>
-            anim.speed = speed;
+        public void SetSpeed(float speed) {
+            animSpeed = speed;
+            anim.speed = animSpeed * state.animSpeed;
+        }
 
         public void Send(Signal signal) =>
             signals.Enqueue(signal);
@@ -32,8 +36,13 @@ namespace OSBE.Controllers {
         public bool CanTransition(Signal signal) =>
             state != state.Next(signal);
 
+        public bool DidAllFramesPlay() {
+            AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+            return info.loop || info.normalizedTime >= 1f;
+        }
+
         private void Update() {
-            if (state is null) return;
+            if (state is null || !DidAllFramesPlay()) return;
             timeInState += Time.deltaTime;
             if (timeInState < state.minTime) return;
 
@@ -49,6 +58,7 @@ namespace OSBE.Controllers {
                 receiver.OnStateExit(curr, state.state);
                 this.state = state;
                 timeInState = 0f;
+                anim.speed = animSpeed * state.animSpeed;
                 anim.Play(state.state.ToString());
                 receiver.OnStateEnter(curr, state.state);
             }

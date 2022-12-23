@@ -224,8 +224,8 @@ namespace OSBE.Controllers {
                 1000f))
                 distanceToGround = ground.distance;
 
-            anim.SetSpeed(0.5f);
             anim.Send(PlayerAnimSignal.FALLING_LUNGE);
+            anim.SetSpeed(1f);
             rb.velocity = Vector3.zero;
             rb.isKinematic = true;
 
