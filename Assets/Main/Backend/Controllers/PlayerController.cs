@@ -22,19 +22,26 @@ using static OSCore.Data.Controllers.PlayerControllerInput;
 namespace OSBE.Controllers {
     public class PlayerController : ASystemInitializer, IController<PlayerControllerInput>, IPlayerMainController, IStateReceiver<PlayerAnim> {
         private static readonly PlayerState DEFAULT_STATE = new() {
-            input = new() {
+            common = new() {
+                anim = PlayerAnim.crouch_idle,
+                animSpeed = 1f,
+                controls = PlayerInputControlMap.Standard,
+            },
+            std = new() {
+                mouseLookTimer = 0f,
+                stance = PlayerStance.STANDING,
+                attackMode = AttackMode.HAND,
+                isMoving = false,
+                isSprinting = false,
+                isScoping = false,
+                isGrounded = true,
                 movement = Vector2.zero,
                 facing = Vector2.zero,
-                mouseLookTimer = 0f,
-                controls = PlayerInputControlMap.Standard,
-                hangingPoint = Vector3.zero,
             },
-            stance = PlayerStance.STANDING,
-            attackMode = AttackMode.HAND,
-            isMoving = false,
-            isSprinting = false,
-            isScoping = false,
-            isGrounded = true,
+            hang = new() {
+                hangingPoint = Vector3.zero,
+                ledge = default,
+            }
         };
 
         [SerializeField] private PlayerCfgSO cfg;
@@ -54,7 +61,7 @@ namespace OSBE.Controllers {
             switch (e) {
                 case MovementInput ev: OnMovementInput(ev.direction); break;
                 case SprintInput ev: OnSprintInput(ev.isSprinting); break;
-                case LookInput ev:OnLookInput(ev.direction, ev.isMouse); break;
+                case LookInput ev: OnLookInput(ev.direction, ev.isMouse); break;
                 case StanceInput: OnStanceInput(); break;
                 case ScopeInput ev: OnScopeInput(ev.isScoping); break;
                 case AimInput ev: OnAimInput(ev.isAiming); break;
@@ -88,7 +95,7 @@ namespace OSBE.Controllers {
             if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
                 rb.isKinematic = false;
                 UpdateState(state => state with {
-                    input = state.input with {
+                    common = state.common with {
                         controls = PlayerInputControlMap.Standard
                     }
                 });
@@ -99,16 +106,16 @@ namespace OSBE.Controllers {
             PlayerState prevState = state;
             UpdateState(state => PlayerControllerUtils.TransitionState(state, anim));
 
-            if (state.input.controls != PlayerInputControlMap.None) {
-                string controls = state.input.controls.ToString();
+            if (state.common.controls != PlayerInputControlMap.None) {
+                string controls = state.common.controls.ToString();
                 if (input.currentActionMap.name != controls)
                     input.SwitchCurrentActionMap(controls);
             }
 
             ActivateStance();
-            PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
-            PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
-            PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
+            PublishChanged(prevState.std.stance, state.std.stance, new StanceChanged(state.std.stance));
+            PublishChanged(prevState.std.attackMode, state.std.attackMode, new AttackModeChanged(state.std.attackMode));
+            PublishChanged(prevState.std.isScoping, state.std.isScoping, new ScopingChanged(state.std.isScoping));
         }
 
         private void Start() {
@@ -131,17 +138,17 @@ namespace OSBE.Controllers {
         }
 
         private void Update() {
-            controllers.Get(state.input.controls).OnUpdate(state);
+            controllers.Get(state.common.controls).OnUpdate(state);
         }
 
         private void FixedUpdate() {
-            bool prevGrounded = state.isGrounded;
-            Collider ledge = state.ground.collider;
-            bool wasCrouching = state.stance == PlayerStance.CROUCHING;
+            bool prevGrounded = state.std.isGrounded;
+            Collider ledge = state.std.ground.collider;
+            bool wasCrouching = state.std.stance == PlayerStance.CROUCHING;
 
-            controllers.Get(state.input.controls).OnFixedUpdate(state);
+            controllers.Get(state.common.controls).OnFixedUpdate(state);
 
-            bool isFallStart = prevGrounded && !state.isGrounded;
+            bool isFallStart = prevGrounded && !state.std.isGrounded;
             bool isCatchable = ledge != null
                 && system.Send<ITagRegistry, ISet<GameObject>>(tags =>
                     tags.Get(IdTag.PLATFORM_CATCHABLE))
@@ -158,10 +165,10 @@ namespace OSBE.Controllers {
                 .gameObject;
 
         private void ActivateStance() {
-            stand.SetActive(state.stance == PlayerStance.STANDING);
-            crouch.SetActive(state.stance == PlayerStance.CROUCHING);
-            crawl.SetActive(state.stance == PlayerStance.CRAWLING);
-            hang.SetActive(state.stance == PlayerStance.HANGING);
+            stand.SetActive(state.std.stance == PlayerStance.STANDING);
+            crouch.SetActive(state.std.stance == PlayerStance.CROUCHING);
+            crawl.SetActive(state.std.stance == PlayerStance.CRAWLING);
+            hang.SetActive(state.std.stance == PlayerStance.HANGING);
         }
 
         private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
@@ -187,12 +194,14 @@ namespace OSBE.Controllers {
                 transform.position += (direction * 0.275f).Upgrade();
 
                 UpdateState(state => state with {
-                    input = state.input with {
+                    std = state.std with {
                         movement = Vector3.zero,
                         facing = pt - transform.position,
-                        hangingPoint = pt,
                     },
-                    ledge = ledge,
+                    hang = state.hang with {
+                        hangingPoint = pt,
+                        ledge = ledge,
+                    }
                 });
             }
         }
@@ -204,7 +213,7 @@ namespace OSBE.Controllers {
                 anim.Send(signal);
 
             UpdateState(state => state with {
-                input = state.input with {
+                std = state.std with {
                     movement = direction
                 }
             });
@@ -222,20 +231,20 @@ namespace OSBE.Controllers {
                 anim.Send(signal);
 
             UpdateState(state => state with {
-                input = state.input with {
+                std = state.std with {
                     facing = direction,
                     mouseLookTimer = isMouse && Vectors.NonZero(direction)
                         ? cfg.mouseLookReset
-                        : state.input.mouseLookTimer
+                        : state.std.mouseLookTimer
                 }
             });
         }
 
         private void OnStanceInput() {
             PlayerAnimSignal signal = PlayerAnimSignal.STANCE;
-            PlayerStance nextStance = PlayerControllerUtils.NextStance(state.stance);
+            PlayerStance nextStance = PlayerControllerUtils.NextStance(state.std.stance);
             if (anim.CanTransition(signal)
-                && (!state.isMoving || PlayerControllerUtils.IsMovable(nextStance, state)))
+                && (!state.std.isMoving || PlayerControllerUtils.IsMovable(nextStance, state)))
                 anim.Send(signal);
         }
 
@@ -255,7 +264,7 @@ namespace OSBE.Controllers {
             PlayerAnimSignal signal = PlayerAnimSignal.ATTACK;
             if (isAttacking
                 && anim.CanTransition(signal)
-                && PlayerControllerUtils.CanAttack(state.attackMode))
+                && PlayerControllerUtils.CanAttack(state.std.attackMode))
                 anim.Send(signal);
         }
 
@@ -264,10 +273,10 @@ namespace OSBE.Controllers {
             if (anim.CanTransition(signal)) {
                 anim.Send(signal);
 
-                Vector3 diff = (state.input.hangingPoint - transform.position) * 1.2f;
+                Vector3 diff = (state.hang.hangingPoint - transform.position) * 1.2f;
                 transform.position += diff;
                 UpdateState(state => state with {
-                    input = state.input with {
+                    std = state.std with {
                         facing = Vector3.zero,
                     }
                 });
@@ -279,10 +288,10 @@ namespace OSBE.Controllers {
             if (anim.CanTransition(signal)) {
                 anim.Send(signal);
 
-                float pointZ = state.input.hangingPoint.z;
+                float pointZ = state.hang.hangingPoint.z;
                 transform.position = transform.position.WithZ(pointZ + 0.55f);
                 UpdateState(state => state with {
-                    input = state.input with {
+                    std = state.std with {
                         facing = Vector3.zero,
                     }
                 });

@@ -27,25 +27,35 @@ namespace OSCore.Data {
     }
 
     public record PlayerState {
-        public PlayerInputState input { get; init; }
-        public PlayerStance stance { get; init; }
-        public AttackMode attackMode { get; init; }
+        public PlayerSharedInputState common { get; init; }
+        public PlayerStandardInputState std { get; init; }
+        public PlayerLedgeHangingInputState hang { get; init; }
+    }
+
+    public record PlayerSharedInputState {
+        public PlayerInputControlMap controls { get; init; }
         public PlayerAnim anim { get; init; }
         public float animSpeed { get; init; }
+
+    }
+
+    public record PlayerStandardInputState {
+        public Vector2 movement { get; init; }
+        public Vector2 facing { get; init; }
+        public PlayerStance stance { get; init; }
+        public AttackMode attackMode { get; init; }
+        public float mouseLookTimer { get; init; }
         public bool isMoving { get; init; }
         public bool isSprinting { get; init; }
         public bool isScoping { get; init; }
         public bool isGrounded { get; init; }
         public RaycastHit ground { get; init; }
-        public Collider ledge { get; init; }
     }
 
-    public record PlayerInputState {
-        public PlayerInputControlMap controls { get; init; }
+    public record PlayerLedgeHangingInputState {
         public Vector3 hangingPoint { get; init; }
-        public Vector2 movement { get; init; }
-        public Vector2 facing { get; init; }
-        public float mouseLookTimer { get; init; }
+        public Collider ledge { get; init; }
+
     }
 
     public record EnemyState {

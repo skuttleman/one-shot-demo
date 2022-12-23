@@ -20,7 +20,13 @@ namespace OSBE.Controllers.Player {
             this.transform = transform;
         }
 
-        public void On(PlayerControllerInput e) { }
+        public void On(PlayerControllerInput e) {
+            switch (e) {
+                case MovementInput ev:
+                    Debug.Log("MOVE " + ev.direction.Directionify());
+                    break;
+            }
+        }
 
         public void OnUpdate(PlayerState state) {
             RotatePlayer(state, PlayerControllerUtils.MoveCfg(cfg, state));
@@ -29,11 +35,11 @@ namespace OSBE.Controllers.Player {
         private void RotatePlayer(PlayerState state, MoveConfig moveCfg) {
             Vector2 direction;
 
-            if (Vectors.NonZero(state.input.facing)
-                && (state.stance != PlayerStance.CRAWLING || !Vectors.NonZero(state.input.movement)))
-                direction = state.input.facing;
-            else if (state.input.mouseLookTimer <= 0f && Vectors.NonZero(state.input.movement))
-                direction = state.input.movement;
+            if (Vectors.NonZero(state.std.facing)
+                && (state.std.stance != PlayerStance.CRAWLING || !Vectors.NonZero(state.std.movement)))
+                direction = state.std.facing;
+            else if (state.std.mouseLookTimer <= 0f && Vectors.NonZero(state.std.movement))
+                direction = state.std.movement;
             else return;
 
             float rotationZ = Vectors.AngleTo(Vector2.zero, direction);

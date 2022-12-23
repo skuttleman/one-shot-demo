@@ -89,5 +89,10 @@ namespace OSCore.Utils {
 
         public static Vector3 WithZ(this Vector3 vector, float z) =>
             new(vector.x, vector.y, z);
+
+        public static Vector2 Directionify(this Vector2 vector) {
+            bool horizontal = Mathf.Abs(vector.x) > Mathf.Abs(vector.y);
+            return new(horizontal ? vector.x : 0f, horizontal ? 0f : vector.y);
+        }
     }
 }
