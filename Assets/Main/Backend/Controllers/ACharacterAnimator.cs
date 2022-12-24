@@ -37,17 +37,6 @@ namespace OSBE.Controllers {
         public bool CanTransition(Signal signal) =>
             state != state.Next(signal);
 
-        private void Update() {
-            if (state is null || !DidAllFramesPlay()) return;
-            timeInState += Time.deltaTime;
-            if (timeInState < state.minTime) return;
-
-            if (state != state.next)
-                Transition(state.next);
-            else if (signals.TryDequeue(out Signal signal))
-                Transition(state.Next(signal));
-        }
-
         private void Transition(AStateNode<State, Signal> state) {
             if (this.state != state) {
                 State curr = this.state.state;
@@ -64,6 +53,21 @@ namespace OSBE.Controllers {
         private bool DidAllFramesPlay() {
             AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
             return info.loop || info.normalizedTime >= (state?.minLoops ?? 0f);
+        }
+
+        /*
+         * Lifecycle Methods
+         */
+
+        private void Update() {
+            if (state is null || !DidAllFramesPlay()) return;
+            timeInState += Time.deltaTime;
+            if (timeInState < state.minTime) return;
+
+            if (state != state.next)
+                Transition(state.next);
+            else if (signals.TryDequeue(out Signal signal))
+                Transition(state.Next(signal));
         }
     }
 }

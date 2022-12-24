@@ -5,13 +5,17 @@ namespace OSFE.Scripts {
         private SpriteRenderer rdr;
         private float existence = 1f;
 
-        void Start() {
+        /*
+         * Lifecycle Methods
+         */
+
+        private void Start() {
             rdr = GetComponent<SpriteRenderer>();
             transform.localScale = new(0, 0, 0);
             rdr.color = new(rdr.color.r, rdr.color.g, rdr.color.b, 0f);
         }
 
-        void Update() {
+        private void Update() {
             existence -= Time.deltaTime * 1.5f;
             if (existence <= 0) {
                 Destroy(gameObject);

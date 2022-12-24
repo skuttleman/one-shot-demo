@@ -9,20 +9,6 @@ namespace OSBE.Controllers {
         private Mesh mesh;
         private float timeout;
 
-        private void Start() {
-            mesh = new();
-            timeout = 0f;
-            GetComponent<MeshFilter>().mesh = mesh;
-        }
-
-        private void Update() {
-            if (timeout > 0f) {
-                timeout -= Time.deltaTime;
-            } else {
-                timeout = cfg.secondsBetween;
-                DrawFOV();
-            }
-        }
         private void DrawFOV() {
             Transform head = Transforms
                 .FindInActiveChildren(transform.parent, xform => xform.name == "head")
@@ -76,6 +62,25 @@ namespace OSBE.Controllers {
             mesh.uv = uv;
             mesh.triangles = triangles;
             mesh.bounds = new Bounds(vertices[0], Vector3.one * 1000f);
+        }
+
+        /*
+         * Lifecycle Methods
+         */
+
+        private void Start() {
+            mesh = new();
+            timeout = 0f;
+            GetComponent<MeshFilter>().mesh = mesh;
+        }
+
+        private void Update() {
+            if (timeout > 0f) {
+                timeout -= Time.deltaTime;
+            } else {
+                timeout = cfg.secondsBetween;
+                DrawFOV();
+            }
         }
     }
 }

@@ -12,6 +12,10 @@ namespace OSFE.Scripts {
             controller.On(new DamageInput(damage));
         }
 
+        /*
+         * Lifecycle Methods
+         */
+
         private void Start() {
             controller = Transforms.Entity(transform)
                 .GetComponent<IController<EnemyControllerInput>>();

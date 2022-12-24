@@ -23,6 +23,10 @@ namespace OSCore {
         public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent =>
             system.Send(action);
 
+        /*
+         * Lifecycle Methods
+         */
+
         private void Awake() {
             if (FindObjectsOfType<GameController>().Length > 1) {
                 Destroy(gameObject);

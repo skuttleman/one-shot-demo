@@ -50,6 +50,10 @@ namespace OSFE.Scripts {
             controller.On(new ClimbInput(ClimbDirection.DOWN));
         }
 
+        /*
+         * Lifecycle Methods
+         */
+
         private void Start() {
             controller = Transforms.Entity(transform)
                 .GetComponent<IController<PlayerControllerInput>>();

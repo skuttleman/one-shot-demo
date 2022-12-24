@@ -19,6 +19,12 @@ namespace OSCore.System {
         protected IGameSystem system;
         private IEnumerable<long> subs;
 
+        protected abstract void OnEvent(A e);
+
+        /*
+         * Lifecycle Methods
+         */
+
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
             subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
@@ -32,7 +38,6 @@ namespace OSCore.System {
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }
 
-        protected abstract void OnEvent(A e);
     }
 
     public abstract class ASystemInitializer<A, B> : MonoBehaviour
@@ -40,6 +45,13 @@ namespace OSCore.System {
         where B : IEvent {
         protected IGameSystem system;
         private IEnumerable<long> subs;
+
+        protected abstract void OnEvent(A e);
+        protected abstract void OnEvent(B e);
+
+        /*
+         * Lifecycle Methods
+         */
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
@@ -54,9 +66,6 @@ namespace OSCore.System {
             system.Send<IPubSub>(pubsub =>
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }
-
-        protected abstract void OnEvent(A e);
-        protected abstract void OnEvent(B e);
     }
 
     public abstract class ASystemInitializer<A, B, C> : MonoBehaviour
@@ -65,6 +74,14 @@ namespace OSCore.System {
         where C : IEvent {
         protected IGameSystem system;
         private IEnumerable<long> subs;
+
+        protected abstract void OnEvent(A e);
+        protected abstract void OnEvent(B e);
+        protected abstract void OnEvent(C e);
+
+        /*
+         * Lifecycle Methods
+         */
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
@@ -80,10 +97,6 @@ namespace OSCore.System {
             system.Send<IPubSub>(pubsub =>
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }
-
-        protected abstract void OnEvent(A e);
-        protected abstract void OnEvent(B e);
-        protected abstract void OnEvent(C e);
     }
 
     public abstract class ASystemInitializer<A, B, C, D> : MonoBehaviour
@@ -93,6 +106,15 @@ namespace OSCore.System {
         where D : IEvent {
         protected IGameSystem system;
         private IEnumerable<long> subs;
+
+        protected abstract void OnEvent(A e);
+        protected abstract void OnEvent(B e);
+        protected abstract void OnEvent(C e);
+        protected abstract void OnEvent(D e);
+
+        /*
+         * Lifecycle Methods
+         */
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
@@ -109,10 +131,5 @@ namespace OSCore.System {
             system.Send<IPubSub>(pubsub =>
                 subs.ForEach(sub => pubsub.Unsubscribe(sub)));
         }
-
-        protected abstract void OnEvent(A e);
-        protected abstract void OnEvent(B e);
-        protected abstract void OnEvent(C e);
-        protected abstract void OnEvent(D e);
     }
 }

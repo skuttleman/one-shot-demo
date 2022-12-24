@@ -11,6 +11,10 @@ namespace OSFE.Scripts {
             controller.OnStep();
         }
 
+        /*
+         * Lifecycle Methods
+         */
+
         private void Start() {
             controller = Transforms.Entity(transform)
                 .GetComponent<IController<PlayerControllerInput>>();
