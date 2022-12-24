@@ -132,6 +132,7 @@ namespace OSBE.Controllers.Player {
         }
 
         private void RotatePlayer(PlayerSharedInputState common, MoveConfig moveCfg) {
+            if (!state.isGrounded) return;
             Vector2 direction;
 
             if (Vectors.NonZero(state.facing)

@@ -54,7 +54,6 @@ namespace OSBE.Controllers.Player {
         }
 
         public void OnActivate(PlayerSharedInputState state) {
-            Debug.Log("WONDER TWINS ACTIVATE");
             controller.Notify(new Facing(Vector2.zero));
         }
 

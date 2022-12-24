@@ -56,14 +56,15 @@ namespace OSBE.Controllers {
         }
 
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
+            Controller().OnStateTransition(prev, curr);
+
             if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
                 rb.isKinematic = false;
                 UpdateState(state => state with {
                     controls = PlayerInputControlMap.Standard,
                 });
+                Controller().OnStateTransition(prev, curr);
             }
-
-            Controller().OnStateTransition(prev, curr);
         }
 
         public void OnStateEnter(PlayerAnim anim) {
