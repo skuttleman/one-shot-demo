@@ -21,7 +21,7 @@ namespace OSCore.ScriptableObjects {
                 .To(EnemyAnimSignal.AIM_ON, stand_idle_aim, (EnemyAnim.stand_toaim, aimingSpeed))
                 .With(EnemyAnimSignal.ATTACK, EnemyAnim.stand_melee, meleeSpeed);
             stand_move
-                .To(EnemyAnimSignal.MOVE_OFF, stand_idle, (EnemyAnim.stand_idle, defaultSpeed, 0.5f));
+                .To(EnemyAnimSignal.MOVE_OFF, stand_idle, (EnemyAnim.stand_idle, defaultSpeed, 0f, 0.5f));
             stand_idle_aim
                 .To(EnemyAnimSignal.AIM_OFF, stand_idle, (EnemyAnim.stand_toaim, aimingSpeed))
                 .With(EnemyAnimSignal.ATTACK, EnemyAnim.stand_fire, firingSpeed);

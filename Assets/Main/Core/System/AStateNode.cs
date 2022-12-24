@@ -5,14 +5,17 @@ namespace OSCore.System {
     public abstract class AStateNode<State, Signal> {
         public readonly State state;
         public readonly float minTime;
+        public readonly float minLoops;
         public readonly float animSpeed;
         public virtual AStateNode<State, Signal> next => this;
 
         private readonly IDictionary<Signal, AStateNode<State, Signal>> edges;
 
-        public AStateNode(State state, float minTime, float animSpeed) {
+        public AStateNode(State state, float minTime, float minLoops, float animSpeed) {
             this.state = state;
             this.minTime = minTime;
+            this.minLoops = minLoops;
+
             this.animSpeed = animSpeed;
             edges = new Dictionary<Signal, AStateNode<State, Signal>>();
         }
@@ -28,8 +31,8 @@ namespace OSCore.System {
     }
 
     public class StableNode<State, Signal> : AStateNode<State, Signal> {
-        public StableNode(State state) : base(state, 0f, 1f) { }
-        public StableNode(State state, float minTime) : base(state, minTime, 1f) { }
+        public StableNode(State state) : base(state, 0f, 0f, 1f) { }
+        public StableNode(State state, float minTime, float minLoops) : base(state, minTime, minLoops, 1f) { }
     }
 
     public class TransitionNode<State, Signal> : AStateNode<State, Signal> {
@@ -39,13 +42,14 @@ namespace OSCore.System {
         public TransitionNode(
             State state,
             float minTime,
-            AStateNode<State, Signal> target) : this(state, minTime, 1f, target) { }
+            AStateNode<State, Signal> target) : this(state, minTime, 0f, 1f, target) { }
 
         public TransitionNode(
             State state,
             float minTime,
+            float minLoops,
             float animSpeed,
-            AStateNode<State, Signal> target) : base(state, minTime, animSpeed) {
+            AStateNode<State, Signal> target) : base(state, minTime, minLoops, animSpeed) {
             this.target = target;
         }
     }
@@ -74,9 +78,9 @@ namespace OSCore.System {
             this AStateNode<State, Signal> node,
             Signal signal,
             AStateNode<State, Signal> target,
-            params (State transition, float minTime, float animSpeed)[] comps) {
+            params (State transition, float minTime, float minLoops, float animSpeed)[] comps) {
             node.SetEdge(signal, comps.Reduce((target, comp) =>
-                new TransitionNode<State, Signal>(comp.transition, comp.minTime, comp.animSpeed, target)
+                new TransitionNode<State, Signal>(comp.transition, comp.minTime, comp.minLoops, comp.animSpeed, target)
                 , target));
             return node;
         }
@@ -93,7 +97,8 @@ namespace OSCore.System {
             Signal signal,
             State transition,
             float minTime,
+            float minLoops,
             float animSpeed) =>
-            node.To(signal, node, (transition, minTime, animSpeed));
+            node.To(signal, node, (transition, minTime, minLoops, animSpeed));
     }
 }

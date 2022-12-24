@@ -18,21 +18,21 @@ MonoBehaviour:
     <moveSpeed>k__BackingField: 75
     <rotationSpeed>k__BackingField: 11
     <animFactor>k__BackingField: 0.65
-    <maxVelocity>k__BackingField: 5
+    <maxVelocity>k__BackingField: 4.5
     <maxVelocitydamper>k__BackingField: 1
     <lookSpeedInhibiter>k__BackingField: 0
   <crouching>k__BackingField:
     <moveSpeed>k__BackingField: 75
     <rotationSpeed>k__BackingField: 12
     <animFactor>k__BackingField: 0.75
-    <maxVelocity>k__BackingField: 2
+    <maxVelocity>k__BackingField: 2.25
     <maxVelocitydamper>k__BackingField: 1
     <lookSpeedInhibiter>k__BackingField: 0.25
   <crawling>k__BackingField:
     <moveSpeed>k__BackingField: 20
     <rotationSpeed>k__BackingField: 5
     <animFactor>k__BackingField: 1.25
-    <maxVelocity>k__BackingField: 0.85
+    <maxVelocity>k__BackingField: 1
     <maxVelocitydamper>k__BackingField: 0.25
     <lookSpeedInhibiter>k__BackingField: 0
   <scopeFactor>k__BackingField: 0.75

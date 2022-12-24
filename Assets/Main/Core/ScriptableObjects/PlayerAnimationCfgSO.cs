@@ -39,7 +39,7 @@ namespace OSCore.ScriptableObjects {
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.stand_punch, punchingSpeed);
             stand_fall
                 .To(PlayerAnimSignal.LAND_SPRINT, stand_move)
-                .To(PlayerAnimSignal.FALLING_LUNGE, hang_idle, (PlayerAnim.hang_lunge, 0f, lungingSpeed))
+                .To(PlayerAnimSignal.FALLING_LUNGE, hang_idle, (PlayerAnim.hang_lunge, 0f, 1f, lungingSpeed))
                 .To(PlayerAnimSignal.LAND_MOVE, crouch_move, (PlayerAnim.stand_idle, landingSpeed))
                 .To(PlayerAnimSignal.LAND_IDLE, crouch_idle, (PlayerAnim.stand_idle, landingSpeed));
 
@@ -103,7 +103,7 @@ namespace OSCore.ScriptableObjects {
                 .With(PlayerAnimSignal.ATTACK, PlayerAnim.crawl_fire, firingSpeed);
 
             hang_idle
-                .With(PlayerAnimSignal.MOVE_ON, PlayerAnim.hang_move, 0.4f, ledgeShimmySpeed)
+                .With(PlayerAnimSignal.MOVE_ON, PlayerAnim.hang_move, 0.4f, 1f, ledgeShimmySpeed)
                 .To(PlayerAnimSignal.LEDGE_CLIMB, crouch_idle, (PlayerAnim.hang_climb, defaultSpeed))
                 .To(PlayerAnimSignal.LEDGE_DROP, stand_fall);
 

@@ -36,11 +36,6 @@ namespace OSBE.Controllers {
         public bool CanTransition(Signal signal) =>
             state != state.Next(signal);
 
-        public bool DidAllFramesPlay() {
-            AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
-            return info.loop || info.normalizedTime >= 1f;
-        }
-
         private void Update() {
             if (state is null || !DidAllFramesPlay()) return;
             timeInState += Time.deltaTime;
@@ -63,6 +58,11 @@ namespace OSBE.Controllers {
                 anim.Play(state.state.ToString());
                 receiver.OnStateEnter(state.state);
             }
+        }
+
+        private bool DidAllFramesPlay() {
+            AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+            return info.loop || info.normalizedTime >= (state?.minLoops ?? 0f);
         }
     }
 }
