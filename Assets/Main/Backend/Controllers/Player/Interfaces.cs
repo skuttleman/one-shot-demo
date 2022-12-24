@@ -1,19 +1,18 @@
-﻿using OSCore.Data.Events;
+﻿using OSCore.Data.Animations;
+using OSCore.Data.Controllers;
 using OSCore.Data;
 using OSCore.System.Interfaces.Controllers;
-using System;
-using OSCore.Data.Controllers;
+using OSCore.System.Interfaces;
 
 namespace OSBE.Controllers.Player.Interfaces {
     public interface IPlayerMainController {
-        public void Publish(IEvent e);
-        public PlayerState UpdateState(Func<PlayerState, PlayerState> updateFn);
+        public IPlayerMainController Notify(PlayerControllerInput msg);
     }
 
-    public interface IPlayerInputController : IController<PlayerControllerInput> {
-        public void OnActivate(PlayerState state) { }
-        public void OnUpdate(PlayerState state) { }
-        public void OnFixedUpdate(PlayerState state) { }
-        public void OnDeactivate(PlayerState state) { }
+    public interface IPlayerInputController : IController<PlayerControllerInput>, IStateReceiver<PlayerAnim> {
+        public void OnActivate(PlayerSharedInputState state) { }
+        public void OnUpdate(PlayerSharedInputState state) { }
+        public void OnFixedUpdate(PlayerSharedInputState state) { }
+        public void OnDeactivate(PlayerSharedInputState state) { }
     }
 }

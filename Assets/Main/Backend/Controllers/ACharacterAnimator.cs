@@ -10,7 +10,7 @@ namespace OSBE.Controllers {
         private AStateNode<State, Signal> state = null;
         private IStateReceiver<State> receiver;
         private float timeInState;
-        private float animSpeed = 1f;
+        public float animSpeed { get; private set; } = 1f;
 
         public ACharacterAnimator() {
             signals = new();

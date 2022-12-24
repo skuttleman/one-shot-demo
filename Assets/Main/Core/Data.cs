@@ -26,17 +26,10 @@ namespace OSCore.Data {
         }
     }
 
-    public record PlayerState {
-        public PlayerSharedInputState common { get; init; }
-        public PlayerStandardInputState std { get; init; }
-        public PlayerLedgeHangingInputState hang { get; init; }
-    }
-
     public record PlayerSharedInputState {
         public PlayerInputControlMap controls { get; init; }
         public PlayerAnim anim { get; init; }
-        public float animSpeed { get; init; }
-
+        public Vector2 rotation { get; init; }
     }
 
     public record PlayerStandardInputState {
@@ -55,7 +48,6 @@ namespace OSCore.Data {
     public record PlayerLedgeHangingInputState {
         public Vector3 hangingPoint { get; init; }
         public Collider ledge { get; init; }
-
     }
 
     public record EnemyState {
@@ -73,6 +65,9 @@ namespace OSCore.Data {
             public record StanceInput() : PlayerControllerInput();
             public record ScopeInput(bool isScoping) : PlayerControllerInput();
             public record ClimbInput(ClimbDirection direction) : PlayerControllerInput();
+
+            public record LedgeTransition(Collider ledge, Vector3 pt) : PlayerControllerInput();
+            public record Facing(Vector2 direction) : PlayerControllerInput();
 
             private PlayerControllerInput() { }
         }
