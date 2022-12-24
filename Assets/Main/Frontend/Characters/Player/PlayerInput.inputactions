@@ -76,6 +76,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "MoveSlow",
+                    "type": "Button",
+                    "id": "238eae1b-3c24-4aa0-8515-6426a6f87e1d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -170,7 +179,7 @@
                 {
                     "name": "",
                     "id": "ac8b60a4-8cdd-4222-b1b5-6aa7e36206f0",
-                    "path": "<Keyboard>/x",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "Mouse + Keyboard",
@@ -192,7 +201,7 @@
                 {
                     "name": "",
                     "id": "338ccc96-f66b-463e-bf8e-ad3c9c56b484",
-                    "path": "<Keyboard>/tab",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "Mouse + Keyboard",
@@ -269,11 +278,22 @@
                 {
                     "name": "",
                     "id": "f25319d1-6f90-4e27-b16e-320e8d1628c7",
-                    "path": "<Keyboard>/ctrl",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "Mouse + Keyboard",
                     "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9230af7d-31a5-4f43-9fa3-9a517505da19",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse + Keyboard",
+                    "action": "MoveSlow",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -392,7 +412,7 @@
                 {
                     "name": "",
                     "id": "4a10e914-291a-49a4-8ca4-6971d65e5881",
-                    "path": "<Keyboard>/c",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "Mouse + Keyboard",
