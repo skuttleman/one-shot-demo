@@ -15,14 +15,17 @@ namespace OSBE.Controllers {
         private bool isMoving;
         private bool isScoping;
 
-        protected override void OnEvent(AttackModeChanged ev) =>
+        protected override void OnEvent(AttackModeChanged ev) {
             attackMode = ev.mode;
+        }
 
-        protected override void OnEvent(MovementChanged ev) =>
+        protected override void OnEvent(MovementChanged ev) {
             isMoving = Maths.NonZero(ev.speed);
+        }
 
-        protected override void OnEvent(ScopingChanged ev) =>
+        protected override void OnEvent(ScopingChanged ev) {
             isScoping = ev.isScoping;
+        }
 
         protected override void OnEnable() {
             base.OnEnable();

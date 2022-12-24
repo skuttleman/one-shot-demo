@@ -3,7 +3,9 @@ using System;
 
 namespace OSCore.Utils {
     public static class Sequences {
-        public static void DoAll<T>(this IEnumerable<T> coll) => ForEach(coll, _ => { });
+        public static void DoAll<T>(this IEnumerable<T> coll) {
+            ForEach(coll, _ => { });
+        }
 
         public static void ForEach<T>(this IEnumerable<T> coll, Action<T> action) {
             foreach (T item in coll ?? Empty<T>()) action(item);
@@ -79,12 +81,13 @@ namespace OSCore.Utils {
         public static IList<O> Transduce<I, O>(this IEnumerable<I> coll, IXForm<I, O> xform) =>
             Transduce<IList<O>, I, O>(coll, xform, Colls.Add, new List<O>());
 
-        public static void Transduce<I, O>(this IEnumerable<I> coll, IXForm<I, O> xform, Action<O> consumer) =>
+        public static void Transduce<I, O>(this IEnumerable<I> coll, IXForm<I, O> xform, Action<O> consumer) {
             Transduce<dynamic, I, O>(
                 coll,
                 xform,
                 (_, item) => { consumer(item); return default; },
                 default);
+        }
     }
 
     public class Reduction<T> {

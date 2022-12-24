@@ -35,11 +35,13 @@ namespace OSBE.Controllers {
 
         private Rigidbody rb;
 
-        public void On(PlayerControllerInput e) =>
+        public void On(PlayerControllerInput e) {
             Controller().On(e);
+        }
 
-        public void Publish(IEvent e) =>
+        public void Publish(IEvent e) {
             system.Send<IPubSub>(pubsub => pubsub.Publish(e));
+        }
 
         public void OnStateExit(PlayerAnim curr) {
             switch (curr) {

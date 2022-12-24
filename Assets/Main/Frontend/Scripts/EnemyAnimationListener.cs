@@ -7,8 +7,9 @@ namespace OSFE.Scripts {
     public class EnemyAnimationListener : MonoBehaviour {
         private IController<EnemyControllerInput> controller;
 
-        public void OnStep() =>
+        public void OnStep() {
             controller.OnStep();
+        }
 
         private void Start() {
             controller = Transforms.Entity(transform)

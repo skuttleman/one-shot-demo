@@ -9,8 +9,9 @@ namespace OSFE.Scripts {
     public class CrawlWalls : ASystemInitializer<StanceChanged> {
         private PlayerStance stance;
 
-        protected override void OnEvent(StanceChanged e) =>
+        protected override void OnEvent(StanceChanged e) {
             stance = e.stance;
+        }
 
         void Update() {
             foreach (Transform child in transform)

@@ -20,8 +20,9 @@ namespace OSCore.System {
             edges = new Dictionary<Signal, AStateNode<State, Signal>>();
         }
 
-        public void SetEdge(Signal signal, AStateNode<State, Signal> node) =>
+        public void SetEdge(Signal signal, AStateNode<State, Signal> node) {
             edges.Add(signal, node);
+        }
 
         public AStateNode<State, Signal> Next(Signal signal) {
             if (edges.TryGetValue(signal, out AStateNode<State, Signal> node))

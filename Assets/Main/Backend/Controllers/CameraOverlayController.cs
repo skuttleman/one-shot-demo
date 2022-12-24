@@ -13,8 +13,9 @@ namespace OSBE.Controllers {
         private bool isScoping = false;
         private float alpha = 0f;
 
-        protected override void OnEvent(ScopingChanged e) =>
+        protected override void OnEvent(ScopingChanged e) {
             isScoping = e.isScoping;
+        }
 
         protected override void OnEnable() {
             base.OnEnable();

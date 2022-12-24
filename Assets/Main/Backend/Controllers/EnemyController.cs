@@ -55,8 +55,9 @@ namespace OSBE.Controllers {
                 Instantiate(footstep, transform.position, Quaternion.identity);
         }
 
-        protected override void OnEvent(MovementChanged e) =>
+        protected override void OnEvent(MovementChanged e) {
             isPlayerMoving = Maths.NonZero(e.speed);
+        }
 
         protected override void OnEnable() {
             base.OnEnable();
@@ -164,14 +165,16 @@ namespace OSBE.Controllers {
             }
         }
 
-        private void DoFace(Vector3 rotation) =>
+        private void DoFace(Vector3 rotation) {
             DoFace(Vectors.AngleTo(transform.position, rotation));
+        }
 
-        private void DoFace(float rotationZ) =>
+        private void DoFace(float rotationZ) {
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
                 Quaternion.Euler(0f, 0f, rotationZ),
                 cfg.rotationSpeed * Time.fixedDeltaTime);
+        }
 
         private IEnumerable<float> Goto(Vector3 position) {
             while (Vector2.Distance(position, transform.position) > Time.fixedDeltaTime) {

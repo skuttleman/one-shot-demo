@@ -30,8 +30,9 @@ namespace OSBE.Controllers {
             anim.speed = animSpeed * state.animSpeed;
         }
 
-        public void Send(Signal signal) =>
+        public void Send(Signal signal) {
             signals.Enqueue(signal);
+        }
 
         public bool CanTransition(Signal signal) =>
             state != state.Next(signal);

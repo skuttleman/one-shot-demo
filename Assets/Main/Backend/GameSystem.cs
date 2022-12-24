@@ -37,14 +37,17 @@ namespace OSBE {
             Init();
         }
 
-        private void Start() =>
+        private void Start() {
             components?.ForEach(component => component.Value.OnStart());
+        }
 
-        private void Update() =>
+        private void Update() {
             components?.ForEach(component => component.Value.OnUpdate());
+        }
 
-        private void FixedUpdate() =>
+        private void FixedUpdate() {
             components?.ForEach(component => component.Value.OnFixedUpdate());
+        }
 
         private void OnDestroy() {
             components?.ForEach(component => component.Value.OnDestroy());

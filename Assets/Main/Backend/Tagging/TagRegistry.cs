@@ -21,10 +21,11 @@ namespace OSBE.Tagging {
         public GameObject GetUnique(IdTag tag) =>
             uniqueTags.Get(tag, null);
 
-        public void Register(IdTag tag, GameObject obj) =>
+        public void Register(IdTag tag, GameObject obj) {
             tags.Update(tag,
                 set => Colls.Add(set, obj),
                 () => new HashSet<GameObject>());
+        }
 
         public void RegisterUnique(IdTag tag, GameObject obj) {
             if (uniqueTags.ContainsKey(tag))  {

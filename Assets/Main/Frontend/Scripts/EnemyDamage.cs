@@ -8,8 +8,9 @@ namespace OSFE.Scripts {
     public class EnemyDamage : MonoBehaviour, IDamage {
         private IController<EnemyControllerInput> controller;
 
-        public void OnAttack(float damage) =>
+        public void OnAttack(float damage) {
             controller.On(new DamageInput(damage));
+        }
 
         private void Start() {
             controller = Transforms.Entity(transform)
