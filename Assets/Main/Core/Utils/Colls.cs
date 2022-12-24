@@ -46,8 +46,6 @@ namespace OSCore.Utils {
             return otherwise;
         }
 
-        public static IEnumerable<long> Range() => Sequences.Iterate(0L, x => x + 1);
-
         public static IEnumerable<long> Range(long end) => Range(0L, end);
 
         public static IEnumerable<long> Range(long start, long end) => Range(start, end, 1L);

@@ -30,12 +30,14 @@ namespace OSFE.Scripts {
             Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.1f); // TODON'T
             rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
 
-            IEnumerable<RaycastHit> hits = Physics.RaycastAll(
-                transform.parent.position,
-                playerPos - transform.parent.position,
-                Vector3.Distance(playerPos, transform.parent.position))
-                .Remove(hit => transform.IsChildOf(hit.transform));
-            if (!hits.IsEmpty() && hits.First().transform.IsChildOf(player.transform))
+            IEnumerable<RaycastHit> hits = Sequences.Transduce(
+                Physics.RaycastAll(
+                    transform.parent.position,
+                    playerPos - transform.parent.position,
+                    Vector3.Distance(playerPos, transform.parent.position)),
+                Fns.Filter<RaycastHit>(hit => !transform.IsChildOf(hit.transform)));
+
+             if (!hits.IsEmpty() && hits.First().transform.IsChildOf(player.transform))
                 los = true;
 
             controller.On(new PlayerLOS(seesPlayer && los));

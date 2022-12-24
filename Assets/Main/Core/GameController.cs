@@ -31,9 +31,10 @@ namespace OSCore {
             DontDestroyOnLoad(gameObject);
 
             if (hideInvisible)
-                GameObject.FindGameObjectsWithTag("Invisible")
-                    .MapCat(obj => obj.GetComponentsInChildren<Renderer>())
-                    .ForEach(rdr => rdr.enabled = false);
+                Sequences.Transduce(
+                    GameObject.FindGameObjectsWithTag("Invisible"),
+                    Fns.MapCat<GameObject, Renderer>(obj => obj.GetComponentsInChildren<Renderer>()),
+                    rdr => rdr.enabled = false);
         }
     }
 }

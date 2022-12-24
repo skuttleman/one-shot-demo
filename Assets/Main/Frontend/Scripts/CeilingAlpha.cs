@@ -18,8 +18,9 @@ namespace OSFE.Scripts {
         }
 
         private void Start() {
-            maps = transform.parent.parent.GetComponentsInChildren<Tilemap>()
-                .Filter(map => !map.transform.name.Contains("seethrough"));
+            maps = Sequences.Transduce(
+                transform.parent.parent.GetComponentsInChildren<Tilemap>(),
+                Fns.Filter<Tilemap>(map => !map.transform.name.Contains("seethrough")));
         }
 
         private void OnTriggerStay(Collider other) {
