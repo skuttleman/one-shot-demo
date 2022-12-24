@@ -10,6 +10,7 @@ namespace OSBE.Controllers {
         [SerializeField] private CameraCfgSO cfg;
 
         private CinemachineCameraOffset camOffset = null;
+        private Transform player;
         private AttackMode attackMode;
         private bool isMoving;
         private bool isScoping;
@@ -22,6 +23,11 @@ namespace OSBE.Controllers {
 
         protected override void OnEvent(ScopingChanged ev) =>
             isScoping = ev.isScoping;
+
+        protected override void OnEnable() {
+            base.OnEnable();
+            player = system.Player().transform;
+        }
 
         private void Start() {
             camOffset = GetComponent<CinemachineCameraOffset>();
@@ -37,9 +43,8 @@ namespace OSBE.Controllers {
 
             camOffset.m_Offset = Vector3.Lerp(
                 camOffset.m_Offset,
-                transform.rotation * rotFactor,
-                cfg.orbitSpeed * Time.deltaTime)
-                + ShakeOffset();
+                player.rotation * rotFactor,
+                cfg.orbitSpeed * Time.deltaTime);
         }
 
         private Vector3 LookAheadOffset() {
@@ -52,21 +57,8 @@ namespace OSBE.Controllers {
             return new(0f, Mathf.Clamp(lookAhead, 0f, cfg.maxLookAhead), 0f);
         }
 
-        private Vector3 ShakeOffset() {
-            float offset = attackMode == AttackMode.FIRING
-                ? cfg.fireOffset : cfg.punchOffset;
-
-            if (IsAttacking())
-                return transform.rotation * new Vector3(0, -offset, 0f) * Time.deltaTime;
-            return Vector3.zero;
-        }
-
         private bool IsAiming() =>
             attackMode == AttackMode.WEAPON
-                || attackMode == AttackMode.FIRING;
-
-        private bool IsAttacking() =>
-            attackMode == AttackMode.MELEE
                 || attackMode == AttackMode.FIRING;
     }
 }
