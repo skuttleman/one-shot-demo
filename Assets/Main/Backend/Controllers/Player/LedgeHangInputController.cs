@@ -15,6 +15,9 @@ namespace OSBE.Controllers.Player {
         private readonly PlayerCfgSO cfg;
         private readonly Transform transform;
         private readonly PlayerAnimator anim;
+        private readonly Rigidbody rb;
+
+        private CapsuleCollider playerCollider;
 
         private PlayerLedgeHangingInputState state = new() {
             hangingPoint = Vector3.zero,
@@ -25,7 +28,9 @@ namespace OSBE.Controllers.Player {
             this.controller = controller;
             this.cfg = cfg;
             this.transform = transform;
+
             anim = transform.GetComponentInChildren<PlayerAnimator>();
+            rb = transform.GetComponent<Rigidbody>();
         }
 
         public void On(PlayerControllerInput e) {
@@ -37,27 +42,31 @@ namespace OSBE.Controllers.Player {
                     });
                     break;
                 case ClimbInput ev:
+                    anim.transform.localPosition = anim.transform.localPosition
+                        .WithZ(anim.transform.localPosition.z + 0.6f);
                     if (ev.direction == ClimbDirection.UP) OnClimbUp();
                     else OnClimbDown();
                     break;
-                case MovementInput ev:
-                    break;
+                case MovementInput ev: OnMovementInput(ev.direction); break;
             }
         }
 
-        public void OnUpdate(PlayerSharedInputState common) {
-            RotatePlayer(common);
-        }
+        public void OnUpdate(PlayerSharedInputState common) { }
 
-        private void RotatePlayer(PlayerSharedInputState common) {
-            
-        }
-
-        public void OnActivate(PlayerSharedInputState state) {
+        public void OnActivate(PlayerSharedInputState common) {
             controller.Notify(new Facing(Vector2.zero));
+
+            float angleToPoint = Mathf.Round(Vectors.AngleTo(transform.position - state.hangingPoint));
+            transform.rotation = Quaternion.Euler(0f, 0f, angleToPoint);
+            playerCollider = transform.GetComponentInChildren<CapsuleCollider>();
+
+            rb.isKinematic = true;
+            transform.position = transform.position.WithZ(state.hangingPoint.z + 0.6f);
         }
 
         public void OnStateEnter(PlayerAnim anim) {
+            if (anim == PlayerAnim.hang_move)
+                MovePlayer();
             state = ControllerUtils.TransitionState(state, anim);
         }
 
@@ -85,5 +94,43 @@ namespace OSBE.Controllers.Player {
 
         private PlayerLedgeHangingInputState UpdateState(Func<PlayerLedgeHangingInputState, PlayerLedgeHangingInputState> updateFn) =>
             state = updateFn(state);
+
+        private void OnMovementInput(Vector2 direction) {
+            Vector2 dir = direction.Directionify().normalized;
+            Vector2 move = dir * cfg.hangMoveAmount;
+            Vector3 nextHangingPoint = state.hangingPoint + move.Upgrade();
+            Vector3 nextPlayerPos = transform.position + move.Upgrade();
+
+            float heightAxis = (playerCollider.height + 0.1f) / 2f;
+            Vector3 height = new(
+                playerCollider.direction == 0 ? heightAxis : 0,
+                playerCollider.direction == 1 ? heightAxis : 0,
+                playerCollider.direction == 2 ? heightAxis : 0);
+
+            if (dir.magnitude > 0.5f
+                && anim.CanTransition(PlayerAnimSignal.MOVE_ON)
+                && Mathf.Abs(transform.rotation.eulerAngles.z - Vectors.AngleTo(dir)) % 180f == 90f
+                && state.ledge.ClosestPoint(nextHangingPoint) == nextHangingPoint
+                && state.ledge.ClosestPoint(nextPlayerPos) != nextPlayerPos
+                && !Physics.CapsuleCast(
+                    playerCollider.center + transform.position + height,
+                    playerCollider.center + transform.position - height,
+                    playerCollider.radius,
+                    move,
+                    cfg.hangMoveAmount)) {
+
+                anim.Send(PlayerAnimSignal.MOVE_ON);
+                UpdateState(state => state with {
+                    movement = move,
+                });
+            }
+        }
+
+        private void MovePlayer() {
+            transform.position += state.movement.Upgrade();
+            UpdateState(state => state with {
+                hangingPoint = state.hangingPoint + state.movement.Upgrade(),
+            });
+        }
     }
 }

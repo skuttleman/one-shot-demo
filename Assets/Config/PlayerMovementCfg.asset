@@ -37,3 +37,4 @@ MonoBehaviour:
     <lookSpeedInhibiter>k__BackingField: 0
   <scopeFactor>k__BackingField: 0.75
   <aimFactor>k__BackingField: 0.9
+  <hangMoveAmount>k__BackingField: 0.15

@@ -180,16 +180,13 @@ namespace OSBE.Controllers.Player {
                 },
 
                 PlayerAnim.hang_lunge => state with {
-                    stance = PlayerStance.HANGING,
                     isMoving = false,
                     isSprinting = false,
                 },
                 PlayerAnim.hang_idle => state with {
-                    stance = PlayerStance.HANGING,
                     isMoving = false,
                 },
                 PlayerAnim.hang_move => state with {
-                    stance = PlayerStance.HANGING,
                     isMoving = true,
                 },
 

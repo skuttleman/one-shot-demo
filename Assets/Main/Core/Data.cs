@@ -10,7 +10,7 @@ namespace OSCore.Data {
         }
 
         public enum PlayerStance {
-            STANDING, CROUCHING, CRAWLING, HANGING,
+            STANDING, CROUCHING, CRAWLING,
         }
 
         public enum AttackMode {
@@ -48,6 +48,7 @@ namespace OSCore.Data {
     public record PlayerLedgeHangingInputState {
         public Vector3 hangingPoint { get; init; }
         public Collider ledge { get; init; }
+        public Vector2 movement { get; init; }
     }
 
     public record EnemyState {

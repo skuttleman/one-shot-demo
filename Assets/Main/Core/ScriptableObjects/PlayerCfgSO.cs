@@ -7,7 +7,7 @@ namespace OSCore.ScriptableObjects {
         [field: Header("Input")]
         [field: SerializeField] public float mouseLookReset { get; private set; }
         [field: Range(0.1f, 1f)]
-        [field: SerializeField]  public float groundedDist { get; private set; }
+        [field: SerializeField] public float groundedDist { get; private set; }
 
         [field: Header("Stance")]
         [field: SerializeField] public MoveConfig sprinting { get; private set; }
@@ -17,6 +17,9 @@ namespace OSCore.ScriptableObjects {
         [field: Header("Movement")]
         [field: SerializeField] public float scopeFactor { get; private set; }
         [field: SerializeField] public float aimFactor { get; private set; }
+
+        [field: Header("LedgeHang")]
+        [field: SerializeField] public float hangMoveAmount { get; private set; }
 
         [Serializable]
         public struct MoveConfig {

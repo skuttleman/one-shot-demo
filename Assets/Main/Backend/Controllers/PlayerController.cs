@@ -82,6 +82,9 @@ namespace OSBE.Controllers {
 
         public IPlayerMainController Notify(PlayerControllerInput msg) {
             switch (msg) {
+                case LedgeTransition ev:
+                    UpdateState(state => state with { controls = PlayerInputControlMap.None });
+                    break;
                 case Facing ev:
                     UpdateState(state => state with { rotation = ev.direction });
                     break;

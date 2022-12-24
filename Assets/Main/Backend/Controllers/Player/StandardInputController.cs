@@ -28,7 +28,6 @@ namespace OSBE.Controllers.Player {
         private readonly GameObject stand;
         private readonly GameObject crouch;
         private readonly GameObject crawl;
-        private readonly GameObject hang;
 
         private PlayerStandardInputState state = new() {
             mouseLookTimer = 0f,
@@ -54,7 +53,6 @@ namespace OSBE.Controllers.Player {
             stand = FindStance("stand");
             crouch = FindStance("crouch");
             crawl = FindStance("crawl");
-            hang = FindStance("hang");
         }
 
         public void On(PlayerControllerInput e) {
@@ -273,14 +271,16 @@ namespace OSBE.Controllers.Player {
                 distanceToGround = ground.distance;
 
             if (distanceToGround >= 0.6f) {
+
+                anim.transform.localPosition = anim.transform.localPosition
+                    .WithZ(anim.transform.localPosition.z - 0.6f);
                 anim.Send(PlayerAnimSignal.FALLING_LUNGE);
-                rb.velocity = Vector3.zero;
-                rb.isKinematic = true;
 
                 Vector3 pt = ledge.ClosestPoint(transform.position);
                 Vector2 direction = (transform.position - pt).normalized;
                 Vector2 facing = pt - transform.position;
                 transform.position += (direction * 0.275f).Upgrade();
+                rb.velocity = Vector3.zero;
 
                 UpdateState(state => state with {
                     movement = Vector3.zero,
@@ -303,7 +303,6 @@ namespace OSBE.Controllers.Player {
             stand.SetActive(state.stance == PlayerStance.STANDING);
             crouch.SetActive(state.stance == PlayerStance.CROUCHING);
             crawl.SetActive(state.stance == PlayerStance.CRAWLING);
-            hang.SetActive(state.stance == PlayerStance.HANGING);
         }
     }
 }
