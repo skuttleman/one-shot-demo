@@ -8,6 +8,7 @@ using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
+using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
 using System;
@@ -88,7 +89,9 @@ namespace OSBE.Controllers.Player {
                 transform.position - new Vector3(0, 0, 0.01f),
                 Vectors.DOWN,
                 out RaycastHit ground,
-                cfg.groundedDist);
+                cfg.groundedDist,
+                ~0,
+                QueryTriggerInteraction.Ignore);
             UpdateState(state => state with {
                 isGrounded = isGrounded,
                 ground = ground,
@@ -263,24 +266,26 @@ namespace OSBE.Controllers.Player {
 
         private void TransitionToLedgeHang(Collider ledge) {
             float distanceToGround = float.PositiveInfinity;
+
+            Vector3 pt = ledge.ClosestPoint(transform.position);
+            Vector2 direction = (transform.position - pt).Downgrade().Directionify().normalized;
+            Vector3 nextPlayerPos = pt + (direction * 0.275f).Upgrade();
+
             if (Physics.Raycast(
-                transform.position - new Vector3(0, 0, 0.01f),
+                nextPlayerPos,
                 Vectors.DOWN,
                 out RaycastHit ground,
                 1000f))
                 distanceToGround = ground.distance;
 
             if (distanceToGround >= 0.6f) {
-
                 anim.transform.localPosition = anim.transform.localPosition
                     .WithZ(anim.transform.localPosition.z - 0.6f);
                 anim.Send(PlayerAnimSignal.FALLING_LUNGE);
 
-                Vector3 pt = ledge.ClosestPoint(transform.position);
-                Vector2 direction = (transform.position - pt).normalized;
-                Vector2 facing = pt - transform.position;
-                transform.position += (direction * 0.275f).Upgrade();
+                Vector2 facing = pt - nextPlayerPos;
                 rb.velocity = Vector3.zero;
+                transform.position = nextPlayerPos;
 
                 UpdateState(state => state with {
                     movement = Vector3.zero,

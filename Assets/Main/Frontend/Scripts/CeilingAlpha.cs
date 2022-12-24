@@ -18,7 +18,7 @@ namespace OSFE.Scripts {
         }
 
         private void Start() {
-            maps = transform.parent.GetComponentsInChildren<Tilemap>()
+            maps = transform.parent.parent.GetComponentsInChildren<Tilemap>()
                 .Filter(map => !map.transform.name.Contains("seethrough"));
         }
 
