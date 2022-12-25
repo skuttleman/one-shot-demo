@@ -3,16 +3,22 @@ using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces;
 using OSCore.Utils;
 using UnityEngine;
+using static OSCore.ScriptableObjects.EnemyAnimationCfgSO;
 
 namespace OSBE.Controllers {
-    public class EnemyAnimator : ACharacterAnimator<EnemyAnim, EnemyAnimSignal> {
+    public class EnemyAnimator : ACharacterAnimator<EnemyAnim, EnemyAnimState> {
         [SerializeField] private EnemyAnimationCfgSO cfg;
 
         private void Start() {
             IStateReceiver<EnemyAnim> receiver = Transforms
                 .Entity(transform)
                 .GetComponentInChildren<IStateReceiver<EnemyAnim>>();
-            Init(receiver, cfg.Init());
+            Init(receiver, cfg.Init(), new() {
+                state = EnemyAnim.stand_idle,
+                isMoving = false,
+                isAiming = false,
+                isAttacking = false,
+            });
         }
     }
 }

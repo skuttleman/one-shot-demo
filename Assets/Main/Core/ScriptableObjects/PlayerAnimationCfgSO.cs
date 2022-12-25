@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/player/animator")]
-    public class PlayerAnimationCfgSO : ACharacterAnimatorCfgSO<PlayerAnim, PlayerAnimSignal> {
+    public class PlayerAnimationCfgSO : ACharacterAnimatorCfgSOOld<PlayerAnim, PlayerAnimSignal> {
         [field: SerializeField] public float defaultSpeed { get; private set; }
         [field: SerializeField] public float aimingSpeed { get; private set; }
         [field: SerializeField] public float scopingSpeed { get; private set; }
@@ -14,20 +14,20 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public float lungingSpeed { get; private set; }
         [field: SerializeField] public float ledgeShimmySpeed { get; private set; }
 
-        public override AStateNode<PlayerAnim, PlayerAnimSignal> Init() {
-            StableNode<PlayerAnim, PlayerAnimSignal> stand_move = new(PlayerAnim.stand_move);
-            StableNode<PlayerAnim, PlayerAnimSignal> stand_fall = new(PlayerAnim.stand_fall);
-            StableNode<PlayerAnim, PlayerAnimSignal> crouch_idle_bino = new(PlayerAnim.crouch_idle_bino);
-            StableNode<PlayerAnim, PlayerAnimSignal> crouch_move_bino = new(PlayerAnim.crouch_move_bino);
-            StableNode<PlayerAnim, PlayerAnimSignal> crouch_idle = new(PlayerAnim.crouch_idle);
-            StableNode<PlayerAnim, PlayerAnimSignal> crouch_move = new(PlayerAnim.crouch_move);
-            StableNode<PlayerAnim, PlayerAnimSignal> crouch_idle_aim = new(PlayerAnim.crouch_idle_aim);
-            StableNode<PlayerAnim, PlayerAnimSignal> crouch_move_aim = new(PlayerAnim.crouch_move_aim);
-            StableNode<PlayerAnim, PlayerAnimSignal> crawl_idle_bino = new(PlayerAnim.crawl_idle_bino);
-            StableNode<PlayerAnim, PlayerAnimSignal> crawl_idle = new(PlayerAnim.crawl_idle);
-            StableNode<PlayerAnim, PlayerAnimSignal> crawl_move = new(PlayerAnim.crawl_move);
-            StableNode<PlayerAnim, PlayerAnimSignal> crawl_idle_aim = new(PlayerAnim.crawl_idle_aim);
-            StableNode<PlayerAnim, PlayerAnimSignal> hang_idle = new(PlayerAnim.hang_idle);
+        public override AStateNodeOld<PlayerAnim, PlayerAnimSignal> Init() {
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> stand_move = new(PlayerAnim.stand_move);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> stand_fall = new(PlayerAnim.stand_fall);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crouch_idle_bino = new(PlayerAnim.crouch_idle_bino);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crouch_move_bino = new(PlayerAnim.crouch_move_bino);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crouch_idle = new(PlayerAnim.crouch_idle);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crouch_move = new(PlayerAnim.crouch_move);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crouch_idle_aim = new(PlayerAnim.crouch_idle_aim);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crouch_move_aim = new(PlayerAnim.crouch_move_aim);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crawl_idle_bino = new(PlayerAnim.crawl_idle_bino);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crawl_idle = new(PlayerAnim.crawl_idle);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crawl_move = new(PlayerAnim.crawl_move);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> crawl_idle_aim = new(PlayerAnim.crawl_idle_aim);
+            StableNodeOld<PlayerAnim, PlayerAnimSignal> hang_idle = new(PlayerAnim.hang_idle);
 
             stand_move
                 .To(PlayerAnimSignal.FALLING, stand_fall)

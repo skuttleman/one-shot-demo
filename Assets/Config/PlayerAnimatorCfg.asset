@@ -18,5 +18,5 @@ MonoBehaviour:
   <punchingSpeed>k__BackingField: 0.175
   <firingSpeed>k__BackingField: 0.1
   <landingSpeed>k__BackingField: 0.1
-  <lungingSpeed>k__BackingField: 0.75
-  <ledgeShimmySpeed>k__BackingField: 0.85
+  <lungingSpeed>k__BackingField: 0.6
+  <ledgeShimmySpeed>k__BackingField: 1

@@ -164,14 +164,6 @@ namespace OSCore.Data {
             stand_fire,
             stand_fall,
         }
-
-        public enum EnemyAnimSignal {
-            MOVE_ON,
-            MOVE_OFF,
-            AIM_ON,
-            AIM_OFF,
-            ATTACK,
-        }
     }
 
     namespace Patrol {

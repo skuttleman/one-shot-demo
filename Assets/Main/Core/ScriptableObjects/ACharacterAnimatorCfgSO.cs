@@ -4,16 +4,34 @@ using OSCore.System;
 using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
-    public abstract class ACharacterAnimatorCfgSO<State, Signal> : ScriptableObject {
+    public abstract class ACharacterAnimatorCfgSO<State> : ScriptableObject {
+        public readonly IEnumerable<State> states;
+
+        public ACharacterAnimatorCfgSO() {
+            states = EnumList<State>();
+        }
+
+        public abstract AStateNode<State> Init();
+
+        private static IEnumerable<T> EnumList<T>() {
+            Array values = Enum.GetValues(typeof(T));
+            IList<T> result = new List<T>();
+            foreach (object item in values)
+                result.Add((T)item);
+            return result;
+        }
+    }
+
+    public abstract class ACharacterAnimatorCfgSOOld<State, Signal> : ScriptableObject {
         public readonly IEnumerable<State> states;
         public readonly IEnumerable<Signal> signals;
 
-        public ACharacterAnimatorCfgSO() {
+        public ACharacterAnimatorCfgSOOld() {
             states = EnumList<State>();
             signals = EnumList<Signal>();
         }
 
-        public abstract AStateNode<State, Signal> Init();
+        public abstract AStateNodeOld<State, Signal> Init();
 
         private static IEnumerable<T> EnumList<T>() {
             Array values = Enum.GetValues(typeof(T));

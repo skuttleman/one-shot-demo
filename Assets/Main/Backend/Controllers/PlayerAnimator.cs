@@ -5,7 +5,7 @@ using OSCore.Utils;
 using UnityEngine;
 
 namespace OSBE.Controllers {
-    public class PlayerAnimator : ACharacterAnimator<PlayerAnim, PlayerAnimSignal> {
+    public class PlayerAnimator : ACharacterAnimatorOld<PlayerAnim, PlayerAnimSignal> {
         [SerializeField] private PlayerAnimationCfgSO cfg;
 
         private void Start() {

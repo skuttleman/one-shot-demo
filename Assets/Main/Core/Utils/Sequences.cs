@@ -62,6 +62,17 @@ namespace OSCore.Utils {
             return iter.Current;
         }
 
+        public static O First<I, O>(this IEnumerable<I> coll, IXForm<I, O> xform) {
+            RF<O, I> rf = xform.XForm<O>((acc, item) =>
+                acc.IsReduced() ? acc : Reduction<O>.Reduced(item));
+            Reduction<O> result = Reduction<O>.UnReduced(default);
+            foreach (I item in coll) {
+                result = rf(result, item);
+                if (result.IsReduced()) return result.Get();
+            }
+            return default;
+        }
+
         public static bool IsEmpty<T>(this IEnumerable<T> coll) =>
             !coll.GetEnumerator().MoveNext();
 

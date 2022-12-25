@@ -59,6 +59,10 @@ namespace OSBE.Controllers {
             isPlayerMoving = Maths.NonZero(e.speed);
         }
 
+        public void OnStateEnter(EnemyAnim ste) {
+            anim.UpdateState(state => state with { state = ste });
+        }
+
         protected override void OnEnable() {
             base.OnEnable();
             player = system.Player();
@@ -121,7 +125,7 @@ namespace OSBE.Controllers {
                         waitAmount -= Time.fixedDeltaTime;
                         yield return new WaitForFixedUpdate();
                         while (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                            anim.Send(EnemyAnimSignal.MOVE_OFF);
+                            anim.UpdateState(state => state with { isMoving = false });
                             DoFace(player.transform.position);
                             yield return new WaitForFixedUpdate();
                         }
@@ -189,14 +193,14 @@ namespace OSBE.Controllers {
                 float diff = Mathf.Abs(Vectors.AngleTo(transform.position - position) - transform.rotation.eulerAngles.z);
                 diff = diff > 180f ? 360f - diff : diff;
                 if (diff < 45f) {
-                    anim.Send(EnemyAnimSignal.MOVE_ON);
+                    anim.UpdateState(state => state with { isMoving = true });
                     transform.position += direction;
                 }
 
                 yield return 0;
             }
 
-            anim.Send(EnemyAnimSignal.MOVE_OFF);
+            anim.UpdateState(state => state with { isMoving = false });
         }
     }
 }
