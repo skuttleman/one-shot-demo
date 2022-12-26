@@ -18,11 +18,7 @@ namespace OSBE.Controllers.Player {
         private readonly Rigidbody rb;
 
         private CapsuleCollider playerCollider;
-
-        private PlayerLedgeHangingInputState state = new() {
-            hangingPoint = Vector3.zero,
-            ledge = default,
-        };
+        private PlayerControllerState state;
 
         public LedgeHangInputController(IPlayerMainController controller, PlayerCfgSO cfg, Transform transform) {
             this.controller = controller;
@@ -35,12 +31,6 @@ namespace OSBE.Controllers.Player {
 
         public void On(PlayerControllerInput e) {
             switch (e) {
-                case LedgeTransition ev:
-                    UpdateState(state => state with {
-                        ledge = ev.ledge,
-                        hangingPoint = ev.pt,
-                    });
-                    break;
                 case ClimbInput ev:
                     anim.transform.localPosition = anim.transform.localPosition
                         .WithZ(anim.transform.localPosition.z + 0.6f);
@@ -51,10 +41,12 @@ namespace OSBE.Controllers.Player {
             }
         }
 
-        public void OnUpdate(PlayerSharedInputState common) { }
+        public void OnUpdate(PlayerControllerState state) {
+            this.state = state;
+        }
 
-        public void OnActivate(PlayerSharedInputState common) {
-            controller.Notify(new Facing(Vector2.zero));
+        public void OnActivate(PlayerControllerState state) {
+            controller.UpdateState(state => state with { facing = Vector2.zero });
 
             float angleToPoint = Mathf.Round(Vectors.AngleTo(transform.position - state.hangingPoint));
             transform.rotation = Quaternion.Euler(0f, 0f, angleToPoint);
@@ -63,12 +55,12 @@ namespace OSBE.Controllers.Player {
             rb.velocity = Vector3.zero;
             rb.isKinematic = true;
             transform.position = transform.position.WithZ(state.hangingPoint.z + 0.6f);
+            this.state = state;
         }
 
         public void OnStateEnter(PlayerAnim anim) {
             if (anim == PlayerAnim.hang_move)
                 MovePlayer();
-            state = ControllerUtils.TransitionState(state, anim);
         }
 
         private void OnClimbUp() {
@@ -78,7 +70,7 @@ namespace OSBE.Controllers.Player {
 
                 Vector3 diff = (state.hangingPoint - transform.position) * 1.2f;
                 transform.position += diff;
-                controller.Notify(new Facing(Vector2.zero));
+                controller.UpdateState(state => state with { facing = Vector2.zero });
             }
         }
 
@@ -89,12 +81,9 @@ namespace OSBE.Controllers.Player {
 
                 float pointZ = state.hangingPoint.z;
                 transform.position = transform.position.WithZ(pointZ + 0.55f);
-                controller.Notify(new Facing(Vector2.zero));
+                controller.UpdateState(state => state with { facing = Vector2.zero });
             }
         }
-
-        private PlayerLedgeHangingInputState UpdateState(Func<PlayerLedgeHangingInputState, PlayerLedgeHangingInputState> updateFn) =>
-            state = updateFn(state);
 
         private void OnMovementInput(Vector2 direction) {
             Vector2 dir = direction.Directionify().normalized;
@@ -121,7 +110,7 @@ namespace OSBE.Controllers.Player {
                     cfg.hangMoveAmount)) {
 
                 anim.Send(PlayerAnimSignal.MOVE_ON);
-                UpdateState(state => state with {
+                controller.UpdateState(state => state with {
                     movement = move,
                 });
             }
@@ -129,7 +118,7 @@ namespace OSBE.Controllers.Player {
 
         private void MovePlayer() {
             transform.position += state.movement.Upgrade();
-            UpdateState(state => state with {
+            controller.UpdateState(state => state with {
                 hangingPoint = state.hangingPoint + state.movement.Upgrade(),
             });
         }

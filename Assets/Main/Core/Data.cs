@@ -26,29 +26,25 @@ namespace OSCore.Data {
         }
     }
 
-    public record PlayerSharedInputState {
+    public record PlayerControllerState {
         public PlayerInputControlMap controls { get; init; }
-        public PlayerAnim anim { get; init; }
-        public Vector2 rotation { get; init; }
-    }
-
-    public record PlayerStandardInputState {
         public Vector2 movement { get; init; }
         public Vector2 facing { get; init; }
-        public PlayerStance stance { get; init; }
         public AttackMode attackMode { get; init; }
+        public RaycastHit ground { get; init; }
+        public Collider ledge { get; init; }
+        public Vector3 hangingPoint { get; init; }
         public float mouseLookTimer { get; init; }
+
+        public PlayerAnim anim { get; init; }
+        public PlayerStance stance { get; init; }
+        public bool isHanging { get; init; }
         public bool isMoving { get; init; }
         public bool isSprinting { get; init; }
         public bool isScoping { get; init; }
+        public bool isAiming { get; init; }
+        public bool isAttacking { get; init; }
         public bool isGrounded { get; init; }
-        public RaycastHit ground { get; init; }
-    }
-
-    public record PlayerLedgeHangingInputState {
-        public Vector3 hangingPoint { get; init; }
-        public Collider ledge { get; init; }
-        public Vector2 movement { get; init; }
     }
 
     public record EnemyState {
@@ -66,9 +62,6 @@ namespace OSCore.Data {
             public record StanceInput() : PlayerControllerInput();
             public record ScopeInput(bool isScoping) : PlayerControllerInput();
             public record ClimbInput(ClimbDirection direction) : PlayerControllerInput();
-
-            public record LedgeTransition(Collider ledge, Vector3 pt) : PlayerControllerInput();
-            public record Facing(Vector2 direction) : PlayerControllerInput();
 
             private PlayerControllerInput() { }
         }

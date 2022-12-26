@@ -3,16 +3,17 @@ using OSCore.Data.Controllers;
 using OSCore.Data;
 using OSCore.System.Interfaces.Controllers;
 using OSCore.System.Interfaces;
+using System;
 
 namespace OSBE.Controllers.Player.Interfaces {
     public interface IPlayerMainController {
-        public IPlayerMainController Notify(PlayerControllerInput msg);
+        public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn);
     }
 
     public interface IPlayerInputController : IController<PlayerControllerInput>, IStateReceiver<PlayerAnim> {
-        public void OnActivate(PlayerSharedInputState state) { }
-        public void OnUpdate(PlayerSharedInputState state) { }
-        public void OnFixedUpdate(PlayerSharedInputState state) { }
-        public void OnDeactivate(PlayerSharedInputState state) { }
+        public void OnActivate(PlayerControllerState state) { }
+        public void OnUpdate(PlayerControllerState state) { }
+        public void OnFixedUpdate(PlayerControllerState state) { }
+        public void OnDeactivate(PlayerControllerState state) { }
     }
 }

@@ -15,7 +15,7 @@ namespace OSBE.Controllers.Player {
         public static bool IsAiming(AttackMode mode) =>
             mode == AttackMode.WEAPON || mode == AttackMode.FIRING;
 
-        public static bool IsMovable(PlayerStance stance, PlayerStandardInputState state) =>
+        public static bool IsMovable(PlayerStance stance, PlayerControllerState state) =>
             stance != PlayerStance.CRAWLING
             || (!IsAiming(state.attackMode) && !state.isScoping);
 
@@ -24,48 +24,18 @@ namespace OSBE.Controllers.Player {
                 && mode != AttackMode.FIRING
                 && mode != AttackMode.MELEE;
 
-        public static MoveConfig MoveCfg(PlayerCfgSO cfg, PlayerStandardInputState state) =>
+        public static MoveConfig MoveCfg(PlayerCfgSO cfg, PlayerControllerState state) =>
             state.stance switch {
                 PlayerStance.CROUCHING => cfg.crouching,
                 PlayerStance.CRAWLING => cfg.crawling,
                 _ => cfg.sprinting
             };
 
-        public static bool CanSprint(PlayerStandardInputState state) =>
+        public static bool CanSprint(PlayerControllerState state) =>
             !state.isScoping && !IsAiming(state.attackMode);
 
-        public static PlayerSharedInputState TransitionState(PlayerSharedInputState state, PlayerAnim anim) {
-            PlayerSharedInputState result = anim switch {
-                PlayerAnim.stand_fall => state with {
-                    controls = PlayerInputControlMap.Standard,
-                },
-
-                PlayerAnim.crouch_idle => state with {
-                    controls = PlayerInputControlMap.Standard,
-                },
-
-                PlayerAnim.hang_lunge => state with {
-                    controls = PlayerInputControlMap.None,
-                },
-                PlayerAnim.hang_idle => state with {
-                    controls = PlayerInputControlMap.LedgeHang,
-
-                },
-
-                PlayerAnim.hang_climb => state with {
-                    controls = PlayerInputControlMap.None,
-                },
-
-                _ => state
-            };
-
-            return result with {
-                anim = anim,
-            };
-        }
-
-        public static PlayerStandardInputState TransitionState(PlayerStandardInputState state, PlayerAnim anim) {
-            PlayerStandardInputState result = anim switch {
+        public static PlayerControllerState TransitionState(PlayerControllerState state, PlayerAnim anim) {
+            PlayerControllerState result = anim switch {
                 PlayerAnim.stand_idle => state with {
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.HAND,
@@ -84,6 +54,7 @@ namespace OSBE.Controllers.Player {
                     attackMode = AttackMode.MELEE,
                 },
                 PlayerAnim.stand_fall => state with {
+                    controls = PlayerInputControlMap.Standard,
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.NONE,
                     isScoping = false,
@@ -106,6 +77,7 @@ namespace OSBE.Controllers.Player {
                     isScoping = true,
                 },
                 PlayerAnim.crouch_idle => state with {
+                    controls = PlayerInputControlMap.Standard,
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.HAND,
                     isMoving = false,
@@ -180,24 +152,21 @@ namespace OSBE.Controllers.Player {
                 },
 
                 PlayerAnim.hang_lunge => state with {
+                    controls = PlayerInputControlMap.None,
                     isMoving = false,
                     isSprinting = false,
                 },
                 PlayerAnim.hang_idle => state with {
+                    controls = PlayerInputControlMap.LedgeHang,
                     isMoving = false,
                 },
                 PlayerAnim.hang_move => state with {
                     isMoving = true,
                 },
+                PlayerAnim.hang_climb => state with {
+                    controls = PlayerInputControlMap.None,
+                },
 
-                _ => state
-            };
-
-            return result;
-        }
-
-        public static PlayerLedgeHangingInputState TransitionState(PlayerLedgeHangingInputState state, PlayerAnim anim) {
-            PlayerLedgeHangingInputState result = anim switch {
                 _ => state
             };
 

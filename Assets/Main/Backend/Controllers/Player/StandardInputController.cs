@@ -30,23 +30,19 @@ namespace OSBE.Controllers.Player {
         private readonly GameObject crouch;
         private readonly GameObject crawl;
 
-        private PlayerStandardInputState state = new() {
-            mouseLookTimer = 0f,
-            stance = PlayerStance.STANDING,
-            attackMode = AttackMode.HAND,
-            isMoving = false,
-            isSprinting = false,
-            isScoping = false,
-            isGrounded = true,
-            movement = Vector2.zero,
-            facing = Vector2.zero,
-        };
+        private PlayerControllerState state;
 
-        public StandardInputController(IPlayerMainController controller, IGameSystem system, PlayerCfgSO cfg, Transform transform) {
+        public StandardInputController(
+            IPlayerMainController controller,
+            IGameSystem system,
+            PlayerCfgSO cfg,
+            Transform transform,
+            PlayerControllerState state) {
             this.controller = controller;
             this.system = system;
             this.cfg = cfg;
             this.transform = transform;
+            this.state = state;
 
             rb = transform.GetComponent<Rigidbody>();
             anim = transform.GetComponentInChildren<PlayerAnimator>();
@@ -58,7 +54,6 @@ namespace OSBE.Controllers.Player {
 
         public void On(PlayerControllerInput e) {
             switch (e) {
-                case Facing ev: UpdateState(state => state with { facing = ev.direction }); break;
                 case MovementInput ev: OnMovementInput(ev.direction); break;
                 case SprintInput ev: OnSprintInput(ev.isSprinting); break;
                 case LookInput ev: OnLookInput(ev.direction, ev.isMouse); break;
@@ -69,19 +64,20 @@ namespace OSBE.Controllers.Player {
             }
         }
 
-        public void OnUpdate(PlayerSharedInputState common) {
-            if (state.mouseLookTimer > 0f)
-                UpdateState(state => state with {
+        public void OnUpdate(PlayerControllerState state) {
+            if (this.state.mouseLookTimer > 0f)
+                controller.UpdateState(mainState => mainState with {
                     mouseLookTimer = state.mouseLookTimer - Time.deltaTime
                 });
 
-            RotatePlayer(common, ControllerUtils.MoveCfg(cfg, state));
+            this.state = state;
+            RotatePlayer(ControllerUtils.MoveCfg(cfg, this.state));
         }
 
-        public void OnFixedUpdate(PlayerSharedInputState common) {
-            bool prevGrounded = state.isGrounded;
-            Collider ledge = state.ground.collider;
-            bool wasCrouching = state.stance == PlayerStance.CROUCHING;
+        public void OnFixedUpdate(PlayerControllerState state) {
+            bool prevGrounded = this.state.isGrounded;
+            Collider ledge = this.state.ground.collider;
+            bool wasCrouching = this.state.stance == PlayerStance.CROUCHING;
 
 
 
@@ -92,7 +88,7 @@ namespace OSBE.Controllers.Player {
                 cfg.groundedDist,
                 ~0,
                 QueryTriggerInteraction.Ignore);
-            UpdateState(state => state with {
+            controller.UpdateState(state => state with {
                 isGrounded = isGrounded,
                 ground = ground,
             });
@@ -100,15 +96,16 @@ namespace OSBE.Controllers.Player {
             if (prevGrounded && !isGrounded) {
                 anim.Send(PlayerAnimSignal.FALLING);
             } else if (!prevGrounded && isGrounded) {
-                if (state.isSprinting && Vectors.NonZero(state.movement))
+                if (this.state.isSprinting && Vectors.NonZero(this.state.movement))
                     anim.Send(PlayerAnimSignal.LAND_SPRINT);
-                else if (Vectors.NonZero(state.movement))
+                else if (Vectors.NonZero(this.state.movement))
                     anim.Send(PlayerAnimSignal.LAND_MOVE);
                 else
                     anim.Send(PlayerAnimSignal.LAND_IDLE);
             }
 
-            MovePlayer(common, ControllerUtils.MoveCfg(cfg, state));
+            this.state = state;
+            MovePlayer(ControllerUtils.MoveCfg(cfg, this.state));
 
 
 
@@ -123,16 +120,10 @@ namespace OSBE.Controllers.Player {
         }
 
         public void OnStateEnter(PlayerAnim anim) {
-            PlayerStandardInputState prevState = state;
-            state = ControllerUtils.TransitionState(state, anim);
-
             ActivateStance();
-            PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
-            PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
-            PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
         }
 
-        private void RotatePlayer(PlayerSharedInputState common, MoveConfig moveCfg) {
+        private void RotatePlayer(MoveConfig moveCfg) {
             if (!state.isGrounded) return;
             Vector2 direction;
 
@@ -150,7 +141,7 @@ namespace OSBE.Controllers.Player {
                 moveCfg.rotationSpeed * Time.deltaTime);
         }
 
-        private void MovePlayer(PlayerSharedInputState common, MoveConfig moveCfg) {
+        private void MovePlayer(MoveConfig moveCfg) {
             if (state.isGrounded
                 && state.ground.collider != null
                 && state.isMoving
@@ -203,16 +194,13 @@ namespace OSBE.Controllers.Player {
                 system.Send<IPubSub>(pubsub => pubsub.Publish(e));
         }
 
-        private PlayerStandardInputState UpdateState(Func<PlayerStandardInputState, PlayerStandardInputState> updateFn) =>
-            state = updateFn(state);
-
         private void OnMovementInput(Vector2 direction) {
             bool isMoving = Vectors.NonZero(direction);
             PlayerAnimSignal signal = isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF;
             if (anim.CanTransition(signal))
                 anim.Send(signal);
 
-            UpdateState(state => state with {
+            controller.UpdateState(state => state with {
                 movement = direction
             });
         }
@@ -228,7 +216,7 @@ namespace OSBE.Controllers.Player {
             if (anim.CanTransition(signal))
                 anim.Send(signal);
 
-            UpdateState(state => state with {
+            controller.UpdateState(state => state with {
                 facing = direction,
                 mouseLookTimer = isMouse && Vectors.NonZero(direction)
                     ? cfg.mouseLookReset
@@ -287,14 +275,14 @@ namespace OSBE.Controllers.Player {
                 rb.velocity = Vector3.zero;
                 transform.position = nextPlayerPos;
 
-                UpdateState(state => state with {
+                controller.UpdateState(state => state with {
                     movement = Vector3.zero,
-                    facing = facing,
                     isMoving = false,
+                    controls = PlayerInputControlMap.None,
+                    facing = facing,
+                    ledge = ledge,
+                    hangingPoint = pt,
                 });
-                controller
-                    .Notify(new LedgeTransition(ledge, pt))
-                    .Notify(new Facing(facing));
             }
         }
 

@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.InputSystem;
 using UnityEngine;
-using static OSCore.Data.Controllers.PlayerControllerInput;
+using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers {
     public class PlayerController : ASystemInitializer,
@@ -24,10 +24,20 @@ namespace OSBE.Controllers {
         IStateReceiver<PlayerAnim> {
         [SerializeField] private PlayerCfgSO cfg;
 
-        private PlayerSharedInputState state = new() {
+        private PlayerControllerState state = new() {
             anim = PlayerAnim.crouch_idle,
             controls = PlayerInputControlMap.Standard,
-            rotation = Vector2.zero,
+            mouseLookTimer = 0f,
+            stance = PlayerStance.STANDING,
+            attackMode = AttackMode.HAND,
+            isMoving = false,
+            isSprinting = false,
+            isScoping = false,
+            isGrounded = true,
+            movement = Vector2.zero,
+            facing = Vector2.zero,
+            hangingPoint = Vector3.zero,
+            ledge = default,
         };
         private PlayerAnimator anim;
         private PlayerInput input;
@@ -58,20 +68,19 @@ namespace OSBE.Controllers {
         }
 
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
-            Controller().OnStateTransition(prev, curr);
-
             if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
                 rb.isKinematic = false;
                 UpdateState(state => state with {
                     controls = PlayerInputControlMap.Standard,
                 });
-                Controller().OnStateTransition(prev, curr);
             }
+
+            Controller().OnStateTransition(prev, curr);
         }
 
-        public void OnStateEnter(PlayerAnim anim) {
-            PlayerSharedInputState prevState = state;
-            UpdateState(state => ControllerUtils.TransitionState(state, anim));
+        public void OnStateEnter(PlayerAnim curr) {
+            PlayerControllerState prevState = state;
+            UpdateState(state => ControllerUtils.TransitionState(state, curr));
 
             if (state.controls != PlayerInputControlMap.None) {
                 string controls = state.controls.ToString();
@@ -79,29 +88,49 @@ namespace OSBE.Controllers {
                     input.SwitchCurrentActionMap(controls);
             }
 
-            Controller().OnStateEnter(anim);
-        }
-
-        public IPlayerMainController Notify(PlayerControllerInput msg) {
-            switch (msg) {
-                case LedgeTransition ev:
-                    UpdateState(state => state with { controls = PlayerInputControlMap.None });
-                    break;
-                case Facing ev:
-                    UpdateState(state => state with { rotation = ev.direction });
+            switch (curr) {
+                case PlayerAnim.crouch_move:
+                case PlayerAnim.crouch_move_aim:
+                case PlayerAnim.crouch_move_bino:
+                case PlayerAnim.crawl_move:
+                    anim.SetSpeed(1f);
                     break;
             }
 
-            controllers.Values.ForEach(controller =>
-                controller.On(msg));
+            Controller().OnStateEnter(curr);
 
-            return this;
+            PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
+            PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
+            PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
         }
+
+        public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn) {
+            PlayerControllerState nextState = updateFn(state);
+
+            bool controlsChanged = state.controls != nextState.controls;
+            if (controlsChanged) Controller().OnDeactivate(state);
+            state = nextState;
+            if (controlsChanged) Controller().OnActivate(state);
+
+            return state;
+        }
+
+        private IPlayerInputController Controller() =>
+            controllers.Get(state.controls);
+
+        private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
+            if (!oldValue.Equals(newValue))
+                system.Send<IPubSub>(pubsub => pubsub.Publish(e));
+        }
+
+        /*
+         * Lifecycle Methods
+         */
 
         private void Start() {
             controllers = new Dictionary<PlayerInputControlMap, IPlayerInputController>() {
                 { PlayerInputControlMap.None, new NoopInputController() },
-                { PlayerInputControlMap.Standard, new StandardInputController(this, system, cfg, transform) },
+                { PlayerInputControlMap.Standard, new StandardInputController(this, system, cfg, transform, state) },
                 { PlayerInputControlMap.LedgeHang, new LedgeHangInputController(this, cfg, transform) }
             };
             anim = GetComponentInChildren<PlayerAnimator>();
@@ -110,8 +139,8 @@ namespace OSBE.Controllers {
         }
 
         private void Update() {
-            if (Vectors.NonZero(state.rotation)) {
-                float rotationZ = Vectors.AngleTo(Vector2.zero, state.rotation);
+            if (Vectors.NonZero(state.facing)) {
+                float rotationZ = Vectors.AngleTo(Vector2.zero, state.facing);
                 transform.rotation = Quaternion.Lerp(
                     transform.rotation,
                     Quaternion.Euler(0f, 0f, rotationZ),
@@ -123,20 +152,6 @@ namespace OSBE.Controllers {
 
         private void FixedUpdate() =>
             Controller().OnFixedUpdate(state);
-
-        private IPlayerInputController Controller() =>
-            controllers.Get(state.controls);
-
-        private PlayerSharedInputState UpdateState(Func<PlayerSharedInputState, PlayerSharedInputState> updateFn) {
-            PlayerSharedInputState nextState = updateFn(state);
-
-            bool controlsChanged = state.controls != nextState.controls;
-            if (controlsChanged) Controller().OnDeactivate(state);
-            state = nextState;
-            if (controlsChanged) Controller().OnActivate(state);
-
-            return state;
-        }
     }
 
     internal class NoopInputController : IPlayerInputController {
