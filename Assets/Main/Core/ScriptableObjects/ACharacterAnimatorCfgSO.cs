@@ -4,14 +4,15 @@ using OSCore.System;
 using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
-    public abstract class ACharacterAnimatorCfgSO<State> : ScriptableObject {
+    public abstract class ACharacterAnimatorCfgSO<State, Details> : ScriptableObject
+        where Details : AnimStateDetails<State> {
         public readonly IEnumerable<State> states;
 
         public ACharacterAnimatorCfgSO() {
             states = EnumList<State>();
         }
 
-        public abstract AStateNode<State> Init();
+        public abstract AStateNode<State, Details> Init();
 
         private static IEnumerable<T> EnumList<T>() {
             Array values = Enum.GetValues(typeof(T));

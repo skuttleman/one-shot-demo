@@ -6,15 +6,15 @@ using System;
 
 namespace OSBE.Controllers {
     public abstract class ACharacterAnimator<State, Details> : MonoBehaviour
-        where Details : IStateDetails<State> {
+        where Details : AnimStateDetails<State> {
         private IStateReceiver<State> receiver;
-        private AStateNode<State> node = null;
+        private AStateNode<State, Details> node = null;
         private Details state;
         private Animator anim;
         private float timeInState;
         public float animSpeed { get; private set; } = 1f;
 
-        protected void Init(IStateReceiver<State> receiver, AStateNode<State> node, Details state) {
+        protected void Init(IStateReceiver<State> receiver, AStateNode<State, Details> node, Details state) {
             this.receiver = receiver;
             this.node = node;
             this.state = state;
@@ -33,7 +33,7 @@ namespace OSBE.Controllers {
             state = updateFn(state);
         }
 
-        private void Transition(AStateNode<State> node) {
+        private void Transition(AStateNode<State, Details> node) {
             if (this.node != node) {
                 State curr = this.node.state;
                 receiver.OnStateExit(curr);
@@ -46,21 +46,19 @@ namespace OSBE.Controllers {
             }
         }
 
-        private bool DidAllFramesPlay() {
-            AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
-            return info.loop || info.normalizedTime >= (node?.minLoops ?? 0f);
-        }
-
         /*
          * Lifecycle Methods
          */
 
         private void Update() {
-            if (node is null || !DidAllFramesPlay()) return;
+            if (node is null) return;
             timeInState += Time.deltaTime;
-            if (timeInState < node.minTime) return;
 
-            Transition(node.Next(state));
+            AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+            Transition(node.Next(state with {
+                timeInState = timeInState,
+                loops = info.normalizedTime,
+            }));
         }
     }
 
