@@ -109,7 +109,7 @@ namespace OSBE.Controllers.Player {
 
 
 
-            bool isFallStart = prevGrounded && !state.isGrounded;
+            bool isFallStart = prevGrounded && !isGrounded;
             bool isCatchable = ledge != null
                 && system.Send<ITagRegistry, ISet<GameObject>>(tags =>
                     tags.Get(IdTag.PLATFORM_CATCHABLE))
