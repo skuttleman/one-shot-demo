@@ -21,7 +21,7 @@ namespace OSBE.Controllers {
             anim = GetComponent<Animator>();
             anim.speed = animSpeed;
             timeInState = 0f;
-            receiver.OnStateEnter(this.node.state);
+            receiver.OnStateInit(this.state.state);
         }
 
         public void SetSpeed(float speed) {
@@ -36,13 +36,11 @@ namespace OSBE.Controllers {
         private void Transition(AStateNode<State, Details> node) {
             if (this.node != node) {
                 State curr = this.node.state;
-                receiver.OnStateExit(curr);
                 this.node = node;
                 timeInState = 0f;
                 receiver.OnStateTransition(curr, node.state);
                 anim.speed = animSpeed * node.animSpeed;
                 anim.Play(node.state.ToString());
-                receiver.OnStateEnter(node.state);
             }
         }
 
@@ -74,13 +72,12 @@ namespace OSBE.Controllers {
             signals = new();
         }
 
-        protected void Init(IStateReceiver<State> receiver, AStateNodeOld<State, Signal> tree) {
+        protected void Init(IStateReceiver<State> receiver, AStateNodeOld<State, Signal> state) {
             this.receiver = receiver;
             anim = GetComponent<Animator>();
             anim.speed = animSpeed;
-            state = tree;
+            this.state = state;
             timeInState = 0f;
-            receiver.OnStateEnter(state.state);
         }
 
         public void SetSpeed(float speed) {
@@ -98,13 +95,11 @@ namespace OSBE.Controllers {
         private void Transition(AStateNodeOld<State, Signal> state) {
             if (this.state != state) {
                 State curr = this.state.state;
-                receiver.OnStateExit(curr);
                 this.state = state;
                 timeInState = 0f;
                 receiver.OnStateTransition(curr, state.state);
                 anim.speed = animSpeed * state.animSpeed;
                 anim.Play(state.state.ToString());
-                receiver.OnStateEnter(state.state);
             }
         }
 

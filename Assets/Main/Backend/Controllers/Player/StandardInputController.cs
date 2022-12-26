@@ -117,7 +117,7 @@ namespace OSBE.Controllers.Player {
                 TransitionToLedgeHang(ledge);
         }
 
-        public void OnStateEnter(PlayerAnim anim) {
+        public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
             ActivateStance();
         }
 

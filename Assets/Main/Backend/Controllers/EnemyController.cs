@@ -59,10 +59,6 @@ namespace OSBE.Controllers {
             isPlayerMoving = Maths.NonZero(e.speed);
         }
 
-        public void OnStateEnter(EnemyAnim ste) {
-            anim.UpdateState(state => state with { state = ste });
-        }
-
         protected override void OnEnable() {
             base.OnEnable();
             player = system.Player();

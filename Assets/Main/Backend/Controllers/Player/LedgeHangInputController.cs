@@ -58,8 +58,8 @@ namespace OSBE.Controllers.Player {
             this.state = state;
         }
 
-        public void OnStateEnter(PlayerAnim anim) {
-            if (anim == PlayerAnim.hang_move)
+        public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
+            if (curr == PlayerAnim.hang_move)
                 MovePlayer();
         }
 

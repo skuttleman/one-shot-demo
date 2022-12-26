@@ -53,8 +53,8 @@ namespace OSBE.Controllers {
             system.Send<IPubSub>(pubsub => pubsub.Publish(e));
         }
 
-        public void OnStateExit(PlayerAnim curr) {
-            switch (curr) {
+        public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
+            switch (prev) {
                 case PlayerAnim.stand_move:
                 case PlayerAnim.crouch_move:
                 case PlayerAnim.crouch_move_aim:
@@ -64,10 +64,7 @@ namespace OSBE.Controllers {
                     break;
             }
 
-            Controller().OnStateExit(curr);
-        }
 
-        public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
             if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
                 rb.isKinematic = false;
                 UpdateState(state => state with {
@@ -76,9 +73,8 @@ namespace OSBE.Controllers {
             }
 
             Controller().OnStateTransition(prev, curr);
-        }
 
-        public void OnStateEnter(PlayerAnim curr) {
+
             PlayerControllerState prevState = state;
             UpdateState(state => ControllerUtils.TransitionState(state, curr));
 
@@ -96,8 +92,6 @@ namespace OSBE.Controllers {
                     anim.SetSpeed(1f);
                     break;
             }
-
-            Controller().OnStateEnter(curr);
 
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
             PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
