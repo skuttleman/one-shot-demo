@@ -164,6 +164,7 @@ namespace OSBE.Controllers.Player {
                 },
                 PlayerAnim.hang_climb => state with {
                     controls = PlayerInputControlMap.None,
+                    isMoving = false,
                 },
 
                 _ => state,
@@ -193,6 +194,8 @@ namespace OSBE.Controllers.Player {
                 },
                 PlayerAnim.crouch_idle => state with {
                     stance = PlayerStance.CROUCHING,
+                    hang = false,
+                    climb = false,
                 },
                 PlayerAnim.crouch_move => state with {
                     stance = PlayerStance.CROUCHING,
@@ -236,9 +239,6 @@ namespace OSBE.Controllers.Player {
                 },
                 PlayerAnim.hang_move => state with {
                     move = false,
-                },
-                PlayerAnim.hang_climb => state with {
-                    climb = false,
                 },
 
                 _ => state,

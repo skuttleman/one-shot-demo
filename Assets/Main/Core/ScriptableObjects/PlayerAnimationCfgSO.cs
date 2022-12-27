@@ -54,7 +54,7 @@ namespace OSCore.ScriptableObjects {
                     crouch_idle);
             stand_move
                 .To(state => state.fall, stand_fall)
-                .To(state => state.stance != PlayerStance.STANDING, defaultSpeed, 0f, crouch_move)
+                .To(state => state.stance != PlayerStance.STANDING || !state.sprint, defaultSpeed, 0f, crouch_move)
                 .To(state => !state.move, stand_idle)
                 .To(state => state.scope, crouch_tobino)
                 .To(state => state.aim, crouch_toaim)

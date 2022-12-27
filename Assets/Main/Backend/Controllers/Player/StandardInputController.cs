@@ -197,6 +197,7 @@ namespace OSBE.Controllers.Player {
                     ? cfg.mouseLookReset
                     : state.mouseLookTimer
             });
+            anim.UpdateState(state => state with { sprint = false });
         }
 
         private void OnStanceInput() {

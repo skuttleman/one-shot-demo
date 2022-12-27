@@ -63,7 +63,7 @@ namespace OSBE.Controllers.Player {
         }
 
         private void OnClimbUp() {
-            anim.UpdateState(state => state with { climb = true, hang = false });
+            anim.UpdateState(state => state with { climb = true });
 
             Vector3 diff = (state.hangingPoint - transform.position) * 1.2f;
             transform.position += diff;
