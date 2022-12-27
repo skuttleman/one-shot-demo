@@ -14,7 +14,6 @@ namespace OSBE.Controllers {
                 .Entity(transform)
                 .GetComponentInChildren<IStateReceiver<EnemyAnim>>();
             Init(receiver, cfg.Init(), new() {
-                state = EnemyAnim.stand_idle,
                 isMoving = false,
                 isAiming = false,
                 isAttacking = false,

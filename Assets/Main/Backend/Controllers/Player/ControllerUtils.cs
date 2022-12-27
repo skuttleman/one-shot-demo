@@ -150,6 +150,7 @@ namespace OSBE.Controllers.Player {
                     attackMode = AttackMode.FIRING,
                 },
                 PlayerAnim.hang_lunge => state with {
+                    stance = PlayerStance.STANDING,
                     controls = PlayerInputControlMap.None,
                     isMoving = false,
                     isSprinting = false,

@@ -14,7 +14,6 @@ namespace OSBE.Controllers {
                 .Entity(transform)
                 .GetComponentInChildren<IStateReceiver<PlayerAnim>>();
             Init(receiver, cfg.Init(), new() {
-                state = PlayerAnim.crouch_idle,
                 fall = false,
                 attack = false,
                 aim = false,

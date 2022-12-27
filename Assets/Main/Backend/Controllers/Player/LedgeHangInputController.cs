@@ -99,10 +99,12 @@ namespace OSBE.Controllers.Player {
                     move,
                     cfg.hangMoveAmount)) {
 
-                anim.UpdateState(state => state with { move = true });
                 controller.UpdateState(state => state with {
                     movement = move,
                 });
+
+                if (anim.state == PlayerAnim.hang_idle)
+                    anim.UpdateState(state => state with { move = true });
             }
         }
 

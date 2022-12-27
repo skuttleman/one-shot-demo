@@ -4,7 +4,6 @@ using OSCore.Utils;
 
 namespace OSCore.System {
     public abstract record AnimStateDetails<State> {
-        public State state { get; init; }
         public float timeInState { get; init; }
         public float loops { get; init; }
     }
