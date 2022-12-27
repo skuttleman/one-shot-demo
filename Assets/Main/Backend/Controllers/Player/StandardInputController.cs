@@ -91,16 +91,11 @@ namespace OSBE.Controllers.Player {
                 ground = ground,
             });
 
-            if (prevGrounded && !isGrounded) {
-                anim.Send(PlayerAnimSignal.FALLING);
-            } else if (!prevGrounded && isGrounded) {
-                if (this.state.isSprinting && Vectors.NonZero(this.state.movement))
-                    anim.Send(PlayerAnimSignal.LAND_SPRINT);
-                else if (Vectors.NonZero(this.state.movement))
-                    anim.Send(PlayerAnimSignal.LAND_MOVE);
-                else
-                    anim.Send(PlayerAnimSignal.LAND_IDLE);
-            }
+            if (prevGrounded && !isGrounded)
+                anim.UpdateState(state => state with { fall = true });
+            else if (!prevGrounded && isGrounded)
+                anim.UpdateState(state => state with { fall = false });
+
 
             this.state = state;
             MovePlayer(ControllerUtils.MoveCfg(cfg, this.state));
@@ -193,27 +188,20 @@ namespace OSBE.Controllers.Player {
         }
 
         private void OnMovementInput(Vector2 direction) {
-            bool isMoving = Vectors.NonZero(direction);
-            PlayerAnimSignal signal = isMoving ? PlayerAnimSignal.MOVE_ON : PlayerAnimSignal.MOVE_OFF;
-            if (anim.CanTransition(signal))
-                anim.Send(signal);
-
+            anim.UpdateState(state => state with {
+                move = Vectors.NonZero(direction),
+            });
             controller.UpdateState(state => state with {
                 movement = direction
             });
         }
 
         private void OnSprintInput(bool isSprinting) {
-            PlayerAnimSignal signal = PlayerAnimSignal.SPRINT;
-            if (isSprinting && ControllerUtils.CanSprint(state) && anim.CanTransition(signal))
-                anim.Send(signal);
+            if (isSprinting && ControllerUtils.CanSprint(state))
+                anim.UpdateState(state => state with { sprint = isSprinting });
         }
 
         private void OnLookInput(Vector2 direction, bool isMouse) {
-            PlayerAnimSignal signal = PlayerAnimSignal.LOOK;
-            if (anim.CanTransition(signal))
-                anim.Send(signal);
-
             controller.UpdateState(state => state with {
                 facing = direction,
                 mouseLookTimer = isMouse && Vectors.NonZero(direction)
@@ -223,31 +211,22 @@ namespace OSBE.Controllers.Player {
         }
 
         private void OnStanceInput() {
-            PlayerAnimSignal signal = PlayerAnimSignal.STANCE;
             PlayerStance nextStance = ControllerUtils.NextStance(state.stance);
-            if (anim.CanTransition(signal)
-                && (!state.isMoving || ControllerUtils.IsMovable(nextStance, state)))
-                anim.Send(signal);
+            if (!state.isMoving || ControllerUtils.IsMovable(nextStance, state))
+                anim.UpdateState(state => state with { stance = nextStance });
         }
 
         private void OnScopeInput(bool isScoping) {
-            PlayerAnimSignal signal = isScoping ? PlayerAnimSignal.SCOPE_ON : PlayerAnimSignal.SCOPE_OFF;
-            if (anim.CanTransition(signal))
-                anim.Send(signal);
+            anim.UpdateState(state => state with { scope = isScoping });
         }
 
         private void OnAimInput(bool isAiming) {
-            PlayerAnimSignal signal = isAiming ? PlayerAnimSignal.AIM_ON : PlayerAnimSignal.AIM_OFF;
-            if (anim.CanTransition(signal))
-                anim.Send(signal);
+            anim.UpdateState(state => state with { aim = isAiming });
         }
 
         private void OnAttackInput(bool isAttacking) {
-            PlayerAnimSignal signal = PlayerAnimSignal.ATTACK;
-            if (isAttacking
-                && anim.CanTransition(signal)
-                && ControllerUtils.CanAttack(state.attackMode))
-                anim.Send(signal);
+            if (isAttacking && ControllerUtils.CanAttack(state.attackMode))
+                anim.UpdateState(state => state with { attack = isAttacking });
         }
 
         private void TransitionToLedgeHang(Collider ledge) {
@@ -267,7 +246,7 @@ namespace OSBE.Controllers.Player {
             if (distanceToGround >= 0.6f) {
                 anim.transform.localPosition = anim.transform.localPosition
                     .WithZ(anim.transform.localPosition.z - 0.6f);
-                anim.Send(PlayerAnimSignal.FALLING_LUNGE);
+                anim.UpdateState(state => state with { hang = true });
 
                 Vector2 facing = pt - nextPlayerPos;
                 rb.velocity = Vector3.zero;

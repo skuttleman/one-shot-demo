@@ -2,6 +2,9 @@
 using OSCore.Data.Enums;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
+using System;
+using UnityEngine;
+using static OSCore.ScriptableObjects.PlayerAnimationCfgSO;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
 namespace OSBE.Controllers.Player {
@@ -34,8 +37,9 @@ namespace OSBE.Controllers.Player {
         public static bool CanSprint(PlayerControllerState state) =>
             !state.isScoping && !IsAiming(state.attackMode);
 
-        public static PlayerControllerState TransitionState(PlayerControllerState state, PlayerAnim anim) {
-            PlayerControllerState result = anim switch {
+        public static PlayerControllerState TransitionControllerState(
+            PlayerAnim prev, PlayerAnim curr, PlayerControllerState state) =>
+            curr switch {
                 PlayerAnim.stand_idle => state with {
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.HAND,
@@ -59,7 +63,6 @@ namespace OSBE.Controllers.Player {
                     attackMode = AttackMode.NONE,
                     isScoping = false,
                 },
-
                 PlayerAnim.crouch_idle_bino => state with {
                     stance = PlayerStance.CROUCHING,
                     isMoving = false,
@@ -113,7 +116,6 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.FIRING,
                 },
-
                 PlayerAnim.crawl_idle_bino => state with {
                     stance = PlayerStance.CRAWLING,
                 },
@@ -150,7 +152,6 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.CRAWLING,
                     attackMode = AttackMode.FIRING,
                 },
-
                 PlayerAnim.hang_lunge => state with {
                     controls = PlayerInputControlMap.None,
                     isMoving = false,
@@ -167,10 +168,74 @@ namespace OSBE.Controllers.Player {
                     controls = PlayerInputControlMap.None,
                 },
 
-                _ => state
+                _ => state,
             };
 
-            return result;
-        }
+        public static PlayerAnimState TransitionAnimState(
+            PlayerAnim prev, PlayerAnim curr, PlayerAnimState state) =>
+            curr switch {
+                PlayerAnim.stand_idle => state with {
+                    stance = PlayerStance.CROUCHING,
+                },
+                PlayerAnim.stand_move => state with {
+                    stance = PlayerStance.STANDING,
+                    scope = false,
+                    aim = false,
+                },
+                PlayerAnim.stand_punch => state with {
+                    attack = false,
+                },
+                PlayerAnim.stand_fall => state with {
+                    stance = PlayerStance.STANDING,
+                },
+                PlayerAnim.crouch_idle_bino => state with { },
+                PlayerAnim.crouch_tobino => state with {
+                    sprint = false,
+                },
+                PlayerAnim.crouch_idle => state with {
+                    stance = PlayerStance.CROUCHING,
+                },
+                PlayerAnim.crouch_move => state with {
+                    stance = PlayerStance.CROUCHING,
+                    sprint = prev != PlayerAnim.stand_move && state.sprint
+                },
+                PlayerAnim.crouch_punch => state with {
+                    attack = false,
+                },
+                PlayerAnim.crouch_toaim => state with {
+                    sprint = false,
+                },
+                PlayerAnim.crouch_idle_aim => state with { },
+                PlayerAnim.crouch_move_aim => state with { },
+                PlayerAnim.crouch_fire => state with {
+                    attack = false,
+                },
+                PlayerAnim.crawl_idle_bino => state with {
+                    stance = PlayerStance.CRAWLING,
+                },
+                PlayerAnim.crawl_tobino => state with { },
+                PlayerAnim.crawl_idle => state with {
+                    stance = PlayerStance.CRAWLING,
+                },
+                PlayerAnim.crawl_move => state with {
+                    stance = PlayerStance.CRAWLING,
+                },
+                PlayerAnim.crawl_punch => state with {
+                    attack = false,
+                },
+                PlayerAnim.crawl_toaim => state with { },
+                PlayerAnim.crawl_idle_aim => state with { },
+                PlayerAnim.crawl_fire => state with {
+                    attack = false,
+                },
+                PlayerAnim.hang_lunge => state with { },
+                PlayerAnim.hang_idle => state with { },
+                PlayerAnim.hang_move => state with { },
+                PlayerAnim.hang_climb => state with {
+                    climb = false,
+                },
+
+                _ => state,
+            } with { attack = false };
     }
 }

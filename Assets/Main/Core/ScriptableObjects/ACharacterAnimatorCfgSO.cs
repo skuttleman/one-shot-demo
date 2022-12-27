@@ -22,24 +22,4 @@ namespace OSCore.ScriptableObjects {
             return result;
         }
     }
-
-    public abstract class ACharacterAnimatorCfgSOOld<State, Signal> : ScriptableObject {
-        public readonly IEnumerable<State> states;
-        public readonly IEnumerable<Signal> signals;
-
-        public ACharacterAnimatorCfgSOOld() {
-            states = EnumList<State>();
-            signals = EnumList<Signal>();
-        }
-
-        public abstract AStateNodeOld<State, Signal> Init();
-
-        private static IEnumerable<T> EnumList<T>() {
-            Array values = Enum.GetValues(typeof(T));
-            IList<T> result = new List<T>();
-            foreach (object item in values)
-                result.Add((T)item);
-            return result;
-        }
-    }
 }

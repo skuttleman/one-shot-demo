@@ -5,7 +5,6 @@ using OSCore.Data.Enums;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.Utils;
-using System;
 using UnityEngine;
 using static OSCore.Data.Controllers.PlayerControllerInput;
 
@@ -64,25 +63,17 @@ namespace OSBE.Controllers.Player {
         }
 
         private void OnClimbUp() {
-            PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_CLIMB;
-            if (anim.CanTransition(signal)) {
-                anim.Send(signal);
+            anim.UpdateState(state => state with { climb = true, hang = false });
 
-                Vector3 diff = (state.hangingPoint - transform.position) * 1.2f;
-                transform.position += diff;
-                controller.UpdateState(state => state with { facing = Vector2.zero });
-            }
+            Vector3 diff = (state.hangingPoint - transform.position) * 1.2f;
+            transform.position += diff;
         }
 
         private void OnClimbDown() {
-            PlayerAnimSignal signal = PlayerAnimSignal.LEDGE_DROP;
-            if (anim.CanTransition(signal)) {
-                anim.Send(signal);
+            anim.UpdateState(state => state with { fall = true, hang = false });
 
-                float pointZ = state.hangingPoint.z;
-                transform.position = transform.position.WithZ(pointZ + 0.55f);
-                controller.UpdateState(state => state with { facing = Vector2.zero });
-            }
+            float pointZ = state.hangingPoint.z;
+            transform.position = transform.position.WithZ(pointZ + 0.55f);
         }
 
         private void OnMovementInput(Vector2 direction) {
@@ -98,7 +89,6 @@ namespace OSBE.Controllers.Player {
                 playerCollider.direction == 2 ? heightAxis : 0);
 
             if (dir.magnitude > 0.5f
-                && anim.CanTransition(PlayerAnimSignal.MOVE_ON)
                 && Mathf.Abs(transform.rotation.eulerAngles.z - Vectors.AngleTo(dir)) % 180f == 90f
                 && state.ledge.ClosestPoint(nextHangingPoint) == nextHangingPoint
                 && state.ledge.ClosestPoint(nextPlayerPos) != nextPlayerPos
@@ -109,7 +99,7 @@ namespace OSBE.Controllers.Player {
                     move,
                     cfg.hangMoveAmount)) {
 
-                anim.Send(PlayerAnimSignal.MOVE_ON);
+                anim.UpdateState(state => state with { move = true });
                 controller.UpdateState(state => state with {
                     movement = move,
                 });

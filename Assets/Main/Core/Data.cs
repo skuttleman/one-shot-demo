@@ -128,26 +128,6 @@ namespace OSCore.Data {
             hang_climb,
         }
 
-        public enum PlayerAnimSignal {
-            FALLING,
-            FALLING_LUNGE,
-            LAND_IDLE,
-            LAND_MOVE,
-            LAND_SPRINT,
-            LOOK,
-            STANCE,
-            MOVE_ON,
-            MOVE_OFF,
-            SPRINT,
-            SCOPE_ON,
-            SCOPE_OFF,
-            AIM_ON,
-            AIM_OFF,
-            ATTACK,
-            LEDGE_CLIMB,
-            LEDGE_DROP,
-        }
-
         public enum EnemyAnim {
             stand_idle,
             stand_move,

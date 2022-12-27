@@ -67,16 +67,14 @@ namespace OSBE.Controllers {
 
             if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
                 rb.isKinematic = false;
-                UpdateState(state => state with {
-                    controls = PlayerInputControlMap.Standard,
-                });
             }
 
             Controller().OnStateTransition(prev, curr);
 
 
             PlayerControllerState prevState = state;
-            UpdateState(state => ControllerUtils.TransitionState(state, curr));
+            UpdateState(state => ControllerUtils.TransitionControllerState(prev, curr, state));
+            anim.UpdateState(state => ControllerUtils.TransitionAnimState(prev, curr, state));
 
             if (state.controls != PlayerInputControlMap.None) {
                 string controls = state.controls.ToString();
