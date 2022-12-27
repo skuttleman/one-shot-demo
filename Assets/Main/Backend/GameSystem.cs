@@ -11,17 +11,17 @@ using UnityEngine;
 
 namespace OSBE {
     public class GameSystem : MonoBehaviour, IGameSystem {
-        private IDictionary<Type, IGameSystemComponent> components;
+        private IDictionary<Type, IComponentLifecycle> components;
         private GameController controller;
 
-        public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent {
+        public IGameSystem Send<T>(Action<T> action) where T : IComponentLifecycle {
             T component = (T)components.Get(typeof(T), null);
 
             if (component is not null) action(component);
             return this;
         }
 
-        public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent {
+        public R Send<T, R>(Func<T, R> action) where T : IComponentLifecycle {
             T component = (T)components.Get(typeof(T), null);
 
             if (component is null) {
@@ -38,7 +38,7 @@ namespace OSBE {
         }
 
         private void Start() {
-            components?.ForEach(component => component.Value.OnStart());
+            components?.ForEach(component => component.Value.OnActivate());
         }
 
         private void Update() {
@@ -50,12 +50,12 @@ namespace OSBE {
         }
 
         private void OnDestroy() {
-            components?.ForEach(component => component.Value.OnDestroy());
-            components = new Dictionary<Type, IGameSystemComponent>();
+            components?.ForEach(component => component.Value.OnDeactivate());
+            components = new Dictionary<Type, IComponentLifecycle>();
         }
 
         private void Init() {
-            components = new Dictionary<Type, IGameSystemComponent> {
+            components = new Dictionary<Type, IComponentLifecycle> {
                 { typeof(ITagRegistry), new TagRegistry() },
                 { typeof(IPubSub), new DictionaryPubSub() }
             };

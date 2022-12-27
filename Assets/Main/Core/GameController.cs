@@ -15,12 +15,12 @@ namespace OSCore {
             this.system = system;
         }
 
-        public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent {
+        public IGameSystem Send<T>(Action<T> action) where T : IComponentLifecycle {
             system.Send(action);
             return this;
         }
 
-        public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent =>
+        public R Send<T, R>(Func<T, R> action) where T : IComponentLifecycle =>
             system.Send(action);
 
         /*

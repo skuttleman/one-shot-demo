@@ -183,7 +183,6 @@ namespace OSBE.Controllers.Player {
                 },
                 PlayerAnim.stand_fall => state with {
                     stance = PlayerStance.STANDING,
-                    hang = false,
                 },
                 PlayerAnim.crouch_idle_bino => state with { },
                 PlayerAnim.crouch_tobino => state with {

@@ -4,6 +4,10 @@ using System;
 namespace OSCore.Utils {
     public delegate Reduction<A> RF<A, I>(Reduction<A> acc, I item);
 
+    public interface IXForm<I, O> {
+        public RF<A, I> XForm<A>(RF<A, O> rf);
+    }
+
     public static class Fns {
         public static Predicate<T> Compliment<T>(Predicate<T> pred) =>
             t => !pred(t);
@@ -30,10 +34,6 @@ namespace OSCore.Utils {
 
         public static IXForm<I, R> Comp<I, O, R>(this IXForm<I, O> xform1, IXForm<O, R> xform2) =>
             new CompXF<I, O, R>(xform1, xform2);
-    }
-
-    public interface IXForm<I, O> {
-        public RF<A, I> XForm<A>(RF<A, O> rf);
     }
 
     public record MapXF<I, O>(Func<I, O> mapFn) : IXForm<I, O> {

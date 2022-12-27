@@ -11,10 +11,8 @@ namespace OSBE.Controllers.Player.Interfaces {
         public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn);
     }
 
-    public interface IPlayerInputController : IController<PlayerControllerInput>, IStateReceiver<PlayerAnim> {
-        public void OnActivate() { }
-        public void OnUpdate() { }
-        public void OnFixedUpdate() { }
-        public void OnDeactivate() { }
-    }
+    public interface IPlayerInputController :
+        IController<PlayerControllerInput>,
+        IStateReceiver<PlayerAnim>,
+        IComponentLifecycle { }
 }

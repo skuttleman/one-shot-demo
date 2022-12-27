@@ -6,19 +6,19 @@ using UnityEngine;
 
 namespace OSCore.System.Interfaces {
     public interface IGameSystem {
-        public IGameSystem Send<T>(Action<T> action) where T : IGameSystemComponent;
-        public R Send<T, R>(Func<T, R> action) where T : IGameSystemComponent;
+        public IGameSystem Send<T>(Action<T> action) where T : IComponentLifecycle;
+        public R Send<T, R>(Func<T, R> action) where T : IComponentLifecycle;
     }
 
-    public interface IGameSystemComponent {
-        public void OnStart() { }
+    public interface IComponentLifecycle {
+        public void OnActivate() { }
         public void OnUpdate() { }
         public void OnFixedUpdate() { }
-        public void OnDestroy() { }
+        public void OnDeactivate() { }
     }
 
     namespace Tagging {
-        public interface ITagRegistry : IGameSystemComponent {
+        public interface ITagRegistry : IComponentLifecycle {
             public void Register(IdTag tag, GameObject obj);
             public void RegisterUnique(IdTag tag, GameObject obj);
             public ISet<GameObject> Get(IdTag tag);
@@ -27,7 +27,7 @@ namespace OSCore.System.Interfaces {
     }
 
     namespace Events {
-        public interface IPubSub : IGameSystemComponent {
+        public interface IPubSub : IComponentLifecycle {
             void Publish<T>(T item) where T : IEvent;
             long Subscribe<T>(Action<T> action) where T : IEvent;
             void Unsubscribe(long id);
