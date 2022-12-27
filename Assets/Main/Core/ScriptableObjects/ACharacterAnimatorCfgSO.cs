@@ -12,7 +12,7 @@ namespace OSCore.ScriptableObjects {
             states = EnumList<State>();
         }
 
-        public abstract AStateNode<State, Details> Init();
+        public abstract AnimNode<State, Details> Init();
 
         private static IEnumerable<T> EnumList<T>() {
             Array values = Enum.GetValues(typeof(T));

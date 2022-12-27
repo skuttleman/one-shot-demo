@@ -181,9 +181,6 @@ namespace OSBE.Controllers.Player {
                     scope = false,
                     aim = false,
                 },
-                PlayerAnim.stand_punch => state with {
-                    attack = false,
-                },
                 PlayerAnim.stand_fall => state with {
                     stance = PlayerStance.STANDING,
                     hang = false,
@@ -201,38 +198,23 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.CROUCHING,
                     sprint = prev != PlayerAnim.stand_move && state.sprint,
                 },
-                PlayerAnim.crouch_punch => state with {
-                    attack = false,
-                },
                 PlayerAnim.crouch_toaim => state with {
                     sprint = false,
-                },
-                PlayerAnim.crouch_idle_aim => state with { },
-                PlayerAnim.crouch_move_aim => state with { },
-                PlayerAnim.crouch_fire => state with {
-                    attack = false,
                 },
                 PlayerAnim.crawl_idle_bino => state with {
                     stance = PlayerStance.CRAWLING,
                 },
-                PlayerAnim.crawl_tobino => state with { },
                 PlayerAnim.crawl_idle => state with {
                     stance = PlayerStance.CRAWLING,
                 },
                 PlayerAnim.crawl_move => state with {
                     stance = PlayerStance.CRAWLING,
                 },
-                PlayerAnim.crawl_punch => state with {
-                    attack = false,
-                },
-                PlayerAnim.crawl_toaim => state with { },
-                PlayerAnim.crawl_idle_aim => state with { },
-                PlayerAnim.crawl_fire => state with {
-                    attack = false,
-                },
                 PlayerAnim.hang_lunge => state with {
                     stance = PlayerStance.STANDING,
                     fall = false,
+                    aim = false,
+                    scope = false,
                 },
                 PlayerAnim.hang_idle => state with {
                     move = prev != PlayerAnim.hang_lunge && state.move,

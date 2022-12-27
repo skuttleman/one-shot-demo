@@ -8,56 +8,52 @@ namespace OSCore.System {
         public float loops { get; init; }
     }
 
-    public abstract class AStateNode<State, Details>
+    public class AnimNode<State, Details>
         where Details : AnimStateDetails<State> {
         public readonly State state;
         public readonly float animSpeed;
 
-        private readonly IList<(Predicate<Details>, AStateNode<State, Details>)> edges;
+        private readonly IList<(Predicate<Details>, AnimNode<State, Details>)> edges;
 
-        public AStateNode(State state, float animSpeed) {
+        public AnimNode(State state) : this(state, 1f) { }
+
+        public AnimNode(State state, float animSpeed) {
             this.state = state;
 
             this.animSpeed = animSpeed;
-            edges = new List<(Predicate<Details>, AStateNode<State, Details>)>();
+            edges = new List<(Predicate<Details>, AnimNode<State, Details>)>();
         }
 
-        public void AddTransition(Predicate<AnimStateDetails<State>> pred, AStateNode<State, Details> node) {
+        public void AddTransition(Predicate<AnimStateDetails<State>> pred, AnimNode<State, Details> node) {
             edges.Add((pred, node));
         }
 
-        public AStateNode<State, Details> Next(Details details) =>
+        public AnimNode<State, Details> Next(Details details) =>
             edges.First(
                 Fns.Filter<(
                     Predicate<Details> pred,
-                    AStateNode<State, Details> state)>(tpl => tpl.pred(details))
+                    AnimNode<State, Details> state)>(tpl => tpl.pred(details))
                 .Comp(Fns.Map<(
                     Predicate<Details> pred,
-                    AStateNode<State, Details> state),
-                    AStateNode<State, Details>>(tpl => tpl.state)))
+                    AnimNode<State, Details> state),
+                    AnimNode<State, Details>>(tpl => tpl.state)))
                 ?? this;
     }
 
-    public class StableNode<State, Details> : AStateNode<State, Details>
-        where Details : AnimStateDetails<State> {
-        public StableNode(State state) : this(state, 1f) { }
-        public StableNode(State state, float animSpeed) : base(state, animSpeed) { }
-    }
-
-    public static class StateNodeBuilder {
-        public static AStateNode<State, Details> To<State, Details>(
-            this AStateNode<State, Details> node,
+    public static class AnimNodeBuilder {
+        public static AnimNode<State, Details> To<State, Details>(
+            this AnimNode<State, Details> node,
             Predicate<Details> pred,
-            AStateNode<State, Details> target)
+            AnimNode<State, Details> target)
             where Details : AnimStateDetails<State> =>
             node.To(pred, 0.1f, 0f, target);
 
-        public static AStateNode<State, Details> To<State, Details>(
-            this AStateNode<State, Details> node,
+        public static AnimNode<State, Details> To<State, Details>(
+            this AnimNode<State, Details> node,
             Predicate<Details> pred,
             float minTime,
             float minLoops,
-            AStateNode<State, Details> target)
+            AnimNode<State, Details> target)
             where Details : AnimStateDetails<State> {
             node.AddTransition(details =>
                 details.timeInState >= minTime

@@ -13,10 +13,10 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public float meleeSpeed { get; private set; }
         [field: SerializeField] public float firingSpeed { get; private set; }
 
-        public override AStateNode<EnemyAnim, EnemyAnimState> Init() {
-            StableNode<EnemyAnim, EnemyAnimState> stand_idle = new(EnemyAnim.stand_idle);
-            StableNode<EnemyAnim, EnemyAnimState> stand_move = new(EnemyAnim.stand_move);
-            StableNode<EnemyAnim, EnemyAnimState> stand_idle_aim = new(EnemyAnim.stand_idle_aim);
+        public override AnimNode<EnemyAnim, EnemyAnimState> Init() {
+            AnimNode<EnemyAnim, EnemyAnimState> stand_idle = new(EnemyAnim.stand_idle);
+            AnimNode<EnemyAnim, EnemyAnimState> stand_move = new(EnemyAnim.stand_move);
+            AnimNode<EnemyAnim, EnemyAnimState> stand_idle_aim = new(EnemyAnim.stand_idle_aim);
 
             stand_idle.To(state => state.isMoving, stand_move);
             stand_move.To(state => !state.isMoving, stand_idle);

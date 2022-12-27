@@ -7,14 +7,14 @@ namespace OSBE.Controllers {
     public abstract class ACharacterAnimator<State, Details> : MonoBehaviour
         where Details : AnimStateDetails<State> {
         private IStateReceiver<State> receiver;
-        private AStateNode<State, Details> node = null;
+        private AnimNode<State, Details> node = null;
         public State state => node == null ? default : node.state;
         private Details details;
         private Animator anim;
         private float timeInState;
         public float animSpeed { get; private set; } = 1f;
 
-        protected void Init(IStateReceiver<State> receiver, AStateNode<State, Details> node, Details details) {
+        protected void Init(IStateReceiver<State> receiver, AnimNode<State, Details> node, Details details) {
             this.receiver = receiver;
             this.node = node;
             this.details = details;
@@ -33,7 +33,7 @@ namespace OSBE.Controllers {
             details = updateFn(details);
         }
 
-        private void Transition(AStateNode<State, Details> node) {
+        private void Transition(AnimNode<State, Details> node) {
             if (this.node != node) {
                 State prev = this.node.state;
                 this.node = node;
