@@ -47,8 +47,11 @@ namespace OSCore.ScriptableObjects {
 
             stand_idle
                 .To(state => state.fall, stand_fall)
-                .To(state => state.move, stand_move)
-                .To(state => !state.move || state.stance != PlayerStance.STANDING, defaultSpeed, 0f, crouch_idle);
+                .To(state => state.sprint && state.move, stand_move)
+                .To(state => !state.move || !state.sprint || state.stance != PlayerStance.STANDING,
+                    defaultSpeed,
+                    0f,
+                    crouch_idle);
             stand_move
                 .To(state => state.fall, stand_fall)
                 .To(state => state.stance != PlayerStance.STANDING, defaultSpeed, 0f, crouch_move)
@@ -94,7 +97,7 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.attack, crouch_punch);
             crouch_move
                 .To(state => state.fall, stand_fall)
-                .To(state => state.sprint, stand_move)
+                .To(state => state.sprint, defaultSpeed, 0.5f, stand_move)
                 .To(state => state.stance == PlayerStance.CRAWLING, defaultSpeed, 0f, crawl_move)
                 .To(state => !state.move, crouch_idle)
                 .To(state => state.scope, crouch_tobino)
@@ -144,6 +147,7 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.attack, crawl_punch);
             crawl_move
                 .To(state => state.fall, stand_fall)
+                .To(state => state.sprint, defaultSpeed, 0.5f, crouch_move)
                 .To(state => state.stance != PlayerStance.CRAWLING, defaultSpeed, 0f, crouch_move)
                 .To(state => !state.move, crawl_idle);
             crawl_punch

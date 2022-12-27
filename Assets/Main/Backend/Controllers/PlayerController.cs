@@ -24,6 +24,9 @@ namespace OSBE.Controllers {
         IStateReceiver<PlayerAnim> {
         [SerializeField] private PlayerCfgSO cfg;
 
+        private PlayerAnimator anim;
+        private PlayerInput input;
+        private IDictionary<PlayerInputControlMap, IPlayerInputController> controllers;
         private PlayerControllerState state = new() {
             anim = PlayerAnim.crouch_idle,
             controls = PlayerInputControlMap.Standard,
@@ -39,11 +42,11 @@ namespace OSBE.Controllers {
             hangingPoint = Vector3.zero,
             ledge = default,
         };
-        private PlayerAnimator anim;
-        private PlayerInput input;
-        private IDictionary<PlayerInputControlMap, IPlayerInputController> controllers;
 
         private Rigidbody rb;
+        private GameObject stand;
+        private GameObject crouch;
+        private GameObject crawl;
 
         public void On(PlayerControllerInput e) {
             Controller().On(e);
@@ -64,17 +67,15 @@ namespace OSBE.Controllers {
                     break;
             }
 
-
-            if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang")) {
+            if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang"))
                 rb.isKinematic = false;
-            }
-
-            Controller().OnStateTransition(prev, curr);
-
 
             PlayerControllerState prevState = state;
             UpdateState(state => ControllerUtils.TransitionControllerState(prev, curr, state));
             anim.UpdateState(state => ControllerUtils.TransitionAnimState(prev, curr, state));
+            ActivateStance();
+
+            Controller().OnStateTransition(prev, curr);
 
             if (state.controls != PlayerInputControlMap.None) {
                 string controls = state.controls.ToString();
@@ -115,6 +116,18 @@ namespace OSBE.Controllers {
                 system.Send<IPubSub>(pubsub => pubsub.Publish(e));
         }
 
+        private void ActivateStance() {
+            stand.SetActive(state.stance == PlayerStance.STANDING);
+            crouch.SetActive(state.stance == PlayerStance.CROUCHING);
+            crawl.SetActive(state.stance == PlayerStance.CRAWLING);
+        }
+
+        private GameObject FindStance(string name) =>
+            Transforms
+                .FindInChildren(transform, xform => xform.name == name)
+                .First()
+                .gameObject;
+
         /*
          * Lifecycle Methods
          */
@@ -128,6 +141,10 @@ namespace OSBE.Controllers {
             anim = GetComponentInChildren<PlayerAnimator>();
             input = GetComponent<PlayerInput>();
             rb = GetComponent<Rigidbody>();
+
+            stand = FindStance("stand");
+            crouch = FindStance("crouch");
+            crawl = FindStance("crawl");
         }
 
         private void Update() {

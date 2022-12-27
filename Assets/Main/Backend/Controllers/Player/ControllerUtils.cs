@@ -2,8 +2,6 @@
 using OSCore.Data.Enums;
 using OSCore.Data;
 using OSCore.ScriptableObjects;
-using System;
-using UnityEngine;
 using static OSCore.ScriptableObjects.PlayerAnimationCfgSO;
 using static OSCore.ScriptableObjects.PlayerCfgSO;
 
@@ -50,7 +48,6 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.HAND,
                     isMoving = true,
-                    isSprinting = true,
                     isScoping = false,
                 },
                 PlayerAnim.stand_punch => state with {
@@ -187,6 +184,7 @@ namespace OSBE.Controllers.Player {
                 },
                 PlayerAnim.stand_fall => state with {
                     stance = PlayerStance.STANDING,
+                    hang = false,
                 },
                 PlayerAnim.crouch_idle_bino => state with { },
                 PlayerAnim.crouch_tobino => state with {
@@ -197,7 +195,7 @@ namespace OSBE.Controllers.Player {
                 },
                 PlayerAnim.crouch_move => state with {
                     stance = PlayerStance.CROUCHING,
-                    sprint = prev != PlayerAnim.stand_move && state.sprint
+                    sprint = prev != PlayerAnim.stand_move && state.sprint,
                 },
                 PlayerAnim.crouch_punch => state with {
                     attack = false,
@@ -228,9 +226,16 @@ namespace OSBE.Controllers.Player {
                 PlayerAnim.crawl_fire => state with {
                     attack = false,
                 },
-                PlayerAnim.hang_lunge => state with { },
-                PlayerAnim.hang_idle => state with { },
-                PlayerAnim.hang_move => state with { },
+                PlayerAnim.hang_lunge => state with {
+                    stance = PlayerStance.STANDING,
+                    fall = false,
+                },
+                PlayerAnim.hang_idle => state with {
+                    move = prev != PlayerAnim.hang_lunge && state.move,
+                },
+                PlayerAnim.hang_move => state with {
+                    move = false,
+                },
                 PlayerAnim.hang_climb => state with {
                     climb = false,
                 },

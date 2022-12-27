@@ -1,5 +1,4 @@
 ﻿using OSBE.Controllers.Player.Interfaces;
-using OSCore.Data.Animations;
 using OSCore.Data.Controllers;
 using OSCore.Data.Enums;
 using OSCore.Data.Events;
@@ -24,10 +23,6 @@ namespace OSBE.Controllers.Player {
         private readonly Rigidbody rb;
         private readonly PlayerAnimator anim;
 
-        private readonly GameObject stand;
-        private readonly GameObject crouch;
-        private readonly GameObject crawl;
-
         private PlayerControllerState state;
 
         public StandardInputController(
@@ -44,10 +39,6 @@ namespace OSBE.Controllers.Player {
 
             rb = transform.GetComponent<Rigidbody>();
             anim = transform.GetComponentInChildren<PlayerAnimator>();
-
-            stand = FindStance("stand");
-            crouch = FindStance("crouch");
-            crawl = FindStance("crawl");
         }
 
         public void On(PlayerControllerInput e) {
@@ -110,10 +101,6 @@ namespace OSBE.Controllers.Player {
 
             if (isFallStart && isCatchable && wasCrouching)
                 TransitionToLedgeHang(ledge);
-        }
-
-        public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
-            ActivateStance();
         }
 
         private void RotatePlayer(MoveConfig moveCfg) {
@@ -188,11 +175,13 @@ namespace OSBE.Controllers.Player {
         }
 
         private void OnMovementInput(Vector2 direction) {
+            bool isMoving = Vectors.NonZero(direction);
             anim.UpdateState(state => state with {
-                move = Vectors.NonZero(direction),
+                move = isMoving,
+                sprint = state.sprint && isMoving,
             });
             controller.UpdateState(state => state with {
-                movement = direction
+                movement = direction,
             });
         }
 
@@ -261,18 +250,6 @@ namespace OSBE.Controllers.Player {
                     hangingPoint = pt,
                 });
             }
-        }
-
-        private GameObject FindStance(string name) =>
-            Transforms
-                .FindInChildren(transform, xform => xform.name == name)
-                .First()
-                .gameObject;
-
-        private void ActivateStance() {
-            stand.SetActive(state.stance == PlayerStance.STANDING);
-            crouch.SetActive(state.stance == PlayerStance.CROUCHING);
-            crawl.SetActive(state.stance == PlayerStance.CRAWLING);
         }
     }
 }
