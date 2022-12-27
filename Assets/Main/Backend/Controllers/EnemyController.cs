@@ -121,7 +121,7 @@ namespace OSBE.Controllers {
                         waitAmount -= Time.fixedDeltaTime;
                         yield return new WaitForFixedUpdate();
                         while (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                            anim.UpdateState(state => state with { isMoving = false });
+                            anim.Transition(state => state with { isMoving = false });
                             DoFace(player.transform.position);
                             yield return new WaitForFixedUpdate();
                         }
@@ -189,14 +189,14 @@ namespace OSBE.Controllers {
                 float diff = Mathf.Abs(Vectors.AngleTo(transform.position - position) - transform.rotation.eulerAngles.z);
                 diff = diff > 180f ? 360f - diff : diff;
                 if (diff < 45f) {
-                    anim.UpdateState(state => state with { isMoving = true });
+                    anim.Transition(state => state with { isMoving = true });
                     transform.position += direction;
                 }
 
                 yield return 0;
             }
 
-            anim.UpdateState(state => state with { isMoving = false });
+            anim.Transition(state => state with { isMoving = false });
         }
     }
 }

@@ -13,8 +13,6 @@ namespace OSBE.Controllers {
             Transform head = Transforms
                 .FindInActiveChildren(transform.parent, xform => xform.name == "head")
                 .First();
-            float angle = head.rotation.eulerAngles.z;
-            float angleIncrease = 360f / cfg.RAY_COUNT;
 
             Vector3[] vertices = new Vector3[cfg.RAY_COUNT + 1 + 1];
             Vector2[] uv = new Vector2[vertices.Length];
@@ -25,14 +23,24 @@ namespace OSBE.Controllers {
                 head.position.y.RoundTo(100f),
                 head.position.z);
 
-            float facing = angle;
+            int triangleIdx = DrawTriangles(vertices, triangles, head);
 
+            triangles[triangleIdx] = 0;
+            triangles[triangleIdx + 1] = triangles[triangleIdx - 1];
+            triangles[triangleIdx + 2] = 1;
+
+            mesh.vertices = vertices;
+            mesh.uv = uv;
+            mesh.triangles = triangles;
+            mesh.bounds = new Bounds(vertices[0], Vector3.one * 1000f);
+        }
+
+        private int DrawTriangles(Vector3[] vertices, int[] triangles, Transform head) {
             int triangleIdx = -3;
-            for (int vertexIdx = 1; vertexIdx < cfg.RAY_COUNT;) {
-                float diff = Mathf.Abs(facing + 90f - angle);
-                if (diff > 180f) diff = Mathf.Abs(360f - diff);
+            float angleIncrease = 360f / cfg.RAY_COUNT;
+            float angle = head.rotation.eulerAngles.z;
 
-                float percent = Mathf.Max(0.333f, (180f - diff) / 180f);
+            for (int vertexIdx = 1; vertexIdx < cfg.RAY_COUNT;) {
                 bool isHit = Physics.Raycast(
                     vertices[0],
                     Vectors.ToVector3(angle + transform.rotation.eulerAngles.z),
@@ -54,14 +62,7 @@ namespace OSBE.Controllers {
                 triangleIdx += 3;
             }
 
-            triangles[triangleIdx] = 0;
-            triangles[triangleIdx + 1] = triangles[triangleIdx - 1];
-            triangles[triangleIdx + 2] = 1;
-
-            mesh.vertices = vertices;
-            mesh.uv = uv;
-            mesh.triangles = triangles;
-            mesh.bounds = new Bounds(vertices[0], Vector3.one * 1000f);
+            return triangleIdx;
         }
 
         /*

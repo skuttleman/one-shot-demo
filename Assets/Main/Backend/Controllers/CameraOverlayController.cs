@@ -28,7 +28,7 @@ namespace OSBE.Controllers {
 
         private void LateUpdate() {
             if (cfg != null) {
-                float delta = Time.deltaTime / 2;
+                float delta = Time.deltaTime / 1.75f;
                 if (isScoping) alpha += delta;
                 else alpha -= delta;
                 alpha = Mathf.Clamp(alpha, -0.1f, cfg.maxOverlayAlpha);

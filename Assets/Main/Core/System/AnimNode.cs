@@ -40,7 +40,7 @@ namespace OSCore.System {
                 ?? this;
     }
 
-    public static class AnimNodeBuilder {
+    public static class AnimNodeUtils {
         public static AnimNode<State, Details> To<State, Details>(
             this AnimNode<State, Details> node,
             Predicate<Details> pred,

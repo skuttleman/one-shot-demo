@@ -27,7 +27,7 @@ namespace OSFE.Scripts {
 
         private void FixedUpdate() {
             bool los = false;
-            Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.1f); // TODON'T
+            Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.1f);
             rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
 
             IEnumerable<RaycastHit> hits = Sequences.Transduce(
@@ -42,7 +42,7 @@ namespace OSFE.Scripts {
 
             controller.On(new PlayerLOS(seesPlayer && los));
 
-            Vector3 position = transform.parent.parent.position + new Vector3(0, 0, -0.1f); // TODON'T
+            Vector3 position = transform.parent.parent.position + new Vector3(0, 0, -0.1f);
             Vector3 playerEyes = Transforms.FindInActiveChildren(
                 player.transform,
                 xform => xform.name == "head")

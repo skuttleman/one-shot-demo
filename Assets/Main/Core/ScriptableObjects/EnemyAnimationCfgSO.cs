@@ -1,6 +1,5 @@
 using OSCore.Data.Animations;
 using OSCore.System;
-using OSCore.System.Interfaces;
 using UnityEngine;
 using static OSCore.ScriptableObjects.EnemyAnimationCfgSO;
 

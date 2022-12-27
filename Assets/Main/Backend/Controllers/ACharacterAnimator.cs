@@ -29,11 +29,11 @@ namespace OSBE.Controllers {
             anim.speed = animSpeed * node.animSpeed;
         }
 
-        public void UpdateState(Func<Details, Details> updateFn) {
+        public void Transition(Func<Details, Details> updateFn) {
             details = updateFn(details);
         }
 
-        private void Transition(AnimNode<State, Details> node) {
+        private void TransitionTo(AnimNode<State, Details> node) {
             if (this.node != node) {
                 State prev = this.node.state;
                 this.node = node;
@@ -50,13 +50,13 @@ namespace OSBE.Controllers {
 
         private void Update() {
             if (node is null) return;
-            timeInState += Time.deltaTime;
 
             AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
-            Transition(node.Next(details with {
+            TransitionTo(node.Next(details with {
                 timeInState = timeInState,
                 loops = info.normalizedTime,
             }));
+            timeInState += Time.deltaTime;
         }
     }
 }

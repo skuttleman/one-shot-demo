@@ -27,7 +27,7 @@ namespace OSBE.Controllers {
         private PlayerAnimator anim;
         private PlayerInput input;
         private IDictionary<PlayerInputControlMap, IPlayerInputController> controllers;
-        private PlayerControllerState state = new() {
+        public PlayerControllerState state { get; private set; } = new() {
             anim = PlayerAnim.crouch_idle,
             controls = PlayerInputControlMap.Standard,
             mouseLookTimer = 0f,
@@ -57,23 +57,12 @@ namespace OSBE.Controllers {
         }
 
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
-            switch (prev) {
-                case PlayerAnim.stand_move:
-                case PlayerAnim.crouch_move:
-                case PlayerAnim.crouch_move_aim:
-                case PlayerAnim.crouch_move_bino:
-                case PlayerAnim.crawl_move:
-                    anim.SetSpeed(1f);
-                    break;
-            }
-
             if (prev.ToString().StartsWith("hang") && !curr.ToString().StartsWith("hang"))
                 rb.isKinematic = false;
 
             PlayerControllerState prevState = state;
             UpdateState(state => ControllerUtils.TransitionControllerState(prev, curr, state));
-            anim.UpdateState(state => ControllerUtils.TransitionAnimState(prev, curr, state));
-            ActivateStance();
+            ManageAnim(prevState, prev, curr);
 
             Controller().OnStateTransition(prev, curr);
 
@@ -82,8 +71,24 @@ namespace OSBE.Controllers {
                 if (input.currentActionMap.name != controls)
                     input.SwitchCurrentActionMap(controls);
             }
+        }
+
+        public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn) {
+            PlayerControllerState nextState = updateFn(state);
+
+            bool controlsChanged = state.controls != nextState.controls;
+            if (controlsChanged) Controller().OnDeactivate();
+            state = nextState;
+            if (controlsChanged) Controller().OnActivate();
+
+            return state;
+        }
+
+        private void ManageAnim(PlayerControllerState prevState, PlayerAnim prev, PlayerAnim curr) {
+            anim.Transition(state => ControllerUtils.TransitionAnimState(prev, curr, state));
 
             switch (curr) {
+                case PlayerAnim.stand_move:
                 case PlayerAnim.crouch_move:
                 case PlayerAnim.crouch_move_aim:
                 case PlayerAnim.crouch_move_bino:
@@ -95,17 +100,7 @@ namespace OSBE.Controllers {
             PublishChanged(prevState.stance, state.stance, new StanceChanged(state.stance));
             PublishChanged(prevState.attackMode, state.attackMode, new AttackModeChanged(state.attackMode));
             PublishChanged(prevState.isScoping, state.isScoping, new ScopingChanged(state.isScoping));
-        }
-
-        public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn) {
-            PlayerControllerState nextState = updateFn(state);
-
-            bool controlsChanged = state.controls != nextState.controls;
-            if (controlsChanged) Controller().OnDeactivate(state);
-            state = nextState;
-            if (controlsChanged) Controller().OnActivate(state);
-
-            return state;
+            ActivateStance();
         }
 
         private IPlayerInputController Controller() =>
@@ -135,9 +130,10 @@ namespace OSBE.Controllers {
         private void Start() {
             controllers = new Dictionary<PlayerInputControlMap, IPlayerInputController>() {
                 { PlayerInputControlMap.None, new NoopInputController() },
-                { PlayerInputControlMap.Standard, new StandardInputController(this, system, cfg, transform, state) },
+                { PlayerInputControlMap.Standard, new StandardInputController(this, system, cfg, transform) },
                 { PlayerInputControlMap.LedgeHang, new LedgeHangInputController(this, cfg, transform) }
             };
+
             anim = GetComponentInChildren<PlayerAnimator>();
             input = GetComponent<PlayerInput>();
             rb = GetComponent<Rigidbody>();
@@ -156,11 +152,11 @@ namespace OSBE.Controllers {
                     cfg.crouching.rotationSpeed * Time.deltaTime);
             }
 
-            Controller().OnUpdate(state);
+            Controller().OnUpdate();
         }
 
         private void FixedUpdate() =>
-            Controller().OnFixedUpdate(state);
+            Controller().OnFixedUpdate();
     }
 
     internal class NoopInputController : IPlayerInputController {

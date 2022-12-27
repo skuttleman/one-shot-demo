@@ -7,13 +7,14 @@ using System;
 
 namespace OSBE.Controllers.Player.Interfaces {
     public interface IPlayerMainController {
+        public PlayerControllerState state { get; }
         public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn);
     }
 
     public interface IPlayerInputController : IController<PlayerControllerInput>, IStateReceiver<PlayerAnim> {
-        public void OnActivate(PlayerControllerState state) { }
-        public void OnUpdate(PlayerControllerState state) { }
-        public void OnFixedUpdate(PlayerControllerState state) { }
-        public void OnDeactivate(PlayerControllerState state) { }
+        public void OnActivate() { }
+        public void OnUpdate() { }
+        public void OnFixedUpdate() { }
+        public void OnDeactivate() { }
     }
 }
