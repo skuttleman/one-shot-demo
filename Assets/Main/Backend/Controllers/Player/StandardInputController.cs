@@ -1,4 +1,5 @@
 ﻿using OSBE.Controllers.Player.Interfaces;
+using OSCore.Data.Animations;
 using OSCore.Data.Controllers;
 using OSCore.Data.Enums;
 using OSCore.Data.Events;
@@ -42,6 +43,7 @@ namespace OSBE.Controllers.Player {
                 case SprintInput ev: OnSprintInput(ev.isSprinting); break;
                 case LookInput ev: OnLookInput(ev.direction, ev.isMouse); break;
                 case StanceInput: OnStanceInput(); break;
+                case DiveInput: OnDiveInput(); break;
                 case ScopeInput ev: OnScopeInput(ev.isScoping); break;
                 case AimInput ev: OnAimInput(ev.isAiming); break;
                 case AttackInput ev: OnAttackInput(ev.isAttacking); break;
@@ -94,6 +96,14 @@ namespace OSBE.Controllers.Player {
             MovePlayer(ControllerUtils.MoveCfg(cfg, controller.state));
 
             return isGrounded;
+        }
+
+        public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
+            switch ((prev, curr)) {
+                case (_, PlayerAnim.crawl_dive):
+                    rb.AddRelativeForce((Vectors.FORWARD + Vectors.UP) * cfg.diveForce);
+                    break;
+            }
         }
 
         private void RotatePlayer(MoveConfig moveCfg) {
@@ -176,8 +186,12 @@ namespace OSBE.Controllers.Player {
             return dir;
         }
 
-        private float AngleTo(Vector2 position) =>
-            (360f + Vectors.AngleTo(transform.position, transform.position - position.Upgrade())) % 360;
+        private float AngleTo(Vector2 position) {
+            var angle = Vectors.AngleTo(
+                transform.position,
+                transform.position - position.Upgrade());
+            return (360f + angle) % 360;
+        }
 
         private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
             if (!oldValue.Equals(newValue))
@@ -216,6 +230,10 @@ namespace OSBE.Controllers.Player {
                 anim.Transition(state => state with { stance = nextStance });
         }
 
+        private void OnDiveInput() {
+            anim.Transition(state => state with { dive = true });
+        }
+
         private void OnScopeInput(bool isScoping) {
             anim.Transition(state => state with { scope = isScoping });
         }
@@ -244,8 +262,10 @@ namespace OSBE.Controllers.Player {
         }
 
         private bool CanTransition(Vector3 nextPlayerPos) =>
-            !Physics.Raycast(nextPlayerPos, Vectors.DOWN, out RaycastHit ground, 1000f)
-                || ground.distance >= 0.6f;
+            anim.state != PlayerAnim.crawl_dive
+            && Vector3.Distance(nextPlayerPos, transform.position) <= 0.35f
+            && (!Physics.Raycast(nextPlayerPos, Vectors.DOWN, out RaycastHit ground, 1000f)
+                || ground.distance >= 0.6f);
 
         private void TransitionState(Collider ledge, Vector3 pt, Vector3 nextPlayerPos) {
             transform.position = nextPlayerPos;

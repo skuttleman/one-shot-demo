@@ -38,7 +38,7 @@
                     "id": "2e524a64-639d-4826-a113-7e61d939c515",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "MultiTap(tapDelay=0.1),Tap(pressPoint=0.1)",
                     "initialStateCheck": false
                 },
                 {

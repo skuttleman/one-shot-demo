@@ -209,6 +209,9 @@ namespace OSBE.Controllers.Player {
                 PlayerAnim.crawl_move => state with {
                     stance = PlayerStance.CRAWLING,
                 },
+                PlayerAnim.crawl_dive => state with {
+                    sprint = false,
+                },
                 PlayerAnim.hang_lunge => state with {
                     stance = PlayerStance.STANDING,
                     fall = false,
@@ -223,6 +226,6 @@ namespace OSBE.Controllers.Player {
                 },
 
                 _ => state,
-            } with { attack = false };
+            } with { attack = false, dive = false };
     }
 }

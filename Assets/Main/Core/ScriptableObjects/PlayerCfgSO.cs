@@ -17,6 +17,7 @@ namespace OSCore.ScriptableObjects {
         [field: Header("Movement")]
         [field: SerializeField] public float scopeFactor { get; private set; }
         [field: SerializeField] public float aimFactor { get; private set; }
+        [field: SerializeField] public float diveForce { get; private set; }
 
         [field: Header("LedgeHang")]
         [field: SerializeField] public float hangMoveAmount { get; private set; }

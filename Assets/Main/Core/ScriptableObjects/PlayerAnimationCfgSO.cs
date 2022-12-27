@@ -39,6 +39,7 @@ namespace OSCore.ScriptableObjects {
             AnimNode<PlayerAnim, PlayerAnimState> crawl_toaim = new(PlayerAnim.crawl_toaim);
             AnimNode<PlayerAnim, PlayerAnimState> crawl_idle_aim = new(PlayerAnim.crawl_idle_aim);
             AnimNode<PlayerAnim, PlayerAnimState> crawl_fire = new(PlayerAnim.crawl_fire);
+            AnimNode<PlayerAnim, PlayerAnimState> crawl_dive = new(PlayerAnim.crawl_dive);
             AnimNode<PlayerAnim, PlayerAnimState> hang_lunge = new(PlayerAnim.hang_lunge, lungingSpeed);
             AnimNode<PlayerAnim, PlayerAnimState> hang_idle = new(PlayerAnim.hang_idle);
             AnimNode<PlayerAnim, PlayerAnimState> hang_move = new(PlayerAnim.hang_move, ledgeShimmySpeed);
@@ -47,6 +48,7 @@ namespace OSCore.ScriptableObjects {
 
             stand_idle
                 .To(state => state.fall, stand_fall)
+                .To(state => state.dive, crawl_dive)
                 .To(state => state.sprint && state.move, stand_move)
                 .To(state => !state.move || !state.sprint || state.stance != PlayerStance.STANDING,
                     defaultSpeed,
@@ -54,6 +56,7 @@ namespace OSCore.ScriptableObjects {
                     crouch_idle);
             stand_move
                 .To(state => state.fall, stand_fall)
+                .To(state => state.dive, crawl_dive)
                 .To(state => state.stance != PlayerStance.STANDING || !state.sprint, defaultSpeed, 0f, crouch_move)
                 .To(state => !state.move, stand_idle)
                 .To(state => state.scope, crouch_tobino)
@@ -83,6 +86,7 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.move, crouch_idle_bino);
             crouch_tobino
                 .To(state => state.fall, stand_fall)
+                .To(state => state.dive, crawl_dive)
                 .To(state => state.move && state.sprint, scopingSpeed, 0f, stand_move)
                 .To(state => state.move && state.scope, scopingSpeed, 0f, crouch_move_bino)
                 .To(state => state.move && !state.scope, scopingSpeed, 0f, crouch_move)
@@ -90,6 +94,7 @@ namespace OSCore.ScriptableObjects {
                 .To(state => !state.move && !state.scope, scopingSpeed, 0f, crouch_idle);
             crouch_idle
                 .To(state => state.fall, stand_fall)
+                .To(state => state.dive, crawl_dive)
                 .To(state => state.stance == PlayerStance.CRAWLING, defaultSpeed, 0f, crawl_idle)
                 .To(state => state.move, crouch_move)
                 .To(state => state.scope, crouch_tobino)
@@ -97,6 +102,7 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.attack, crouch_punch);
             crouch_move
                 .To(state => state.fall, stand_fall)
+                .To(state => state.dive, crawl_dive)
                 .To(state => state.sprint, defaultSpeed, 0.5f, stand_move)
                 .To(state => state.stance == PlayerStance.CRAWLING, defaultSpeed, 0f, crawl_move)
                 .To(state => !state.move, crouch_idle)
@@ -109,6 +115,7 @@ namespace OSCore.ScriptableObjects {
                 .To(state => !state.move, punchingSpeed, 0f, crouch_idle);
             crouch_toaim
                 .To(state => state.fall, stand_fall)
+                .To(state => state.dive, crawl_dive)
                 .To(state => state.move && state.sprint, aimingSpeed, 0f, stand_move)
                 .To(state => state.move && state.aim, aimingSpeed, 0f, crouch_move_aim)
                 .To(state => state.move && !state.aim, aimingSpeed, 0f, crouch_move)
@@ -170,6 +177,9 @@ namespace OSCore.ScriptableObjects {
             crawl_fire
                 .To(state => state.fall, stand_fall)
                 .To(state => !state.attack, firingSpeed, 0f, crawl_idle_aim);
+            crawl_dive
+                .To(state => state.fall, 0.5f, 0f, stand_fall)
+                .To(state => !state.fall, crawl_idle);
 
 
             hang_lunge
@@ -191,6 +201,7 @@ namespace OSCore.ScriptableObjects {
         public record PlayerAnimState : AnimStateDetails<PlayerAnim> {
             public PlayerStance stance { get; init; }
             public bool fall { get; init; }
+            public bool dive { get; init; }
             public bool move { get; init; }
             public bool sprint { get; init; }
             public bool hang { get; init; }

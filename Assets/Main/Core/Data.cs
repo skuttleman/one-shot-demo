@@ -60,6 +60,7 @@ namespace OSCore.Data {
             public record AttackInput(bool isAttacking) : PlayerControllerInput();
             public record DamageInput(float damage) : PlayerControllerInput();
             public record StanceInput() : PlayerControllerInput();
+            public record DiveInput() : PlayerControllerInput();
             public record ScopeInput(bool isScoping) : PlayerControllerInput();
             public record ClimbInput(ClimbDirection direction) : PlayerControllerInput();
 
@@ -121,6 +122,7 @@ namespace OSCore.Data {
             crawl_toaim,
             crawl_idle_aim,
             crawl_fire,
+            crawl_dive,
 
             hang_lunge,
             hang_idle,
