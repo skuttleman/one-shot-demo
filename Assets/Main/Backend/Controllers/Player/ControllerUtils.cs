@@ -42,7 +42,6 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.STANDING,
                     attackMode = AttackMode.HAND,
                     isMoving = false,
-                    isSprinting = false,
                 },
                 PlayerAnim.stand_move => state with {
                     stance = PlayerStance.STANDING,
@@ -73,7 +72,6 @@ namespace OSBE.Controllers.Player {
                 PlayerAnim.crouch_tobino => state with {
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.NONE,
-                    isSprinting = false,
                     isScoping = true,
                 },
                 PlayerAnim.crouch_idle => state with {
@@ -87,7 +85,6 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.HAND,
                     isMoving = true,
-                    isSprinting = false,
                     isScoping = false,
                 },
                 PlayerAnim.crouch_punch => state with {
@@ -97,7 +94,6 @@ namespace OSBE.Controllers.Player {
                 PlayerAnim.crouch_toaim => state with {
                     stance = PlayerStance.CROUCHING,
                     attackMode = AttackMode.NONE,
-                    isSprinting = false,
                 },
                 PlayerAnim.crouch_idle_aim => state with {
                     stance = PlayerStance.CROUCHING,
@@ -153,7 +149,6 @@ namespace OSBE.Controllers.Player {
                     stance = PlayerStance.STANDING,
                     controls = PlayerInputControlMap.None,
                     isMoving = false,
-                    isSprinting = false,
                 },
                 PlayerAnim.hang_idle => state with {
                     controls = PlayerInputControlMap.LedgeHang,

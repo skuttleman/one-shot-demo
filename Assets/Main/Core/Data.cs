@@ -40,7 +40,6 @@ namespace OSCore.Data {
         public PlayerStance stance { get; init; }
         public bool isHanging { get; init; }
         public bool isMoving { get; init; }
-        public bool isSprinting { get; init; }
         public bool isScoping { get; init; }
         public bool isAiming { get; init; }
         public bool isAttacking { get; init; }

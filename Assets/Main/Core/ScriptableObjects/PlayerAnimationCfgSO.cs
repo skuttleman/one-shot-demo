@@ -201,14 +201,14 @@ namespace OSCore.ScriptableObjects {
         public record PlayerAnimState : AnimStateDetails<PlayerAnim> {
             public PlayerStance stance { get; init; }
             public bool fall { get; init; }
-            public bool dive { get; init; }
-            public bool move { get; init; }
             public bool sprint { get; init; }
+            public bool dive { get; init; }
+            public bool attack { get; init; }
+            public bool move { get; init; }
             public bool hang { get; init; }
             public bool climb { get; init; }
             public bool scope { get; init; }
             public bool aim { get; init; }
-            public bool attack { get; init; }
         }
     }
 }

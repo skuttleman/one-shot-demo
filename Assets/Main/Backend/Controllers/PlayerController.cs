@@ -34,7 +34,6 @@ namespace OSBE.Controllers {
             stance = PlayerStance.STANDING,
             attackMode = AttackMode.HAND,
             isMoving = false,
-            isSprinting = false,
             isScoping = false,
             isGrounded = true,
             movement = Vector2.zero,

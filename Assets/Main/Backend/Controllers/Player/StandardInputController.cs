@@ -211,7 +211,7 @@ namespace OSBE.Controllers.Player {
 
         private void OnSprintInput(bool isSprinting) {
             if (isSprinting && ControllerUtils.CanSprint(controller.state))
-                anim.Transition(state => state with { sprint = isSprinting });
+                anim.Transition(state => state with { sprint = isSprinting, stance = PlayerStance.STANDING });
         }
 
         private void OnLookInput(Vector2 direction, bool isMouse) {
