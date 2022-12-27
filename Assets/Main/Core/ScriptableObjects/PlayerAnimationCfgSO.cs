@@ -133,9 +133,10 @@ namespace OSCore.ScriptableObjects {
             crawl_idle_bino
                 .To(state => state.fall, stand_fall)
                 .To(state => state.stance != PlayerStance.CRAWLING, defaultSpeed, 0f, crouch_idle_bino)
-                .To(state => !state.scope, crawl_tobino);
+                .To(state => !state.scope || state.move, crawl_tobino);
             crawl_tobino
                 .To(state => state.fall, stand_fall)
+                .To(state => state.move, scopingSpeed, 0f, crawl_move)
                 .To(state => state.scope, scopingSpeed, 0f, crawl_idle_bino)
                 .To(state => !state.scope, scopingSpeed, 0f, crawl_idle);
             crawl_idle
@@ -156,12 +157,13 @@ namespace OSCore.ScriptableObjects {
                 .To(state => !state.move, punchingSpeed, 0f, crawl_idle);
             crawl_toaim
                 .To(state => state.fall, stand_fall)
+                .To(state => state.move, scopingSpeed, 0f, crawl_move)
                 .To(state => state.aim, aimingSpeed, 0f, crawl_idle_aim)
                 .To(state => !state.aim, aimingSpeed, 0f, crawl_idle);
             crawl_idle_aim
                 .To(state => state.fall, stand_fall)
                 .To(state => state.stance != PlayerStance.CRAWLING, defaultSpeed, 0f, crouch_idle_aim)
-                .To(state => !state.aim, crawl_toaim)
+                .To(state => !state.aim || state.move, crawl_toaim)
                 .To(state => state.attack, crawl_fire);
             crawl_fire
                 .To(state => state.fall, stand_fall)
