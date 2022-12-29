@@ -35,6 +35,7 @@ namespace OSCore.Data {
         public Collider ledge { get; init; }
         public Vector3 hangingPoint { get; init; }
         public float mouseLookTimer { get; init; }
+        public float tbdTimer { get; init; }
 
         public PlayerAnim anim { get; init; }
         public PlayerStance stance { get; init; }
@@ -62,6 +63,7 @@ namespace OSCore.Data {
             public record DiveInput() : PlayerControllerInput();
             public record ScopeInput(bool isScoping) : PlayerControllerInput();
             public record ClimbInput(ClimbDirection direction) : PlayerControllerInput();
+            public record TBDInput() : PlayerControllerInput();
 
             private PlayerControllerInput() { }
         }

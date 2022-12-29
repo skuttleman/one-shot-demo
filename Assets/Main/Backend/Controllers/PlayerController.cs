@@ -23,6 +23,8 @@ namespace OSBE.Controllers {
         IPlayerMainController,
         IStateReceiver<PlayerAnim> {
         [SerializeField] private PlayerCfgSO cfg;
+        [SerializeField] private Transform tbdEffect;
+        [SerializeField] private Transform tbdEffect2;
 
         private PlayerAnimator anim;
         private PlayerInput input;
@@ -31,6 +33,7 @@ namespace OSBE.Controllers {
             anim = PlayerAnim.crouch_idle,
             controls = PlayerInputControlMap.Standard,
             mouseLookTimer = 0f,
+            tbdTimer = 0f,
             stance = PlayerStance.STANDING,
             attackMode = AttackMode.HAND,
             isMoving = false,
@@ -75,12 +78,16 @@ namespace OSBE.Controllers {
         public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn) {
             PlayerControllerState nextState = updateFn(state);
 
+            if (nextState.tbdTimer == cfg.tbdCooldown && state.tbdTimer != nextState.tbdTimer) {
+                StartCoroutine(InitiateTBD());
+            }
+
             bool controlsChanged = state.controls != nextState.controls;
             if (controlsChanged) Controller().OnDeactivate();
             state = nextState;
             if (controlsChanged) Controller().OnActivate();
 
-            return state;
+            return nextState;
         }
 
         private void ManageAnim(PlayerControllerState prevState, PlayerAnim prev, PlayerAnim curr) {
@@ -121,6 +128,32 @@ namespace OSBE.Controllers {
                 .FindInChildren(transform, xform => xform.name == name)
                 .First()
                 .gameObject;
+
+        private IEnumerator<YieldInstruction> InitiateTBD() {
+            while (Time.timeScale > cfg.tbdMinTime) {
+                Time.timeScale = Mathf.Max(cfg.tbdMinTime, Time.timeScale - (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
+                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(20, 20, 20), 1 - Time.timeScale);
+                yield return new WaitForEndOfFrame();
+            }
+            yield return new WaitForSeconds(cfg.tbdMinTimeDuration);
+
+            while (Time.timeScale < cfg.tbdMaxTime) {
+                Time.timeScale = Mathf.Min(cfg.tbdMaxTime, Time.timeScale + (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
+                tbdEffect2.localScale = Vector3.Lerp(
+                    new(0, 0, 0),
+                    new(20, 20, 20),
+                    1 - (cfg.tbdMaxTime - Time.timeScale));
+                yield return new WaitForEndOfFrame();
+            }
+            yield return new WaitForSeconds(cfg.tbdMaxTimeDuration);
+
+            while (Time.timeScale > 1f) {
+                Time.timeScale = Mathf.Max(1f, Time.timeScale - (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
+                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(20, 20, 20), (Time.timeScale  - 1) / (cfg.tbdMaxTime - 1));
+                tbdEffect2.localScale = Vector3.Lerp(new(0, 0, 0), new(20, 20, 20), (Time.timeScale  - 1) / (cfg.tbdMaxTime - 1));
+                yield return new WaitForEndOfFrame();
+            }
+        }
 
         /*
          * Lifecycle Methods

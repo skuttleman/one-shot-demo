@@ -39,3 +39,9 @@ MonoBehaviour:
   <aimFactor>k__BackingField: 0.9
   <diveForce>k__BackingField: 60
   <hangMoveAmount>k__BackingField: 0.15
+  <tbdCooldown>k__BackingField: 5
+  <tbdMinTime>k__BackingField: 0.2
+  <tbdMinTimeDuration>k__BackingField: 0.5
+  <tbdMaxTime>k__BackingField: 3
+  <tbdMaxTimeDuration>k__BackingField: 0.05
+  <tbdTransitionSpeed>k__BackingField: 0.075

@@ -47,14 +47,18 @@ namespace OSBE.Controllers.Player {
                 case ScopeInput ev: OnScopeInput(ev.isScoping); break;
                 case AimInput ev: OnAimInput(ev.isAiming); break;
                 case AttackInput ev: OnAttackInput(ev.isAttacking); break;
+                case TBDInput: OnTBDInput(); break;
             }
         }
 
         public void OnUpdate() {
-            if (controller.state.mouseLookTimer > 0f)
-                controller.UpdateState(mainState => mainState with {
-                    mouseLookTimer = controller.state.mouseLookTimer - Time.deltaTime
-                });
+            controller.UpdateState(mainState => {
+                if (mainState.mouseLookTimer > 0f)
+                    mainState = mainState with { mouseLookTimer = mainState.mouseLookTimer - Time.deltaTime };
+                if (mainState.tbdTimer > 0f)
+                    mainState = mainState with { tbdTimer = mainState.tbdTimer - Time.deltaTime };
+                return mainState;
+            });
 
             RotatePlayer(ControllerUtils.MoveCfg(cfg, controller.state));
         }
@@ -245,6 +249,12 @@ namespace OSBE.Controllers.Player {
         private void OnAttackInput(bool isAttacking) {
             if (isAttacking && ControllerUtils.CanAttack(controller.state.attackMode))
                 anim.Transition(state => state with { attack = isAttacking });
+        }
+
+        private void OnTBDInput() {
+            if (controller.state.tbdTimer <= 0f) {
+                controller.UpdateState(state => state with { tbdTimer = cfg.tbdCooldown });
+            }
         }
 
         private void TransitionToLedgeHang(Collider ledge) {

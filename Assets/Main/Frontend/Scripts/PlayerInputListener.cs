@@ -47,6 +47,10 @@ namespace OSFE.Scripts {
             controller.On(new ClimbInput(ClimbDirection.DOWN));
         }
 
+        public void OnTBD(InputValue _) {
+            controller.On(new TBDInput());
+        }
+
         /*
          * Lifecycle Methods
          */

@@ -38,7 +38,7 @@
                     "id": "2e524a64-639d-4826-a113-7e61d939c515",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "MultiTap(tapDelay=0.1),Tap(pressPoint=0.1)",
+                    "interactions": "MultiTap(tapDelay=0.15),Tap(pressPoint=0.15)",
                     "initialStateCheck": false
                 },
                 {
@@ -81,6 +81,15 @@
                     "name": "MoveSlow",
                     "type": "Button",
                     "id": "238eae1b-3c24-4aa0-8515-6426a6f87e1d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "TBD",
+                    "type": "Button",
+                    "id": "03187ada-bac8-4926-b69c-97fd2e5bbf25",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -294,6 +303,28 @@
                     "processors": "",
                     "groups": "Mouse + Keyboard",
                     "action": "MoveSlow",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3645d202-5cd2-4eb2-ad78-7ffdb933b0e3",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "TBD",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2bc760b1-33bf-401f-b649-dc2feb9e4b80",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse + Keyboard",
+                    "action": "TBD",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

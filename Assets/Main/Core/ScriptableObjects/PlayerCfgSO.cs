@@ -22,6 +22,14 @@ namespace OSCore.ScriptableObjects {
         [field: Header("LedgeHang")]
         [field: SerializeField] public float hangMoveAmount { get; private set; }
 
+        [field: Header("TBD")]
+        [field: SerializeField] public float tbdCooldown { get; private set; }
+        [field: SerializeField] public float tbdMinTime { get; private set; }
+        [field: SerializeField] public float tbdMinTimeDuration { get; private set; }
+        [field: SerializeField] public float tbdMaxTime { get; private set; }
+        [field: SerializeField] public float tbdMaxTimeDuration { get; private set; }
+        [field: SerializeField] public float tbdTransitionSpeed { get; private set; }
+
         [Serializable]
         public struct MoveConfig {
             [field: SerializeField] public float moveSpeed { get; private set; }
