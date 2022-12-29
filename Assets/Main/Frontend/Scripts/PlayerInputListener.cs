@@ -56,7 +56,7 @@ namespace OSFE.Scripts {
          */
 
         private void Start() {
-            controller = Transforms.Entity(transform)
+            controller = Transforms.Body(transform)
                 .GetComponent<IController<PlayerControllerInput>>();
             GetComponent<PlayerInput>()
                 .currentActionMap

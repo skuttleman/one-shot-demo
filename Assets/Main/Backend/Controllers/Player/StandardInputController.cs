@@ -82,7 +82,7 @@ namespace OSBE.Controllers.Player {
         public bool GroundPlayer(bool prevGrounded) {
             bool isGrounded = Physics.Raycast(
                 transform.position - new Vector3(0, 0, 0.01f),
-                Vectors.DOWN,
+                Vector3.down,
                 out RaycastHit ground,
                 cfg.groundedDist,
                 ~0,
@@ -105,7 +105,7 @@ namespace OSBE.Controllers.Player {
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
             switch ((prev, curr)) {
                 case (_, PlayerAnim.crawl_dive):
-                    rb.AddRelativeForce((Vectors.FORWARD + Vectors.UP) * cfg.diveForce);
+                    rb.AddRelativeForce((Vector3.forward + Vector3.up) * cfg.diveForce);
                     break;
             }
         }
@@ -122,10 +122,10 @@ namespace OSBE.Controllers.Player {
                 direction = controller.state.movement;
             else return;
 
-            float rotationZ = Vectors.AngleTo(Vector2.zero, direction);
+            float rotationY = Vectors.AngleTo(Vector2.zero, direction);
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
-                Quaternion.Euler(0f, 0f, rotationZ),
+                Quaternion.Euler(0f, -rotationY, 0f),
                 moveCfg.rotationSpeed * Time.deltaTime);
         }
 
@@ -150,7 +150,7 @@ namespace OSBE.Controllers.Player {
                     anim.SetSpeed(animSpeed * Time.fixedDeltaTime);
 
                     if (controller.state.stance == PlayerStance.STANDING)
-                        rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);
+                        rb.AddRelativeForce(Vector3.forward * dir.magnitude);
                     else rb.AddForce(dir);
                 }
             }
@@ -180,8 +180,12 @@ namespace OSBE.Controllers.Player {
             return speed;
         }
 
-        private Vector3 MoveDirection(MoveConfig moveCfg, float speed, float forceZ) {
-            Vector3 dir = speed * controller.state.movement.Upgrade(-forceZ);
+        private Vector3 MoveDirection(MoveConfig moveCfg, float speed, float forceY) {
+            Vector3 dir = speed * new Vector3(
+                controller.state.movement.x,
+                forceY,
+                controller.state.movement.y);
+            controller.state.movement.Upgrade(-forceY);
             float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
 
             if (velocityDiff < moveCfg.maxVelocitydamper)
@@ -264,7 +268,7 @@ namespace OSBE.Controllers.Player {
 
             if (CanTransition(nextPlayerPos)) {
                 anim.transform.localPosition = anim.transform.localPosition
-                    .WithZ(anim.transform.localPosition.z - 0.6f);
+                    .WithY(anim.transform.localPosition.y + 0.6f);
                 anim.Transition(state => state with { hang = true });
 
                 TransitionState(ledge, pt, nextPlayerPos);
@@ -274,7 +278,7 @@ namespace OSBE.Controllers.Player {
         private bool CanTransition(Vector3 nextPlayerPos) =>
             anim.state != PlayerAnim.crawl_dive
             && Vector3.Distance(nextPlayerPos, transform.position) <= 0.35f
-            && (!Physics.Raycast(nextPlayerPos, Vectors.DOWN, out RaycastHit ground, 1000f)
+            && (!Physics.Raycast(nextPlayerPos, Vector3.down, out RaycastHit ground, 1000f)
                 || ground.distance >= 0.6f);
 
         private void TransitionState(Collider ledge, Vector3 pt, Vector3 nextPlayerPos) {

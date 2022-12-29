@@ -17,7 +17,7 @@ namespace OSFE.Scripts {
 
         private void Start() {
             rb = GetComponent<Rigidbody>();
-            rb.AddRelativeForce(Vectors.FORWARD * 150f);
+            rb.AddRelativeForce(Vector3.forward * 150f);
             StartCoroutine(Monos.After(5f, () => Destroy(gameObject)));
         }
     }

@@ -27,24 +27,25 @@ namespace OSBE.Controllers {
         }
 
         private void LateUpdate() {
-            if (cfg != null) {
-                float delta = Time.deltaTime / 1.75f;
-                if (isScoping) alpha += delta;
-                else alpha -= delta;
-                alpha = Mathf.Clamp(alpha, -0.1f, cfg.maxOverlayAlpha);
+            float delta = Time.deltaTime / 1.75f;
+            if (isScoping) alpha += delta;
+            else alpha -= delta;
+            alpha = Mathf.Clamp(alpha, -0.1f, cfg.maxOverlayAlpha);
 
-                float overlayAngle = Vectors.AngleTo(player.position, transform.parent.position);
-                if (Vectors.NonZero(player.position.Downgrade() - transform.parent.position.Downgrade())) {
-                    transform.rotation = Quaternion.Euler(
-                        0f,
-                        0f,
-                        overlayAngle);
-                } else {
-                    transform.rotation = player.rotation;
-                }
-
-                rdr.color = new(rdr.color.r, rdr.color.g, rdr.color.b, Mathf.Max(0f, alpha));
+            float overlayAngle = Vectors.AngleTo(new(
+                player.position.x - transform.position.x,
+                player.position.z - transform.position.z));
+            Debug.Log("overlayAngle " + overlayAngle);
+            if (Vectors.NonZero(player.position.WithY(0) - transform.parent.position.WithY(0))) {
+                transform.rotation = Quaternion.Euler(
+                    90f,
+                    -overlayAngle,
+                    0f);
+            } else {
+                transform.rotation = player.rotation;
             }
+
+            rdr.color = new(rdr.color.r, rdr.color.g, rdr.color.b, Mathf.Max(0f, alpha));
         }
     }
 }

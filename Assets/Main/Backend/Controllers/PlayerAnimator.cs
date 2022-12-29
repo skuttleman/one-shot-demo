@@ -11,7 +11,7 @@ namespace OSBE.Controllers {
 
         private void Start() {
             IStateReceiver<PlayerAnim> receiver = Transforms
-                .Entity(transform)
+                .Body(transform)
                 .GetComponentInChildren<IStateReceiver<PlayerAnim>>();
             Init(receiver, cfg.Init(), new() {
                 fall = false,

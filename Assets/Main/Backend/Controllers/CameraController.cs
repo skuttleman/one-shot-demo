@@ -42,22 +42,23 @@ namespace OSBE.Controllers {
         }
 
         private void SetOffset() {
-            Vector3 rotFactor = LookAheadOffset();
+            float rotFactor = LookAheadOffset();
+            Vector3 angle = Vectors.ToVector3(player.rotation.eulerAngles.y - 90);
 
             camOffset.m_Offset = Vector3.Lerp(
                 camOffset.m_Offset,
-                player.rotation * rotFactor,
+                rotFactor * new Vector3(angle.x, -angle.y, 0f),
                 cfg.orbitSpeed * Time.deltaTime);
         }
 
-        private Vector3 LookAheadOffset() {
+        private float LookAheadOffset() {
             float lookAhead = 0f;
 
             if (IsAiming()) lookAhead += cfg.aimOffset;
             else if (isScoping) lookAhead = 0f;
             if (isMoving) lookAhead += cfg.moveOffset;
 
-            return new(0f, Mathf.Clamp(lookAhead, 0f, cfg.maxLookAhead), 0f);
+            return Mathf.Clamp(lookAhead, 0f, cfg.maxLookAhead);
         }
 
         private bool IsAiming() =>

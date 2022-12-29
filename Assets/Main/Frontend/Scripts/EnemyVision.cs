@@ -20,7 +20,7 @@ namespace OSFE.Scripts {
         }
 
         private void Start() {
-            Transform entity = Transforms.Entity(transform);
+            Transform entity = Transforms.Body(transform);
             controller = entity.GetComponent<IController<EnemyControllerInput>>();
             rdr = entity.GetComponentInChildren<SpriteRenderer>();
         }
@@ -53,7 +53,7 @@ namespace OSFE.Scripts {
                 position - playerEyes,
                 out RaycastHit hit,
                 Vector3.Distance(transform.parent.parent.position, playerEyes),
-                1 << LayerMask.NameToLayer("Walls"));
+                1 << LayerMask.NameToLayer("Geometry"));
 
             if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
             else timeSinceSeeable = -0.25f;

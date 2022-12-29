@@ -66,7 +66,7 @@ namespace OSBE.Controllers {
 
         private void Start() {
             anim = GetComponentInChildren<EnemyAnimator>();
-            speech = Transforms.Entity(transform)
+            speech = Transforms.Body(transform)
                 .parent
                 .gameObject
                 .GetComponentInChildren<TextMeshPro>();
@@ -158,9 +158,9 @@ namespace OSBE.Controllers {
         private IEnumerable<float> Face(Vector3 rotation) =>
             Face(Vectors.AngleTo(transform.position, rotation));
 
-        private IEnumerable<float> Face(float rotationZ) {
-            while (Mathf.Abs(transform.rotation.eulerAngles.z - rotationZ) % 360 > cfg.rotationSpeed * Time.fixedDeltaTime) {
-                DoFace(rotationZ);
+        private IEnumerable<float> Face(float rotationY) {
+            while (Mathf.Abs(transform.rotation.eulerAngles.y + rotationY) % 360 > cfg.rotationSpeed * Time.fixedDeltaTime) {
+                DoFace(rotationY);
                 yield return 0;
             }
         }
@@ -169,10 +169,10 @@ namespace OSBE.Controllers {
             DoFace(Vectors.AngleTo(transform.position, rotation));
         }
 
-        private void DoFace(float rotationZ) {
+        private void DoFace(float rotationY) {
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
-                Quaternion.Euler(0f, 0f, rotationZ),
+                Quaternion.Euler(0f, -rotationY, 0f),
                 cfg.rotationSpeed * Time.fixedDeltaTime);
         }
 

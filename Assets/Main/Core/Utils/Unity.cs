@@ -15,9 +15,9 @@ namespace OSCore.Utils {
                 parent,
                 child => child.gameObject.activeInHierarchy && pred(child));
 
-        public static Transform Entity(Transform transform) {
+        public static Transform Body(Transform transform) {
             Transform entity = transform;
-            while (entity is not null && entity.name != "Entity") entity = entity.parent;
+            while (entity is not null && entity.name != "body") entity = entity.parent;
             return entity;
         }
 

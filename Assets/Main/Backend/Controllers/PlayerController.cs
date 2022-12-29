@@ -177,10 +177,10 @@ namespace OSBE.Controllers {
 
         private void Update() {
             if (Vectors.NonZero(state.facing)) {
-                float rotationZ = Vectors.AngleTo(Vector2.zero, state.facing);
+                float rotationY = Vectors.AngleTo(Vector2.zero, state.facing);
                 transform.rotation = Quaternion.Lerp(
                     transform.rotation,
-                    Quaternion.Euler(0f, 0f, rotationZ),
+                    Quaternion.Euler(0f, -rotationY, 0f),
                     cfg.crouching.rotationSpeed * Time.deltaTime);
             }
 

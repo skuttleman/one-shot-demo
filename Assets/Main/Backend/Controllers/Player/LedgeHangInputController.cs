@@ -42,12 +42,12 @@ namespace OSBE.Controllers.Player {
             controller.UpdateState(state => state with { facing = Vector2.zero });
 
             float angleToPoint = Mathf.Round(Vectors.AngleTo(transform.position - controller.state.hangingPoint));
-            transform.rotation = Quaternion.Euler(0f, 0f, angleToPoint);
+            transform.rotation = Quaternion.Euler(0f, -angleToPoint, 0f);
             playerCollider = transform.GetComponentInChildren<CapsuleCollider>();
 
             rb.velocity = Vector3.zero;
             rb.isKinematic = true;
-            transform.position = transform.position.WithZ(controller.state.hangingPoint.z + 0.6f);
+            transform.position = transform.position.WithY(controller.state.hangingPoint.y - 0.6f);
         }
 
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
@@ -65,8 +65,8 @@ namespace OSBE.Controllers.Player {
         private void OnClimbDown() {
             anim.Transition(state => state with { fall = true, hang = false });
 
-            float pointZ = controller.state.hangingPoint.z;
-            transform.position = transform.position.WithZ(pointZ + 0.55f);
+            float pointY = controller.state.hangingPoint.y;
+            transform.position = transform.position.WithY(pointY - 0.55f);
         }
 
         private void OnMovementInput(Vector2 direction) {
