@@ -35,7 +35,6 @@ namespace OSBE.Controllers {
             float overlayAngle = Vectors.AngleTo(new(
                 player.position.x - transform.position.x,
                 player.position.z - transform.position.z));
-            Debug.Log("overlayAngle " + overlayAngle);
             if (Vectors.NonZero(player.position.WithY(0) - transform.parent.position.WithY(0))) {
                 transform.rotation = Quaternion.Euler(
                     90f,
