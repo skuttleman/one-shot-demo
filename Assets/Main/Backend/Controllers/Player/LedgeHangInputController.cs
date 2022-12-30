@@ -30,7 +30,7 @@ namespace OSBE.Controllers.Player {
             switch (e) {
                 case ClimbInput ev:
                     anim.transform.localPosition = anim.transform.localPosition
-                        .WithZ(anim.transform.localPosition.z + 0.6f);
+                        .WithY(anim.transform.localPosition.y + 0.6f);
                     if (ev.direction == ClimbDirection.UP) OnClimbUp();
                     else OnClimbDown();
                     break;

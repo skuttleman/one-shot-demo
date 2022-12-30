@@ -32,9 +32,7 @@ namespace OSBE.Controllers {
             else alpha -= delta;
             alpha = Mathf.Clamp(alpha, -0.1f, cfg.maxOverlayAlpha);
 
-            float overlayAngle = Vectors.AngleTo(new(
-                player.position.x - transform.position.x,
-                player.position.z - transform.position.z));
+            float overlayAngle = Vectors.AngleTo(player.position - transform.position);
             if (Vectors.NonZero(player.position.WithY(0) - transform.parent.position.WithY(0))) {
                 transform.rotation = Quaternion.Euler(
                     90f,
