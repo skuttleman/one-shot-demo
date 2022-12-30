@@ -14,7 +14,6 @@ using UnityEngine;
 using static OSCore.Data.Controllers.EnemyControllerInput;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 using static OSCore.Data.Patrol.EnemyPatrol;
-using System;
 
 namespace OSBE.Controllers {
     public class EnemyController : ASystemInitializer<MovementChanged>, IController<EnemyControllerInput>, IStateReceiver<EnemyAnim> {
@@ -153,7 +152,7 @@ namespace OSBE.Controllers {
                         xform,
                         tpl.Item2.Concat(Sequences.Empty<EnemyPatrol>()
                             .ConsIf(waitTime > 0, new PatrolWait(waitTime))
-                            .Cons(new PatrolRotate(xform.rotation.eulerAngles.y))
+                            .ConsIf(waitTime > 0, new PatrolRotate(xform.rotation.eulerAngles.y))
                             .ConsIf(notFirstStep, new PatrolGoto(xform.position))));
                 },
                 (transform, Sequences.Empty<EnemyPatrol>()))
