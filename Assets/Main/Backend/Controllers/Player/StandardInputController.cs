@@ -81,7 +81,7 @@ namespace OSBE.Controllers.Player {
 
         public bool GroundPlayer(bool prevGrounded) {
             bool isGrounded = Physics.Raycast(
-                transform.position - new Vector3(0, 0, 0.01f),
+                transform.position - new Vector3(0, -0.01f, 0f),
                 Vector3.down,
                 out RaycastHit ground,
                 cfg.groundedDist,
@@ -92,10 +92,13 @@ namespace OSBE.Controllers.Player {
                 ground = ground,
             });
 
-            if (prevGrounded && !isGrounded)
+            if (prevGrounded && !isGrounded) {
+                //Debug.Log("FALLING");
                 anim.Transition(state => state with { fall = true });
-            else if (!prevGrounded && isGrounded)
+            } else if (!prevGrounded && isGrounded) {
+                //Debug.Log("LANDING");
                 anim.Transition(state => state with { fall = false });
+            }
 
             MovePlayer(ControllerUtils.MoveCfg(cfg, controller.state));
 
@@ -132,17 +135,19 @@ namespace OSBE.Controllers.Player {
         private void MovePlayer(MoveConfig moveCfg) {
             if (CanMove()) {
                 bool isMoving = Vectors.NonZero(controller.state.movement);
-                float forceZ = controller.state.ground.transform.rotation != Quaternion.identity && isMoving
-                    ? (Vector3.Angle(controller.state.ground.normal, controller.state.movement) - 90f) / 90f
+                float forceY = controller.state.ground.transform.rotation != Quaternion.identity && isMoving
+                    ? (Vector3.Angle(controller.state.ground.normal, controller.state.movement) + 90f) / 90f
                     : 0f;
+
                 float speed = MoveSpeed(moveCfg);
                 float movementSpeed = Mathf.Max(
                     Mathf.Abs(controller.state.movement.x),
                     Mathf.Abs(controller.state.movement.y));
-                bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
                 float currSpeed = anim.animSpeed;
                 float animSpeed = controller.state.isMoving ? movementSpeed * speed * moveCfg.animFactor : 1f;
-                Vector3 dir = MoveDirection(moveCfg, speed, forceZ);
+
+                Vector3 dir = MoveDirection(moveCfg, speed, forceY);
+                bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
 
                 PublishChanged(currSpeed, animSpeed, new MovementChanged(animSpeed));
 
@@ -185,7 +190,7 @@ namespace OSBE.Controllers.Player {
                 controller.state.movement.x,
                 forceY,
                 controller.state.movement.y);
-            controller.state.movement.Upgrade(-forceY);
+            controller.state.movement.Upgrade(forceY);
             float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
 
             if (velocityDiff < moveCfg.maxVelocitydamper)
@@ -262,34 +267,37 @@ namespace OSBE.Controllers.Player {
         }
 
         private void TransitionToLedgeHang(Collider ledge) {
+            const float hardCodedFactor = 0.275f;
+
             Vector3 pt = ledge.ClosestPoint(transform.position);
-            Vector2 direction = (transform.position - pt).Downgrade().Directionify().normalized;
-            Vector3 nextPlayerPos = pt + (direction * 0.275f).Upgrade();
+            Vector3 direction = hardCodedFactor * (transform.position - pt).normalized;
+            Vector3 nextPlayerPos = pt + direction;
 
             if (CanTransition(nextPlayerPos)) {
                 anim.transform.localPosition = anim.transform.localPosition
                     .WithY(anim.transform.localPosition.y + 0.6f);
                 anim.Transition(state => state with { hang = true });
 
-                TransitionState(ledge, pt, nextPlayerPos);
+                TransitionLedgeHangState(ledge, pt, nextPlayerPos);
             }
         }
 
         private bool CanTransition(Vector3 nextPlayerPos) =>
             anim.state != PlayerAnim.crawl_dive
-            && Vector3.Distance(nextPlayerPos, transform.position) <= 0.35f
-            && (!Physics.Raycast(nextPlayerPos, Vector3.down, out RaycastHit ground, 1000f)
-                || ground.distance >= 0.6f);
+                && Vector3.Distance(nextPlayerPos, transform.position) <= 0.35f
+                && (!Physics.Raycast(nextPlayerPos, Vector3.down, out RaycastHit ground, 1000f)
+                    || ground.distance >= 0.6f);
 
-        private void TransitionState(Collider ledge, Vector3 pt, Vector3 nextPlayerPos) {
+        private void TransitionLedgeHangState(Collider ledge, Vector3 pt, Vector3 nextPlayerPos) {
             transform.position = nextPlayerPos;
             rb.velocity = Vector3.zero;
-            Vector2 facing = pt - nextPlayerPos;
+            Vector3 rawFacing = pt - nextPlayerPos;
+            Vector2 facing = new(rawFacing.x, -rawFacing.z);
             controller.UpdateState(state => state with {
                 movement = Vector3.zero,
                 isMoving = false,
                 controls = PlayerInputControlMap.None,
-                facing = facing,
+                facing = facing.Directionify(),
                 ledge = ledge,
                 hangingPoint = pt,
             });

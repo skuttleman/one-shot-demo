@@ -99,6 +99,7 @@ namespace OSBE.Controllers {
                 case PlayerAnim.crouch_move_aim:
                 case PlayerAnim.crouch_move_bino:
                 case PlayerAnim.crawl_move:
+                case PlayerAnim.hang_lunge:
                     anim.SetSpeed(1f);
                     break;
             }
@@ -177,10 +178,9 @@ namespace OSBE.Controllers {
 
         private void Update() {
             if (Vectors.NonZero(state.facing)) {
-                float rotationY = Vectors.AngleTo(Vector2.zero, state.facing);
                 transform.rotation = Quaternion.Lerp(
                     transform.rotation,
-                    Quaternion.Euler(0f, -rotationY, 0f),
+                    Quaternion.LookRotation(new(state.facing.x, 0f, -state.facing.y)),
                     cfg.crouching.rotationSpeed * Time.deltaTime);
             }
 

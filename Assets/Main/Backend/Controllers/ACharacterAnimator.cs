@@ -20,6 +20,7 @@ namespace OSBE.Controllers {
             this.details = details;
             anim = GetComponent<Animator>();
             anim.speed = animSpeed;
+            Play(node.state);
             timeInState = 0f;
             receiver.OnStateInit(state);
         }
@@ -31,6 +32,7 @@ namespace OSBE.Controllers {
 
         public void Transition(Func<Details, Details> updateFn) {
             details = updateFn(details);
+            //Debug.Log("NEW STATE: " + details);
         }
 
         private void TransitionTo(AnimNode<State, Details> node) {
@@ -40,8 +42,13 @@ namespace OSBE.Controllers {
                 timeInState = 0f;
                 receiver.OnStateTransition(prev, state);
                 anim.speed = animSpeed * node.animSpeed;
-                anim.Play(node.state.ToString());
+                Play(node.state);
             }
+        }
+
+        private void Play(State state) {
+            anim.Play(state.ToString());
+            //Debug.Log("ANIMATING  " + state);
         }
 
         /*
