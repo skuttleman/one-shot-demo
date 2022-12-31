@@ -85,7 +85,7 @@ namespace OSBE.Controllers.Player {
                 Vector3.down,
                 out RaycastHit ground,
                 cfg.groundedDist,
-                ~0,
+                1 << LayerMask.NameToLayer("Geometry"),
                 QueryTriggerInteraction.Ignore);
             controller.UpdateState(state => state with {
                 isGrounded = isGrounded,
@@ -284,7 +284,9 @@ namespace OSBE.Controllers.Player {
             Vector3 rawFacing = pt - nextPlayerPos;
             Vector2 facing = new(rawFacing.x, -rawFacing.z);
             transform.position = nextPlayerPos;
+
             rb.velocity = Vector3.zero;
+            rb.isKinematic = true;
 
             controller.UpdateState(state => state with {
                 movement = Vector3.zero,

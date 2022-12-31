@@ -45,8 +45,6 @@ namespace OSBE.Controllers.Player {
             transform.rotation = Quaternion.Euler(0f, -angleToPoint, 0f);
             playerCollider = transform.GetComponentInChildren<CapsuleCollider>();
 
-            rb.velocity = Vector3.zero;
-            rb.isKinematic = true;
             transform.position = transform.position.WithY(controller.state.hangingPoint.y - 0.6f);
         }
 

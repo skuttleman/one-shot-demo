@@ -53,7 +53,7 @@ namespace OSFE.Scripts {
                 position - playerEyes,
                 out RaycastHit hit,
                 Vector3.Distance(transform.parent.parent.position, playerEyes),
-                1 << LayerMask.NameToLayer("Geometry"));
+                1 << LayerMask.NameToLayer("Opaque"));
 
             if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
             else timeSinceSeeable = -0.25f;
