@@ -84,30 +84,34 @@ namespace OSBE.Controllers.Player {
         }
 
         private void MovePlayer() {
-            transform.position += controller.state.movement.Upgrade();
+            Vector3 move = new(controller.state.movement.x, 0f, controller.state.movement.y);
+            transform.position += move;
             controller.UpdateState(state => state with {
-                hangingPoint = state.hangingPoint + state.movement.Upgrade(),
+                hangingPoint = state.hangingPoint + move,
             });
         }
 
         private bool CanMoveTo(Vector2 dir, Vector2 move) {
-            Vector3 nextHangingPoint = controller.state.hangingPoint + move.Upgrade();
-            Vector3 nextPlayerPos = transform.position + move.Upgrade();
+            Vector3 dir3 = new(dir.x, 0f, dir.y);
+            Vector3 move3 = new(move.x, 0f, move.y);
+
+            Vector3 nextHangingPoint = controller.state.hangingPoint + move3;
+            Vector3 nextPlayerPos = transform.position + move3;
             float heightAxis = (playerCollider.height + 0.1f) / 2f;
             Vector3 height = new(
                 playerCollider.direction == 0 ? heightAxis : 0,
                 playerCollider.direction == 1 ? heightAxis : 0,
                 playerCollider.direction == 2 ? heightAxis : 0);
 
-            return dir.magnitude > 0.5f
-                && Mathf.Abs(transform.rotation.eulerAngles.z - Vectors.AngleTo(dir)) % 180f == 90f
+            return dir3.magnitude > 0.5f
+                && Mathf.Abs(transform.rotation.eulerAngles.y - Vectors.AngleTo(dir3)) % 180f == 90f
                 && controller.state.ledge.ClosestPoint(nextHangingPoint) == nextHangingPoint
                 && controller.state.ledge.ClosestPoint(nextPlayerPos) != nextPlayerPos
                 && !Physics.CapsuleCast(
                     playerCollider.center + transform.position + height,
                     playerCollider.center + transform.position - height,
                     playerCollider.radius,
-                    move,
+                    move3,
                     cfg.hangMoveAmount);
         }
     }
