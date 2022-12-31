@@ -596,7 +596,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 136523897}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -627,7 +627,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 152140238}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2186,7 +2186,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 408304235}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2551,7 +2551,7 @@ GameObject:
   m_Component:
   - component: {fileID: 463120005}
   - component: {fileID: 463120006}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: crouch
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2637,7 +2637,7 @@ GameObject:
   - component: {fileID: 467042517}
   - component: {fileID: 467042520}
   - component: {fileID: 467042521}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3452,7 +3452,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 536051503}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3470,7 +3470,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 584960647}
   m_Father: {fileID: 578811401}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3620,7 +3621,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 556029934}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3748,7 +3749,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 571182063}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3825,7 +3826,7 @@ GameObject:
   m_Component:
   - component: {fileID: 578811401}
   - component: {fileID: 578811402}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: stand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3863,6 +3864,64 @@ CapsuleCollider:
   m_Height: 0.5
   m_Direction: 1
   m_Center: {x: 0, y: 0.25, z: 0}
+--- !u!1 &584960646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 584960647}
+  - component: {fileID: 584960648}
+  - component: {fileID: 584960649}
+  m_Layer: 9
+  m_Name: enemy-fov
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &584960647
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584960646}
+  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 536051503}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+--- !u!65 &584960648
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584960646}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3.5, y: 0.3, z: 3.4999995}
+  m_Center: {x: -1.75, y: -0.25, z: 1.75}
+--- !u!114 &584960649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584960646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fc1ff3ae1d84d3b9d4d192f590b8a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &603967981
 GameObject:
   m_ObjectHideFlags: 0
@@ -3957,7 +4016,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 614787066}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4348,7 +4407,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 687610067}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4887,7 +4946,7 @@ GameObject:
   - component: {fileID: 847248306}
   - component: {fileID: 847248305}
   - component: {fileID: 847248304}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5756,8 +5815,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 5
-  m_fontSizeBase: 5
+  m_fontSize: 2
+  m_fontSizeBase: 2
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5766,8 +5825,8 @@ MonoBehaviour:
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 1024
   m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
+  m_characterSpacing: 2
+  m_wordSpacing: -10
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
@@ -5780,7 +5839,7 @@ MonoBehaviour:
   m_enableKerning: 1
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
-  m_isRichText: 1
+  m_isRichText: 0
   m_parseCtrlCharacters: 1
   m_isOrthographic: 0
   m_isCullingEnabled: 0
@@ -5841,7 +5900,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1001 &1047466375
 PrefabInstance:
@@ -6634,7 +6693,7 @@ GameObject:
   - component: {fileID: 1171720041}
   - component: {fileID: 1171720040}
   - component: {fileID: 1171720039}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7136,7 +7195,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1274054073
 Transform:
   m_ObjectHideFlags: 0
@@ -7848,7 +7907,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1330168636}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8805,7 +8864,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1366392943}
   - component: {fileID: 1366392944}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: stand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10098,7 +10157,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1615333097}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11062,7 +11121,7 @@ GameObject:
   - component: {fileID: 1640291873}
   - component: {fileID: 1640291872}
   - component: {fileID: 1640291871}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11194,7 +11253,7 @@ GameObject:
   - component: {fileID: 1650226935}
   - component: {fileID: 1650226934}
   - component: {fileID: 1650226933}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13503,7 +13562,7 @@ GameObject:
   - component: {fileID: 1855521955}
   - component: {fileID: 1855521954}
   - component: {fileID: 1855521953}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: body
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -14065,7 +14124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1924212704}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14097,7 +14156,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1932101183}
   - component: {fileID: 1932101184}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: stand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14246,7 +14305,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1944339774}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14403,7 +14462,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1980334509}
   - component: {fileID: 1980334510}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: crawl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15038,7 +15097,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2108331360}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: feet
   m_TagString: Untagged
   m_Icon: {fileID: 0}

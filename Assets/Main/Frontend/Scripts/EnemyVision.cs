@@ -2,7 +2,6 @@ using OSCore.Data.Controllers;
 using OSCore.System.Interfaces.Controllers;
 using OSCore.System;
 using OSCore.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 using static OSCore.Data.Controllers.EnemyControllerInput;
 
@@ -30,28 +29,27 @@ namespace OSFE.Scripts {
             Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.1f);
             rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
 
-            IEnumerable<RaycastHit> hits = Sequences.Transduce(
-                Physics.RaycastAll(
+            if (Physics.Raycast(
                     transform.parent.position,
                     playerPos - transform.parent.position,
-                    Vector3.Distance(playerPos, transform.parent.position)),
-                Fns.Filter<RaycastHit>(hit => !transform.IsChildOf(hit.transform)));
-
-             if (!hits.IsEmpty() && hits.First().transform.IsChildOf(player.transform))
-                los = true;
+                    out RaycastHit losHit,
+                    Vector3.Distance(playerPos, transform.parent.position),
+                    ~(1 << LayerMask.NameToLayer("Enemies"))))
+                if (losHit.transform.IsChildOf(player.transform))
+                    los = true;
 
             controller.On(new PlayerLOS(seesPlayer && los));
 
             Vector3 position = transform.parent.parent.position + new Vector3(0, 0, -0.1f);
-            Vector3 playerEyes = Transforms.FindInActiveChildren(
-                player.transform,
-                xform => xform.name == "head")
-                .First().position;
+            Vector3 playerEyes =
+                Transforms.FindInActiveChildren(player.transform, xform => xform.name == "head")
+                    .First()
+                    .position;
 
             bool isBlocked = Physics.Raycast(
                 playerEyes,
                 position - playerEyes,
-                out RaycastHit hit,
+                out RaycastHit blockedHit,
                 Vector3.Distance(transform.parent.parent.position, playerEyes),
                 1 << LayerMask.NameToLayer("Opaque"));
 
@@ -60,13 +58,16 @@ namespace OSFE.Scripts {
         }
 
         private void OnTriggerStay(Collider other) {
-            if (other.transform.IsChildOf(player.transform))
+            Debug.Log(other.transform.name);
+            if (other.transform.IsChildOf(player.transform)) {
                 seesPlayer = true;
+            }
         }
 
         private void OnTriggerExit(Collider other) {
-            if (other.transform.IsChildOf(player.transform))
+            if (other.transform.IsChildOf(player.transform)) {
                 seesPlayer = false;
+            }
         }
     }
 }

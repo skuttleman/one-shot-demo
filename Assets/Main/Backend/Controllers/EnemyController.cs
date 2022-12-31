@@ -90,7 +90,7 @@ namespace OSBE.Controllers {
         }
 
         private void FixedUpdate() {
-            speech.transform.position = transform.position + new Vector3(0f, 0.75f, 0f);
+            speech.transform.position = transform.position + new Vector3(0f, 0f, 0.75f);
             if (!state.isPlayerInView) timeSinceSeenPlayer += Time.fixedDeltaTime;
             if (isPlayerMoving) timeSincePlayerMoved = 0f;
             else timeSincePlayerMoved += Time.fixedDeltaTime;
@@ -129,12 +129,11 @@ namespace OSBE.Controllers {
                     while (waitAmount > 0f) {
                         waitAmount -= Time.fixedDeltaTime;
                         yield return new WaitForFixedUpdate();
-                        //while (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                        //    anim.Transition(state => state with { isMoving = false });
-                        //    DoFace(player.transform.position);
-                        //    yield return new WaitForFixedUpdate();
-                        //    timeSinceSeenPlayer = SEEN_THRESHOLD;
-                        //}
+                        while (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
+                            anim.Transition(state => state with { isMoving = false });
+                            DoFace(player.transform.position);
+                            yield return new WaitForFixedUpdate();
+                        }
                     }
                     yield return new WaitForFixedUpdate();
                 }

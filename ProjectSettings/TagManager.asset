@@ -14,9 +14,9 @@ TagManager:
   - UI
   - Opaque
   - Geometry
-  - 
-  - 
-  - 
+  - Obstacles
+  - Enemies
+  - Player
   - 
   - 
   - 
