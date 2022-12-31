@@ -102,7 +102,7 @@ namespace OSBE.Controllers {
                 yield return new WaitForSeconds(0.1f);
             while (true) {
                 if (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                    if (state.isPlayerInView) {
+                    if (state.isPlayerInView || speech.text.Equals("")) {
                         speech.text = "I see you, Bro.";
                     }
                     speech.enabled = true;
