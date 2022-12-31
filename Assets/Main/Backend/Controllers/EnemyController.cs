@@ -102,15 +102,17 @@ namespace OSBE.Controllers {
                 yield return new WaitForSeconds(0.1f);
             while (true) {
                 if (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                    if (state.isPlayerInView || speech.text.Equals("")) {
+                    if (state.isPlayerInView) {
                         speech.text = "I see you, Bro.";
+                    } else if (speech.text.Equals("")) {
+                        speech.text = "Know you're there, Dude.";
                     }
                     speech.enabled = true;
                     yield return new WaitForSeconds(2f);
                     speech.enabled = false;
                     yield return new WaitForSeconds(1f);
                     if (!state.isPlayerInView && timeSinceSeenPlayer > SEEN_THRESHOLD) {
-                        speech.text = "Where'd they go?";
+                        speech.text = "I've lost interest.";
                         speech.enabled = true;
                         float elapsed = 0f;
                         while (!state.isPlayerInView && elapsed < 2f) {
