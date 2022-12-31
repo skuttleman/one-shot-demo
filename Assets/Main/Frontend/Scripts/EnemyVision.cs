@@ -25,40 +25,40 @@ namespace OSFE.Scripts {
         }
 
         private void FixedUpdate() {
-            bool los = false;
-            Vector3 playerPos = player.transform.position + new Vector3(0f, 0f, -0.1f);
-            rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
-
-            if (Physics.Raycast(
-                    transform.parent.position,
-                    playerPos - transform.parent.position,
-                    out RaycastHit losHit,
-                    Vector3.Distance(playerPos, transform.parent.position),
-                    ~(1 << LayerMask.NameToLayer("Enemies"))))
-                if (losHit.transform.IsChildOf(player.transform))
-                    los = true;
-
-            controller.On(new PlayerLOS(seesPlayer && los));
-
-            Vector3 position = transform.parent.parent.position + new Vector3(0, 0, -0.1f);
+            Vector3 playerPos = player.transform.position;
             Vector3 playerEyes =
                 Transforms.FindInActiveChildren(player.transform, xform => xform.name == "head")
                     .First()
                     .position;
+            Vector3 enemyEyes = transform.parent.position;
+            bool los = false;
+
+            if (Physics.Raycast(
+                    enemyEyes,
+                    playerEyes - enemyEyes,
+                    out RaycastHit losHit,
+                    Vector3.Distance(enemyEyes, player.transform.position),
+                    ~LayerMask.GetMask("Enemies", "Geometry"))) {
+                if (losHit.transform.IsChildOf(player.transform)) {
+                    los = true;
+                }
+            }
+
+            rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
+            controller.On(new PlayerLOS(seesPlayer && los));
 
             bool isBlocked = Physics.Raycast(
                 playerEyes,
-                position - playerEyes,
+                enemyEyes - playerEyes,
                 out RaycastHit blockedHit,
                 Vector3.Distance(transform.parent.parent.position, playerEyes),
-                1 << LayerMask.NameToLayer("Opaque"));
+                LayerMask.GetMask("Opaque"));
 
             if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
             else timeSinceSeeable = -0.25f;
         }
 
         private void OnTriggerStay(Collider other) {
-            Debug.Log(other.transform.name);
             if (other.transform.IsChildOf(player.transform)) {
                 seesPlayer = true;
             }

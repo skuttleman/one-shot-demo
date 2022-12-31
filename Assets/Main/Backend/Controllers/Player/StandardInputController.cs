@@ -85,7 +85,7 @@ namespace OSBE.Controllers.Player {
                 Vector3.down,
                 out RaycastHit ground,
                 cfg.groundedDist,
-                1 << LayerMask.NameToLayer("Geometry"),
+                LayerMask.GetMask("Geometry"),
                 QueryTriggerInteraction.Ignore);
             controller.UpdateState(state => state with {
                 isGrounded = isGrounded,
