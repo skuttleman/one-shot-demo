@@ -8,6 +8,8 @@ namespace OSCore.System.Interfaces {
     public interface IGameSystem {
         public IGameSystem Send<T>(Action<T> action) where T : IComponentLifecycle;
         public R Send<T, R>(Func<T, R> action) where T : IComponentLifecycle;
+        public void Register<T>(T component) where T : IComponentLifecycle;
+        public void Unregister<T>() where T : IComponentLifecycle;
     }
 
     public interface IComponentLifecycle {
@@ -47,10 +49,6 @@ namespace OSCore.System.Interfaces {
 
         public interface IDamage {
             public void OnAttack(float damage);
-        }
-
-        public interface ICameraController {
-            public void Shake(float amp, float freq, float duration);
         }
     }
 }

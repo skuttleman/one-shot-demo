@@ -23,6 +23,14 @@ namespace OSCore {
         public R Send<T, R>(Func<T, R> action) where T : IComponentLifecycle =>
             system.Send(action);
 
+        public void Register<T>(T component) where T : IComponentLifecycle {
+            system.Register(component);
+        }
+
+        public void Unregister<T>() where T : IComponentLifecycle {
+            system.Unregister<T>();
+        }
+
         /*
          * Lifecycle Methods
          */

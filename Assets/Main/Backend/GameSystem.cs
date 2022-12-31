@@ -32,6 +32,16 @@ namespace OSBE {
             return action(component);
         }
 
+        public void Register<T>(T component) where T : IComponentLifecycle {
+            components[typeof(T)] = component;
+        }
+
+        public void Unregister<T>() where T : IComponentLifecycle {
+            if (components.ContainsKey(typeof(T))) {
+                components.Remove(typeof(T));
+            }
+        }
+
         private void OnEnable() {
             controller = FindObjectOfType<GameController>();
             Init();

@@ -73,6 +73,8 @@ namespace OSBE.Controllers {
                 if (input.currentActionMap.name != controls)
                     input.SwitchCurrentActionMap(controls);
             }
+
+            Publish(new AnimationChanged(prev, curr));
         }
 
         public PlayerControllerState UpdateState(Func<PlayerControllerState, PlayerControllerState> updateFn) {
