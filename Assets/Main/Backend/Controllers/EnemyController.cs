@@ -46,6 +46,7 @@ namespace OSBE.Controllers {
         public void On(EnemyControllerInput e) {
             switch (e) {
                 case DamageInput:
+                    speech.text = "OUCH!";
                     state = state with { isPlayerInView = true };
                     timeSinceSeenPlayer = 0f;
                     break;
