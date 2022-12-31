@@ -20,8 +20,8 @@ namespace OSBE.Controllers {
 
             vertices[0] = new(
                 head.position.x.RoundTo(100f),
-                head.position.y.RoundTo(100f),
-                head.position.z);
+                head.position.y,
+                head.position.z.RoundTo(100f));
 
             int triangleIdx = DrawTriangles(vertices, triangles, head);
 
@@ -38,15 +38,16 @@ namespace OSBE.Controllers {
         private int DrawTriangles(Vector3[] vertices, int[] triangles, Transform head) {
             int triangleIdx = -3;
             float angleIncrease = 360f / cfg.RAY_COUNT;
-            float angle = head.rotation.eulerAngles.z;
+            float angle = head.rotation.eulerAngles.y;
 
             for (int vertexIdx = 1; vertexIdx < cfg.RAY_COUNT;) {
                 bool isHit = Physics.Raycast(
                     vertices[0],
-                    Vectors.ToVector3(angle + transform.rotation.eulerAngles.z),
+                    Vectors.ToVector3(angle),
                     out RaycastHit hit,
                     cfg.viewDistance,
                     cfg.layerMask);
+
                 vertices[vertexIdx] = isHit
                     ? transform.InverseTransformPoint(hit.point)
                     : vertices[0] + Vectors.ToVector3(angle) * cfg.viewDistance;

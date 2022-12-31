@@ -86,6 +86,7 @@ namespace OSCore.Data {
         namespace Controllers {
             namespace Player {
                 public record AnimationEmittedEvent : IEvent {
+                    public record AnimationChanged(PlayerAnim prev, PlayerAnim curr) : AnimationEmittedEvent();
                     public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
                     public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
                     public record MovementChanged(float speed) : AnimationEmittedEvent();

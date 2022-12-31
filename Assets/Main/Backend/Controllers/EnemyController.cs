@@ -9,6 +9,7 @@ using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.AI;
 using UnityEngine;
 using static OSCore.Data.Controllers.EnemyControllerInput;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
@@ -23,23 +24,29 @@ namespace OSBE.Controllers {
         private GameObject player;
         private EnemyAnimator anim;
         private TextMeshPro speech;
+        private NavMeshAgent nav;
         private float timeSinceSeenPlayer = 0f;
         private float timeSincePlayerMoved = 0f;
         private bool isPlayerMoving = false;
         private EnemyState state = null;
 
-        public IEnumerable<float> DoPatrolStep(EnemyPatrol step) =>
-            step switch {
+        public IEnumerable<float> DoPatrolStep(EnemyPatrol step) {
+            IEnumerable<float> waits = step switch {
                 PatrolWait msg => Wait(msg.seconds),
                 PatrolFace msg => Face(msg.rotation),
-                PatrolRotate msg => Face(msg.rotation),
                 PatrolGoto msg => Goto(msg.position),
+                PatrolRotate msg => Face(Translate(msg.rotation)),
                 _ => new float[] { }
             };
+
+            foreach (float wait in waits)
+                yield return wait;
+        }
 
         public void On(EnemyControllerInput e) {
             switch (e) {
                 case DamageInput:
+                    speech.text = "OUCH!";
                     state = state with { isPlayerInView = true };
                     timeSinceSeenPlayer = 0f;
                     break;
@@ -52,7 +59,7 @@ namespace OSBE.Controllers {
 
         public void OnStep() {
             if (timeSincePlayerMoved > 0.5f)
-                Instantiate(footstep, transform.position, Quaternion.identity);
+                Instantiate(footstep, transform.position, Quaternion.Euler(90f, 0f, 0f));
         }
 
         protected override void OnEvent(MovementChanged e) {
@@ -66,7 +73,10 @@ namespace OSBE.Controllers {
 
         private void Start() {
             anim = GetComponentInChildren<EnemyAnimator>();
-            speech = Transforms.Entity(transform)
+            nav = GetComponent<NavMeshAgent>();
+            nav.updateRotation = false;
+
+            speech = Transforms.Body(transform)
                 .parent
                 .gameObject
                 .GetComponentInChildren<TextMeshPro>();
@@ -81,7 +91,7 @@ namespace OSBE.Controllers {
         }
 
         private void FixedUpdate() {
-            speech.transform.position = transform.position + new Vector3(0f, 0.75f, 0f);
+            speech.transform.position = transform.position + new Vector3(0f, 0f, 0.75f);
             if (!state.isPlayerInView) timeSinceSeenPlayer += Time.fixedDeltaTime;
             if (isPlayerMoving) timeSincePlayerMoved = 0f;
             else timeSincePlayerMoved += Time.fixedDeltaTime;
@@ -92,7 +102,9 @@ namespace OSBE.Controllers {
                 yield return new WaitForSeconds(0.1f);
             while (true) {
                 if (state.isPlayerInView || timeSinceSeenPlayer <= SEEN_THRESHOLD) {
-                    speech.text = "I see you, Bro.";
+                    if (state.isPlayerInView || speech.text.Equals("")) {
+                        speech.text = "I see you, Bro.";
+                    }
                     speech.enabled = true;
                     yield return new WaitForSeconds(2f);
                     speech.enabled = false;
@@ -137,14 +149,13 @@ namespace OSBE.Controllers {
                 .Reduce((tpl, xform) => {
                     float waitTime = xform.localScale.z;
                     bool notFirstStep = tpl.transform != xform;
-                    bool isFarEnough = Vector3.Distance(xform.position, tpl.transform.position) > 0.01f;
 
                     return (
                         xform,
                         tpl.Item2.Concat(Sequences.Empty<EnemyPatrol>()
                             .ConsIf(waitTime > 0, new PatrolWait(waitTime))
-                            .Cons(new PatrolRotate(xform.rotation.eulerAngles.z))
-                            .ConsIf(notFirstStep && isFarEnough, new PatrolGoto(xform.position))));
+                            .ConsIf(waitTime > 0, new PatrolRotate(xform.rotation.eulerAngles.y))
+                            .ConsIf(notFirstStep, new PatrolGoto(xform.position))));
                 },
                 (transform, Sequences.Empty<EnemyPatrol>()))
                 .Item2
@@ -155,47 +166,45 @@ namespace OSBE.Controllers {
             yield return seconds;
         }
 
-        private IEnumerable<float> Face(Vector3 rotation) =>
-            Face(Vectors.AngleTo(transform.position, rotation));
-
-        private IEnumerable<float> Face(float rotationZ) {
-            while (Mathf.Abs(transform.rotation.eulerAngles.z - rotationZ) % 360 > cfg.rotationSpeed * Time.fixedDeltaTime) {
-                DoFace(rotationZ);
-                yield return 0;
-            }
+        private IEnumerable<float> Face(Vector3 rotation) {
+            float diff;
+            do {
+                diff = Mathf.Abs(transform.rotation.eulerAngles.y - Quaternion.LookRotation(rotation - transform.position).eulerAngles.y);
+                diff = diff > 180f ? 360f - diff : diff;
+                DoFace(rotation);
+                yield return 0f;
+            } while (diff > cfg.rotationSpeed * Time.fixedDeltaTime);
         }
 
-        private void DoFace(Vector3 rotation) {
-            DoFace(Vectors.AngleTo(transform.position, rotation));
-        }
-
-        private void DoFace(float rotationZ) {
+        private void DoFace(Vector3 position) {
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
-                Quaternion.Euler(0f, 0f, rotationZ),
+                Quaternion.LookRotation(position - transform.position),
                 cfg.rotationSpeed * Time.fixedDeltaTime);
         }
 
+        private Vector3 Translate(float rotation) {
+            return transform.position + Vectors.ToVector3(rotation);
+        }
+
         private IEnumerable<float> Goto(Vector3 position) {
-            while (Vector2.Distance(position, transform.position) > Time.fixedDeltaTime) {
-                DoFace(position);
-
-                Vector3 direction =
-                    cfg.moveSpeed
-                    * Time.fixedDeltaTime
-                    * (position - transform.position).Sign();
-                direction = direction.Clamp(position - transform.position, transform.position - position);
-
-                float diff = Mathf.Abs(Vectors.AngleTo(transform.position - position) - transform.rotation.eulerAngles.z);
+            float diff = 0;
+            do {
+                diff = Mathf.Abs(transform.rotation.eulerAngles.y - Quaternion.LookRotation(position - transform.position).eulerAngles.y);
                 diff = diff > 180f ? 360f - diff : diff;
-                if (diff < 45f) {
-                    anim.Transition(state => state with { isMoving = true });
-                    transform.position += direction;
-                }
+                DoFace(position);
+                yield return 0f;
+            } while (diff > 60f);
 
-                yield return 0;
+            nav.SetDestination(position);
+            anim.Transition(state => state with { isMoving = true });
+            float timeout = 0f;
+
+            while (timeout < 0.1f || nav.remainingDistance > nav.stoppingDistance) {
+                DoFace(position);
+                yield return 0f;
+                timeout += Time.fixedDeltaTime;
             }
-
             anim.Transition(state => state with { isMoving = false });
         }
     }

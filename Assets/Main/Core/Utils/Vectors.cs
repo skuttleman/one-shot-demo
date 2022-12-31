@@ -2,13 +2,6 @@
 
 namespace OSCore.Utils {
     public static class Vectors {
-        public static Vector3 UP = new(0f, 0f, -1f);
-        public static Vector3 DOWN = new(0f, 0f, 1f);
-        public static Vector3 LEFT = new(-1f, 0f, 0f);
-        public static Vector3 RIGHT = new(1f, 0f, 0f);
-        public static Vector3 FORWARD = new(0f, 1f, 0f);
-        public static Vector3 BACK = new(0f, -1f, 0f);
-
         public static Vector3 Sign(this Vector3 vector) =>
             new(Mathf.Sign(vector.x), Mathf.Sign(vector.y), Mathf.Sign(vector.z));
 
@@ -45,10 +38,18 @@ namespace OSCore.Utils {
         public static bool IsInside(this Vector2 pos, Vector2 lowerLeft, Vector2 upperRight) =>
             IsInside(pos.Upgrade(), lowerLeft.Upgrade(), upperRight.Upgrade());
 
+        public static float AngleTo(Vector3 direction) {
+            Vector3 dir = direction.normalized;
+            return Mathf.Atan2(dir.z, dir.x) * Mathf.Rad2Deg + 90f;
+        }
+
         public static float AngleTo(Vector2 direction) {
             Vector2 dir = direction.normalized;
             return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 90f;
         }
+
+        public static float AngleTo(Vector3 origin, Vector3 position) =>
+            AngleTo(origin - position);
 
         public static float AngleTo(Vector2 origin, Vector2 position) =>
             AngleTo(origin - position);
@@ -69,11 +70,8 @@ namespace OSCore.Utils {
 
         public static Vector3 ToVector3(float angle) {
             float angleRad = angle * (Mathf.PI / 180f);
-            return new(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+            return new(Mathf.Sin(angleRad), 0f, Mathf.Cos(angleRad));
         }
-
-        public static Vector2 ToVector2(float angle) =>
-            Downgrade(ToVector3(angle));
 
         public static Vector2 WithX(this Vector2 vector, float x) =>
             new(x, vector.y);

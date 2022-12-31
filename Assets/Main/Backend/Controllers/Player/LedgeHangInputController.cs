@@ -30,7 +30,7 @@ namespace OSBE.Controllers.Player {
             switch (e) {
                 case ClimbInput ev:
                     anim.transform.localPosition = anim.transform.localPosition
-                        .WithZ(anim.transform.localPosition.z + 0.6f);
+                        .WithY(anim.transform.localPosition.y + 0.6f);
                     if (ev.direction == ClimbDirection.UP) OnClimbUp();
                     else OnClimbDown();
                     break;
@@ -42,12 +42,10 @@ namespace OSBE.Controllers.Player {
             controller.UpdateState(state => state with { facing = Vector2.zero });
 
             float angleToPoint = Mathf.Round(Vectors.AngleTo(transform.position - controller.state.hangingPoint));
-            transform.rotation = Quaternion.Euler(0f, 0f, angleToPoint);
+            transform.rotation = Quaternion.Euler(0f, -angleToPoint, 0f);
             playerCollider = transform.GetComponentInChildren<CapsuleCollider>();
 
-            rb.velocity = Vector3.zero;
-            rb.isKinematic = true;
-            transform.position = transform.position.WithZ(controller.state.hangingPoint.z + 0.6f);
+            transform.position = transform.position.WithY(controller.state.hangingPoint.y - 0.6f);
         }
 
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
@@ -65,8 +63,8 @@ namespace OSBE.Controllers.Player {
         private void OnClimbDown() {
             anim.Transition(state => state with { fall = true, hang = false });
 
-            float pointZ = controller.state.hangingPoint.z;
-            transform.position = transform.position.WithZ(pointZ + 0.55f);
+            float pointY = controller.state.hangingPoint.y;
+            transform.position = transform.position.WithY(pointY - 0.55f);
         }
 
         private void OnMovementInput(Vector2 direction) {
@@ -84,30 +82,34 @@ namespace OSBE.Controllers.Player {
         }
 
         private void MovePlayer() {
-            transform.position += controller.state.movement.Upgrade();
+            Vector3 move = new(controller.state.movement.x, 0f, controller.state.movement.y);
+            transform.position += move;
             controller.UpdateState(state => state with {
-                hangingPoint = state.hangingPoint + state.movement.Upgrade(),
+                hangingPoint = state.hangingPoint + move,
             });
         }
 
         private bool CanMoveTo(Vector2 dir, Vector2 move) {
-            Vector3 nextHangingPoint = controller.state.hangingPoint + move.Upgrade();
-            Vector3 nextPlayerPos = transform.position + move.Upgrade();
+            Vector3 dir3 = new(dir.x, 0f, dir.y);
+            Vector3 move3 = new(move.x, 0f, move.y);
+
+            Vector3 nextHangingPoint = controller.state.hangingPoint + move3;
+            Vector3 nextPlayerPos = transform.position + move3;
             float heightAxis = (playerCollider.height + 0.1f) / 2f;
             Vector3 height = new(
                 playerCollider.direction == 0 ? heightAxis : 0,
                 playerCollider.direction == 1 ? heightAxis : 0,
                 playerCollider.direction == 2 ? heightAxis : 0);
 
-            return dir.magnitude > 0.5f
-                && Mathf.Abs(transform.rotation.eulerAngles.z - Vectors.AngleTo(dir)) % 180f == 90f
+            return dir3.magnitude > 0.5f
+                && Mathf.Abs(transform.rotation.eulerAngles.y - Vectors.AngleTo(dir3)) % 180f == 90f
                 && controller.state.ledge.ClosestPoint(nextHangingPoint) == nextHangingPoint
                 && controller.state.ledge.ClosestPoint(nextPlayerPos) != nextPlayerPos
                 && !Physics.CapsuleCast(
                     playerCollider.center + transform.position + height,
                     playerCollider.center + transform.position - height,
                     playerCollider.radius,
-                    move,
+                    move3,
                     cfg.hangMoveAmount);
         }
     }

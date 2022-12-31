@@ -16,5 +16,5 @@ MonoBehaviour:
   <layerMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 64
-  <viewDistance>k__BackingField: 15
+  <viewDistance>k__BackingField: 10
   <secondsBetween>k__BackingField: 0.03333

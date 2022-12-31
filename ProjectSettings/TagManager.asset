@@ -12,11 +12,11 @@ TagManager:
   - 
   - Water
   - UI
-  - Walls
-  - 
-  - 
-  - 
-  - 
+  - Opaque
+  - Geometry
+  - Obstacles
+  - Enemies
+  - Player
   - 
   - 
   - 

@@ -1,67 +1,76 @@
-﻿using OSCore.Data.Enums;
+using System.Collections.Generic;
+using Cinemachine;
+using OSCore;
+using OSCore.Data.Animations;
 using OSCore.ScriptableObjects;
 using OSCore.System;
-using OSCore.Utils;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
+using static OSCore.ScriptableObjects.CameraAuxCfgSO;
 
 namespace OSBE.Controllers {
-    public class CameraController : ASystemInitializer<AttackModeChanged, MovementChanged, ScopingChanged> {
-        [SerializeField] private CameraCfgSO cfg;
+    public class CameraController : ASystemInitializer<AnimationChanged> {
+        [SerializeField] private CameraAuxCfgSO cfg;
+        private CinemachineVirtualCamera[] cams;
+        private bool isShaking = false;
 
-        private CinemachineCameraOffset camOffset = null;
-        private Transform player;
-        private AttackMode attackMode;
-        private bool isMoving;
-        private bool isScoping;
-
-        protected override void OnEvent(AttackModeChanged ev) {
-            attackMode = ev.mode;
-        }
-
-        protected override void OnEvent(MovementChanged ev) {
-            isMoving = Maths.NonZero(ev.speed);
-        }
-
-        protected override void OnEvent(ScopingChanged ev) {
-            isScoping = ev.isScoping;
-        }
-
-        protected override void OnEnable() {
-            base.OnEnable();
-            player = system.Player().transform;
-        }
-
+        // Start is called before the first frame update
         private void Start() {
-            camOffset = GetComponent<CinemachineCameraOffset>();
+            system = FindObjectOfType<GameController>();
+            cams = transform.parent.GetComponentsInChildren<CinemachineVirtualCamera>();
         }
 
-        private void Update() {
-            if (cfg != null && camOffset != null)
-                SetOffset();
+        private IEnumerator<YieldInstruction> ShakeCamera(ShakeConfig cfg) {
+            isShaking = true;
+            float[] currentAmps = new float[cams.Length];
+            float[] currentFreqs  = new float[cams.Length];
+
+            for (int idx = 0; idx < cams.Length; idx++) {
+                currentAmps[idx] = cams[idx].GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain;
+                cams[idx].GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = cfg.amp;
+
+                currentFreqs[idx] = cams[idx].GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_FrequencyGain;
+                cams[idx].GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_FrequencyGain = cfg.freq;
+            }
+
+            yield return new WaitForSeconds(cfg.duration);
+
+            for (int idx = 0; idx < cams.Length; idx ++) {
+                cams[idx].GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = currentAmps[idx];
+                cams[idx].GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_FrequencyGain = currentFreqs[idx];
+            }
+
+            isShaking = false;
         }
 
-        private void SetOffset() {
-            Vector3 rotFactor = LookAheadOffset();
+        protected override void OnEvent(AnimationChanged e) {
+            if (!isShaking) {
+                switch (e.curr) {
+                    case PlayerAnim.crouch_fire:
+                    case PlayerAnim.crawl_fire:
+                        StartCoroutine(ShakeCamera(cfg.fire));
+                        break;
 
-            camOffset.m_Offset = Vector3.Lerp(
-                camOffset.m_Offset,
-                player.rotation * rotFactor,
-                cfg.orbitSpeed * Time.deltaTime);
+                    case PlayerAnim.stand_punch:
+                    case PlayerAnim.crouch_punch:
+                    case PlayerAnim.crawl_punch:
+                        StartCoroutine(ShakeCamera(cfg.punch));
+                        break;
+
+                    case PlayerAnim.stand_move:
+                    case PlayerAnim.stand_idle:
+                        if (e.prev == PlayerAnim.stand_fall) {
+                            StartCoroutine(ShakeCamera(cfg.fallLand));
+                        }
+                        break;
+
+                    case PlayerAnim.crawl_idle:
+                        if (e.prev == PlayerAnim.crawl_dive) {
+                            StartCoroutine(ShakeCamera(cfg.diveLand));
+                        }
+                        break;
+                }
+            }
         }
-
-        private Vector3 LookAheadOffset() {
-            float lookAhead = 0f;
-
-            if (IsAiming()) lookAhead += cfg.aimOffset;
-            else if (isScoping) lookAhead = 0f;
-            if (isMoving) lookAhead += cfg.moveOffset;
-
-            return new(0f, Mathf.Clamp(lookAhead, 0f, cfg.maxLookAhead), 0f);
-        }
-
-        private bool IsAiming() =>
-            attackMode == AttackMode.WEAPON
-                || attackMode == AttackMode.FIRING;
     }
 }

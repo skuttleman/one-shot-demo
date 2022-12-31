@@ -64,10 +64,18 @@ namespace OSBE.Controllers.Player {
         }
 
         public void OnFixedUpdate() {
-            bool prevGrounded = controller.state.isGrounded;
             Collider ledge = controller.state.ground.collider;
             bool wasCrouching = controller.state.stance == PlayerStance.CROUCHING;
-            bool isGrounded = GroundPlayer(prevGrounded);
+            bool prevGrounded = controller.state.isGrounded;
+            bool isGrounded = GroundPlayer();
+
+            if (prevGrounded && !isGrounded) {
+                anim.Transition(state => state with { fall = true });
+            } else if (!prevGrounded && isGrounded) {
+                anim.Transition(state => state with { fall = false });
+            }
+
+            MovePlayer(ControllerUtils.MoveCfg(cfg, controller.state));
 
             bool isFallStart = prevGrounded && !isGrounded;
             bool isCatchable = ledge != null
@@ -79,25 +87,18 @@ namespace OSBE.Controllers.Player {
                 TransitionToLedgeHang(ledge);
         }
 
-        public bool GroundPlayer(bool prevGrounded) {
+        public bool GroundPlayer() {
             bool isGrounded = Physics.Raycast(
-                transform.position - new Vector3(0, 0, 0.01f),
-                Vectors.DOWN,
+                transform.position - new Vector3(0, -0.01f, 0f),
+                Vector3.down,
                 out RaycastHit ground,
                 cfg.groundedDist,
-                ~0,
+                LayerMask.GetMask("Geometry"),
                 QueryTriggerInteraction.Ignore);
             controller.UpdateState(state => state with {
                 isGrounded = isGrounded,
                 ground = ground,
             });
-
-            if (prevGrounded && !isGrounded)
-                anim.Transition(state => state with { fall = true });
-            else if (!prevGrounded && isGrounded)
-                anim.Transition(state => state with { fall = false });
-
-            MovePlayer(ControllerUtils.MoveCfg(cfg, controller.state));
 
             return isGrounded;
         }
@@ -105,7 +106,7 @@ namespace OSBE.Controllers.Player {
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
             switch ((prev, curr)) {
                 case (_, PlayerAnim.crawl_dive):
-                    rb.AddRelativeForce((Vectors.FORWARD + Vectors.UP) * cfg.diveForce);
+                    rb.AddRelativeForce((Vector3.forward + Vector3.up) * cfg.diveForce);
                     break;
             }
         }
@@ -122,35 +123,31 @@ namespace OSBE.Controllers.Player {
                 direction = controller.state.movement;
             else return;
 
-            float rotationZ = Vectors.AngleTo(Vector2.zero, direction);
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
-                Quaternion.Euler(0f, 0f, rotationZ),
+                Quaternion.LookRotation(new(direction.x, 0f, direction.y)),
                 moveCfg.rotationSpeed * Time.deltaTime);
         }
 
         private void MovePlayer(MoveConfig moveCfg) {
             if (CanMove()) {
-                bool isMoving = Vectors.NonZero(controller.state.movement);
-                float forceZ = controller.state.ground.transform.rotation != Quaternion.identity && isMoving
-                    ? (Vector3.Angle(controller.state.ground.normal, controller.state.movement) - 90f) / 90f
-                    : 0f;
                 float speed = MoveSpeed(moveCfg);
                 float movementSpeed = Mathf.Max(
                     Mathf.Abs(controller.state.movement.x),
                     Mathf.Abs(controller.state.movement.y));
-                bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
                 float currSpeed = anim.animSpeed;
                 float animSpeed = controller.state.isMoving ? movementSpeed * speed * moveCfg.animFactor : 1f;
-                Vector3 dir = MoveDirection(moveCfg, speed, forceZ);
 
-                PublishChanged(currSpeed, animSpeed, new MovementChanged(animSpeed));
+                MovementChanged moveChanged = new(controller.state.isMoving ? animSpeed : 0f);
+                PublishChanged(currSpeed, animSpeed, moveChanged);
 
+                Vector3 dir = MoveDirection(moveCfg, speed, 0f);
+                bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
                 if (isForceable && Vectors.NonZero(controller.state.movement)) {
                     anim.SetSpeed(animSpeed * Time.fixedDeltaTime);
 
                     if (controller.state.stance == PlayerStance.STANDING)
-                        rb.AddRelativeForce(Vectors.FORWARD * dir.magnitude);
+                        rb.AddRelativeForce(Vector3.forward * dir.magnitude);
                     else rb.AddForce(dir);
                 }
             }
@@ -180,8 +177,11 @@ namespace OSBE.Controllers.Player {
             return speed;
         }
 
-        private Vector3 MoveDirection(MoveConfig moveCfg, float speed, float forceZ) {
-            Vector3 dir = speed * controller.state.movement.Upgrade(-forceZ);
+        private Vector3 MoveDirection(MoveConfig moveCfg, float speed, float forceY) {
+            Vector3 dir = speed * new Vector3(
+                controller.state.movement.x,
+                forceY,
+                controller.state.movement.y);
             float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
 
             if (velocityDiff < moveCfg.maxVelocitydamper)
@@ -211,11 +211,19 @@ namespace OSBE.Controllers.Player {
             controller.UpdateState(state => state with {
                 movement = direction,
             });
+
+            if (!isMoving) {
+                system.Send<IPubSub>(pubsub =>
+                    pubsub.Publish(new MovementChanged(0f)));
+            }
         }
 
         private void OnSprintInput(bool isSprinting) {
             if (isSprinting && ControllerUtils.CanSprint(controller.state))
-                anim.Transition(state => state with { sprint = isSprinting, stance = PlayerStance.STANDING });
+                anim.Transition(state => state with {
+                    sprint = isSprinting,
+                    stance = PlayerStance.STANDING
+                });
         }
 
         private void OnLookInput(Vector2 direction, bool isMouse) {
@@ -258,34 +266,40 @@ namespace OSBE.Controllers.Player {
         }
 
         private void TransitionToLedgeHang(Collider ledge) {
+            const float hardCodedFactor = 0.275f;
+
             Vector3 pt = ledge.ClosestPoint(transform.position);
-            Vector2 direction = (transform.position - pt).Downgrade().Directionify().normalized;
-            Vector3 nextPlayerPos = pt + (direction * 0.275f).Upgrade();
+            Vector3 direction = hardCodedFactor * (transform.position - pt).normalized;
+            Vector3 nextPlayerPos = pt + direction;
 
             if (CanTransition(nextPlayerPos)) {
                 anim.transform.localPosition = anim.transform.localPosition
-                    .WithZ(anim.transform.localPosition.z - 0.6f);
+                    .WithY(anim.transform.localPosition.y + 0.6f);
                 anim.Transition(state => state with { hang = true });
 
-                TransitionState(ledge, pt, nextPlayerPos);
+                TransitionLedgeHangState(ledge, pt, nextPlayerPos);
             }
         }
 
         private bool CanTransition(Vector3 nextPlayerPos) =>
             anim.state != PlayerAnim.crawl_dive
-            && Vector3.Distance(nextPlayerPos, transform.position) <= 0.35f
-            && (!Physics.Raycast(nextPlayerPos, Vectors.DOWN, out RaycastHit ground, 1000f)
-                || ground.distance >= 0.6f);
+                && Vector3.Distance(nextPlayerPos, transform.position) <= 0.35f
+                && (!Physics.Raycast(nextPlayerPos, Vector3.down, out RaycastHit ground, 1000f)
+                    || ground.distance >= 0.6f);
 
-        private void TransitionState(Collider ledge, Vector3 pt, Vector3 nextPlayerPos) {
+        private void TransitionLedgeHangState(Collider ledge, Vector3 pt, Vector3 nextPlayerPos) {
+            Vector3 rawFacing = pt - nextPlayerPos;
+            Vector2 facing = new(rawFacing.x, -rawFacing.z);
             transform.position = nextPlayerPos;
+
             rb.velocity = Vector3.zero;
-            Vector2 facing = pt - nextPlayerPos;
+            rb.isKinematic = true;
+
             controller.UpdateState(state => state with {
                 movement = Vector3.zero,
                 isMoving = false,
                 controls = PlayerInputControlMap.None,
-                facing = facing,
+                facing = facing.Directionify(),
                 ledge = ledge,
                 hangingPoint = pt,
             });
