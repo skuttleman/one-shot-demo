@@ -32,7 +32,6 @@ namespace OSBE.Controllers {
 
         public void Transition(Func<Details, Details> updateFn) {
             details = updateFn(details);
-            //Debug.Log("NEW STATE: " + details);
         }
 
         private void TransitionTo(AnimNode<State, Details> node) {
@@ -48,7 +47,6 @@ namespace OSBE.Controllers {
 
         private void Play(State state) {
             anim.Play(state.ToString());
-            //Debug.Log("ANIMATING  " + state);
         }
 
         /*

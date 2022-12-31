@@ -93,10 +93,8 @@ namespace OSBE.Controllers.Player {
             });
 
             if (prevGrounded && !isGrounded) {
-                //Debug.Log("FALLING");
                 anim.Transition(state => state with { fall = true });
             } else if (!prevGrounded && isGrounded) {
-                //Debug.Log("LANDING");
                 anim.Transition(state => state with { fall = false });
             }
 
