@@ -177,10 +177,10 @@ namespace OSBE.Controllers {
         }
 
         private void Update() {
-            if (Vectors.NonZero(state.facing)) {
+            if (Vectors.NonZero(state.facing) && state.controls != PlayerInputControlMap.Standard) {
                 transform.rotation = Quaternion.Lerp(
                     transform.rotation,
-                    Quaternion.LookRotation(new(state.facing.x, 0f, -state.facing.y)),
+                    Quaternion.LookRotation(new(state.facing.x, 0f, state.facing.y)),
                     cfg.crouching.rotationSpeed * Time.deltaTime);
             }
 

@@ -125,10 +125,9 @@ namespace OSBE.Controllers.Player {
                 direction = controller.state.movement;
             else return;
 
-            float rotationY = Vectors.AngleTo(Vector2.zero, direction);
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
-                Quaternion.Euler(0f, -rotationY, 0f),
+                Quaternion.LookRotation(new(direction.x, 0f, direction.y)),
                 moveCfg.rotationSpeed * Time.deltaTime);
         }
 
