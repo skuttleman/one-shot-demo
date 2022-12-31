@@ -64,10 +64,18 @@ namespace OSBE.Controllers.Player {
         }
 
         public void OnFixedUpdate() {
-            bool prevGrounded = controller.state.isGrounded;
             Collider ledge = controller.state.ground.collider;
             bool wasCrouching = controller.state.stance == PlayerStance.CROUCHING;
-            bool isGrounded = GroundPlayer(prevGrounded);
+            bool prevGrounded = controller.state.isGrounded;
+            bool isGrounded = GroundPlayer();
+
+            if (prevGrounded && !isGrounded) {
+                anim.Transition(state => state with { fall = true });
+            } else if (!prevGrounded && isGrounded) {
+                anim.Transition(state => state with { fall = false });
+            }
+
+            MovePlayer(ControllerUtils.MoveCfg(cfg, controller.state));
 
             bool isFallStart = prevGrounded && !isGrounded;
             bool isCatchable = ledge != null
@@ -79,7 +87,7 @@ namespace OSBE.Controllers.Player {
                 TransitionToLedgeHang(ledge);
         }
 
-        public bool GroundPlayer(bool prevGrounded) {
+        public bool GroundPlayer() {
             bool isGrounded = Physics.Raycast(
                 transform.position - new Vector3(0, -0.01f, 0f),
                 Vector3.down,
@@ -91,14 +99,6 @@ namespace OSBE.Controllers.Player {
                 isGrounded = isGrounded,
                 ground = ground,
             });
-
-            if (prevGrounded && !isGrounded) {
-                anim.Transition(state => state with { fall = true });
-            } else if (!prevGrounded && isGrounded) {
-                anim.Transition(state => state with { fall = false });
-            }
-
-            MovePlayer(ControllerUtils.MoveCfg(cfg, controller.state));
 
             return isGrounded;
         }
@@ -138,7 +138,8 @@ namespace OSBE.Controllers.Player {
                 float currSpeed = anim.animSpeed;
                 float animSpeed = controller.state.isMoving ? movementSpeed * speed * moveCfg.animFactor : 1f;
 
-                PublishChanged(currSpeed, animSpeed, new MovementChanged(animSpeed));
+                MovementChanged moveChanged = new(controller.state.isMoving ? animSpeed : 0f);
+                PublishChanged(currSpeed, animSpeed, moveChanged);
 
                 Vector3 dir = MoveDirection(moveCfg, speed, 0f);
                 bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
@@ -210,11 +211,19 @@ namespace OSBE.Controllers.Player {
             controller.UpdateState(state => state with {
                 movement = direction,
             });
+
+            if (!isMoving) {
+                system.Send<IPubSub>(pubsub =>
+                    pubsub.Publish(new MovementChanged(0f)));
+            }
         }
 
         private void OnSprintInput(bool isSprinting) {
             if (isSprinting && ControllerUtils.CanSprint(controller.state))
-                anim.Transition(state => state with { sprint = isSprinting, stance = PlayerStance.STANDING });
+                anim.Transition(state => state with {
+                    sprint = isSprinting,
+                    stance = PlayerStance.STANDING
+                });
         }
 
         private void OnLookInput(Vector2 direction, bool isMouse) {
