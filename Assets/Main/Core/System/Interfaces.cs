@@ -48,5 +48,9 @@ namespace OSCore.System.Interfaces {
         public interface IDamage {
             public void OnAttack(float damage);
         }
+
+        public interface ICameraController {
+            public void Shake(float amp, float freq, float duration);
+        }
     }
 }

@@ -6,8 +6,9 @@ using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers {
-    public class CameraController : ASystemInitializer<AttackModeChanged, MovementChanged, ScopingChanged> {
+    public class CameraOffsetController : ASystemInitializer<AttackModeChanged, MovementChanged, ScopingChanged> {
         [SerializeField] private CameraCfgSO cfg;
+        [SerializeField] private Vector3 foo;
 
         private CinemachineCameraOffset camOffset = null;
         private Transform player;
@@ -43,16 +44,16 @@ namespace OSBE.Controllers {
 
         private void SetOffset() {
             float rotFactor = LookAheadOffset();
-            Vector3 angle = Vectors.ToVector3(player.rotation.eulerAngles.y - 90);
+            Vector3 angle = rotFactor * Vectors.ToVector3(player.rotation.eulerAngles.y).normalized;
 
             camOffset.m_Offset = Vector3.Lerp(
                 camOffset.m_Offset,
-                rotFactor * new Vector3(angle.x, -angle.y, 0f),
+                new(angle.x, angle.z, 0f),
                 cfg.orbitSpeed * Time.deltaTime);
         }
 
         private float LookAheadOffset() {
-            float lookAhead = 0f;
+            float lookAhead = 0.5f;
 
             if (IsAiming()) lookAhead += cfg.aimOffset;
             else if (isScoping) lookAhead = 0f;
