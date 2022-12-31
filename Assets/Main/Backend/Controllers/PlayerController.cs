@@ -24,7 +24,6 @@ namespace OSBE.Controllers {
         IStateReceiver<PlayerAnim> {
         [SerializeField] private PlayerCfgSO cfg;
         [SerializeField] private Transform tbdEffect;
-        [SerializeField] private Transform tbdEffect2;
 
         private PlayerAnimator anim;
         private PlayerInput input;
@@ -133,29 +132,23 @@ namespace OSBE.Controllers {
                 .gameObject;
 
         private IEnumerator<YieldInstruction> InitiateTBD() {
+            bool crossedOver = false;
             while (Time.timeScale > cfg.tbdMinTime) {
                 Time.timeScale = Mathf.Max(cfg.tbdMinTime, Time.timeScale - (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
-                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(20, 20, 20), 1 - Time.timeScale);
+                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(40, 40, 40), 1 - Time.timeScale);
                 yield return new WaitForEndOfFrame();
+                if (Time.timeScale >= 1f) crossedOver = true;
             }
             yield return new WaitForSeconds(cfg.tbdMinTimeDuration);
 
-            while (Time.timeScale < cfg.tbdMaxTime) {
-                Time.timeScale = Mathf.Min(cfg.tbdMaxTime, Time.timeScale + (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
-                tbdEffect2.localScale = Vector3.Lerp(
-                    new(0, 0, 0),
-                    new(20, 20, 20),
-                    1 - (cfg.tbdMaxTime - Time.timeScale));
-                yield return new WaitForEndOfFrame();
-            }
-            yield return new WaitForSeconds(cfg.tbdMaxTimeDuration);
-
-            while (Time.timeScale > 1f) {
+            while (!crossedOver || Time.timeScale > 1f) {
                 Time.timeScale = Mathf.Max(1f, Time.timeScale - (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
-                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(20, 20, 20), (Time.timeScale  - 1) / (cfg.tbdMaxTime - 1));
-                tbdEffect2.localScale = Vector3.Lerp(new(0, 0, 0), new(20, 20, 20), (Time.timeScale  - 1) / (cfg.tbdMaxTime - 1));
+                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(40, 40, 40), (Time.timeScale - 1) / (cfg.tbdMaxTime - 1));
                 yield return new WaitForEndOfFrame();
+                if (Time.timeScale >= 1f) crossedOver = true;
             }
+
+            Time.timeScale = 1f;
         }
 
         /*
