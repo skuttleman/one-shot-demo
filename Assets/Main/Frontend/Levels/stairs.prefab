@@ -559,7 +559,7 @@ GameObject:
   - component: {fileID: 669496503478941787}
   - component: {fileID: 3695068820797857510}
   m_Layer: 0
-  m_Name: ramp
+  m_Name: nav:ramp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -595,7 +595,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6602957951806610105}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
