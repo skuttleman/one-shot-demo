@@ -38,8 +38,9 @@ namespace OSBE.Controllers {
         }
 
         private void Update() {
-            if (cfg != null && camOffset != null)
+            if (cfg != null && camOffset != null) {
                 SetOffset();
+            }
         }
 
         private void SetOffset() {

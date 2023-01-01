@@ -8,8 +8,9 @@ using static OSCore.ScriptableObjects.PlayerCfgSO;
 namespace OSBE.Controllers.Player {
     public static class ControllerUtils {
         public static PlayerStance NextStance(PlayerStance stance) {
-            if (stance == PlayerStance.CROUCHING)
+            if (stance == PlayerStance.CROUCHING) {
                 return PlayerStance.CRAWLING;
+            }
             return PlayerStance.CROUCHING;
         }
 
@@ -18,7 +19,7 @@ namespace OSBE.Controllers.Player {
 
         public static bool IsMovable(PlayerStance stance, PlayerControllerState state) =>
             stance != PlayerStance.CRAWLING
-            || (!IsAiming(state.attackMode) && !state.isScoping);
+                || (!IsAiming(state.attackMode) && !state.isScoping);
 
         public static bool CanAttack(AttackMode mode) =>
             mode != AttackMode.NONE

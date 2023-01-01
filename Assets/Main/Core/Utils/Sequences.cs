@@ -93,7 +93,7 @@ namespace OSCore.Utils {
             Transduce<IList<O>, I, O>(coll, xform, Colls.Add, new List<O>());
 
         public static void Transduce<I, O>(this IEnumerable<I> coll, IXForm<I, O> xform, Action<O> consumer) {
-            Transduce<dynamic, I, O>(
+            Transduce<bool, I, O>(
                 coll,
                 xform,
                 (_, item) => { consumer(item); return default; },

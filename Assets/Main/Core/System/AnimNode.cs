@@ -28,16 +28,19 @@ namespace OSCore.System {
             edges.Add((pred, node));
         }
 
-        public AnimNode<State, Details> Next(Details details) =>
-            edges.First(
-                Fns.Filter<(
-                    Predicate<Details> pred,
-                    AnimNode<State, Details> state)>(tpl => tpl.pred(details))
-                .Comp(Fns.Map<(
-                    Predicate<Details> pred,
-                    AnimNode<State, Details> state),
-                    AnimNode<State, Details>>(tpl => tpl.state)))
-                ?? this;
+        public AnimNode<State, Details> Next(Details details) {
+            IXForm<
+                (Predicate<Details> pred, AnimNode<State, Details> state),
+                AnimNode<State, Details>> xform =
+                    Fns.Filter<(
+                        Predicate<Details> pred,
+                        AnimNode<State, Details> state)>(tpl => tpl.pred(details))
+                    .Comp(Fns.Map<(
+                        Predicate<Details> pred,
+                        AnimNode<State, Details> state),
+                        AnimNode<State, Details>>(tpl => tpl.state));
+            return edges.First(xform) ?? this;
+        }
     }
 
     public static class AnimNodeUtils {

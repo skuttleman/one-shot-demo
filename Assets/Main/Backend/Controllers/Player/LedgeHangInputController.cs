@@ -49,8 +49,9 @@ namespace OSBE.Controllers.Player {
         }
 
         public void OnStateTransition(PlayerAnim prev, PlayerAnim curr) {
-            if (curr == PlayerAnim.hang_move)
+            if (curr == PlayerAnim.hang_move) {
                 MovePlayer();
+            }
         }
 
         private void OnClimbUp() {
@@ -76,8 +77,9 @@ namespace OSBE.Controllers.Player {
                     movement = move,
                 });
 
-                if (anim.state == PlayerAnim.hang_idle)
+                if (anim.state == PlayerAnim.hang_idle) {
                     anim.Transition(state => state with { move = true });
+                }
             }
         }
 

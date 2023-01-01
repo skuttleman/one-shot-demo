@@ -58,8 +58,9 @@ namespace OSBE.Controllers {
         }
 
         public void OnStep() {
-            if (timeSincePlayerMoved > 0.5f)
+            if (timeSincePlayerMoved > 0.5f) {
                 Instantiate(footstep, transform.position, Quaternion.Euler(90f, 0f, 0f));
+            }
         }
 
         protected override void OnEvent(MovementChanged e) {

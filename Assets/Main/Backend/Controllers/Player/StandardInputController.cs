@@ -53,10 +53,12 @@ namespace OSBE.Controllers.Player {
 
         public void OnUpdate() {
             controller.UpdateState(mainState => {
-                if (mainState.mouseLookTimer > 0f)
+                if (mainState.mouseLookTimer > 0f) {
                     mainState = mainState with { mouseLookTimer = mainState.mouseLookTimer - Time.deltaTime };
-                if (mainState.tbdTimer > 0f)
+                }
+                if (mainState.tbdTimer > 0f) {
                     mainState = mainState with { tbdTimer = mainState.tbdTimer - Time.deltaTime };
+                }
                 return mainState;
             });
 
@@ -83,8 +85,9 @@ namespace OSBE.Controllers.Player {
                     tags.Get(IdTag.PLATFORM_CATCHABLE))
                     .Contains(ledge.gameObject);
 
-            if (isFallStart && isCatchable && wasCrouching)
+            if (isFallStart && isCatchable && wasCrouching) {
                 TransitionToLedgeHang(ledge);
+            }
         }
 
         public bool GroundPlayer() {
@@ -117,11 +120,13 @@ namespace OSBE.Controllers.Player {
             bool isMoving = Vectors.NonZero(controller.state.movement);
 
             if (Vectors.NonZero(controller.state.facing)
-                && (controller.state.stance != PlayerStance.CRAWLING || !isMoving))
+                && (controller.state.stance != PlayerStance.CRAWLING || !isMoving)) {
                 direction = controller.state.facing;
-            else if (controller.state.mouseLookTimer <= 0f && isMoving)
+            } else if (controller.state.mouseLookTimer <= 0f && isMoving) {
                 direction = controller.state.movement;
-            else return;
+            } else {
+                return;
+            }
 
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
@@ -184,8 +189,9 @@ namespace OSBE.Controllers.Player {
                 controller.state.movement.y);
             float velocityDiff = moveCfg.maxVelocity - rb.velocity.magnitude;
 
-            if (velocityDiff < moveCfg.maxVelocitydamper)
+            if (velocityDiff < moveCfg.maxVelocitydamper) {
                 dir *= velocityDiff / moveCfg.maxVelocitydamper;
+            }
 
             return dir;
         }
@@ -198,8 +204,9 @@ namespace OSBE.Controllers.Player {
         }
 
         private void PublishChanged<T>(T oldValue, T newValue, IEvent e) {
-            if (!oldValue.Equals(newValue))
+            if (!oldValue.Equals(newValue)) {
                 system.Send<IPubSub>(pubsub => pubsub.Publish(e));
+            }
         }
 
         private void OnMovementInput(Vector2 direction) {
@@ -219,11 +226,12 @@ namespace OSBE.Controllers.Player {
         }
 
         private void OnSprintInput(bool isSprinting) {
-            if (isSprinting && ControllerUtils.CanSprint(controller.state))
+            if (isSprinting && ControllerUtils.CanSprint(controller.state)) {
                 anim.Transition(state => state with {
                     sprint = isSprinting,
                     stance = PlayerStance.STANDING
                 });
+            }
         }
 
         private void OnLookInput(Vector2 direction, bool isMouse) {
@@ -238,8 +246,9 @@ namespace OSBE.Controllers.Player {
 
         private void OnStanceInput() {
             PlayerStance nextStance = ControllerUtils.NextStance(controller.state.stance);
-            if (!controller.state.isMoving || ControllerUtils.IsMovable(nextStance, controller.state))
+            if (!controller.state.isMoving || ControllerUtils.IsMovable(nextStance, controller.state)) {
                 anim.Transition(state => state with { stance = nextStance });
+            }
         }
 
         private void OnDiveInput() {
@@ -255,8 +264,9 @@ namespace OSBE.Controllers.Player {
         }
 
         private void OnAttackInput(bool isAttacking) {
-            if (isAttacking && ControllerUtils.CanAttack(controller.state.attackMode))
+            if (isAttacking && ControllerUtils.CanAttack(controller.state.attackMode)) {
                 anim.Transition(state => state with { attack = isAttacking });
+            }
         }
 
         private void OnTBDInput() {

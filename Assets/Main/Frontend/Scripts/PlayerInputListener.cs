@@ -56,12 +56,16 @@ namespace OSFE.Scripts {
          */
 
         private void Start() {
+            FilterXF<InputAction> xform =
+                (FilterXF<InputAction>)Fns.Filter<InputAction>(action => action.name == "Stance");
+            xform.XForm<PlayerInput>((acc, item) => acc);
+
             controller = Transforms.Body(transform)
                 .GetComponent<IController<PlayerControllerInput>>();
             GetComponent<PlayerInput>()
                 .currentActionMap
                 .actions
-                .First(Fns.Filter<InputAction>(action => action.name == "Stance"))
+                .First(xform)
                 .performed += context => {
                     switch (context.interaction) {
                         case MultiTapInteraction interaction:
