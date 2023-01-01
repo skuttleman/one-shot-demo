@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System;
 using OSCore.Data.Enums;
 using OSCore.System;
 using UnityEngine;
