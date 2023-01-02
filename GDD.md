@@ -60,7 +60,7 @@ We'll provide the player with some exploitable, systemic opportunities for sneak
     Doing this will knock out lights and other electronic security equipment until the backup generator comes online. All enemies are elevated to "alert" status (if not already higher).
 - Destroy/sabotage base communications
     This disables enemies' ability to communicate/coordinate with the rest of the base. All enemies are elevated to "alert" status (if not already higher).
-- Neutralize base communications officer
+- Neutralize base communications officer (BCO)
     This is a hard-to-find/hard-to-get-to enemy who moves about the level. Neutralizing them will allow you to hijack base comms and feed enemies misinformation (i.e. false player location, trigger a shift change, etc.).
     Enemies will eventually figure out the ruse and stop taking false instructions.
 
@@ -70,11 +70,11 @@ Narrative and character information will be relayed to the player through in-gam
 
 Meatier story/character moments can happen much the same way, but with the aid of on-screen avatars to punctuate the converstations. These will be less frequent and only take place at the beginning/end of levels and/or at key moments within a level (i.e. a mission objective is updated).
 
-The most critical story beats will be delivered through interstitial, skippable cutscenes that will bookend levels. The cutscenes will display as panel-style storyboards with simple parallaxing and minimal (if any) animations. Some examples of what I mean are: Infamous, Metal Gear Solid Peacewalker, or Gravity Rush.
+The most critical story beats will be delivered through interstitial, skippable cutscenes that will bookend levels. The cutscenes will display as panel-style storyboards with simple parallaxing and minimal (if any) animations. Some examples of games that do this: Infamous, Metal Gear Solid Peacewalker, and Gravity Rush.
 
 ## Mechanics
 
-In earnest, this game is mechanically a spiritual successor to Metal Gear Solid V with some simplifications and adaptations made to accomdate for a narrower scope and fixed camera perspective.
+In earnest, this game is mechanically a spiritual successor to Metal Gear Solid V with some simplifications and adaptations made to accomdate a narrower scope and fixed camera perspective.
 
 ### Core Mechanics
 
@@ -91,10 +91,9 @@ During normal play, the player will move about the space in different stances. E
     - scope/aim/melee/shooting can _only_ be done while staying still in this stance
     - player cannot see over short obstacles into windows
 - Running
-    - enemies will see and hear running player from very far away
+    - enemies will see and hear the player running from further away
     - primarily used for retreating from combat or covering large distances quickly
-    - if the player stops moving they will transition the back to a crouching stance
-    - scope/aim/looking while running will transition the player back to a crouching stance
+    - limited equipment use while running
 
 #### Player Movement Speed
 
@@ -126,13 +125,12 @@ We will prevent the player from killing enemies outside of combat. Within combat
 - stairs
 - ledge shimmying
 - jumping/diving/falling from a roof/higher level
-- ladders
-- drainpipes
+- ladders and other stationary climbable fixtures
 - certain climbable obstacles (i.e. crates)
 
 ### Equipment
 
-Furtive Solutions is well funded and highly invested in providing state-of-the-art tools and gadgets to enable their field agents to complete their assignments within FS's high standards of excellence. Expect some cool surprises from R&D.
+Furtive Solutions is well funded and highly invested in providing state-of-the-art tools and gadgets to enable their field agents to complete their assignments while meeting FS's high standards of excellence. Expect some cool surprises from R&D in the near future.
 
 #### Time Bender Distender aka TBD
 
@@ -142,33 +140,34 @@ Yes. It's just a placeholder name. TBD is a device built into Mel's suit which e
 
 ### Enemy Types
 
-- basic patrolling enemy
-- snipers
+- Basic Units
+    - most enemies will be of this type. these enemies patrol and protect the base following the AI awareness states outlined below.
+- Snipers
     - stationary
     - see long distances
-- hunters
+- Hunters
     - can see and follow player's footsteps
     - will search in "safe zones"
 
 ### Awareness States
 
-As is typical in stealth games, rank-and-file enemy awareness will have different states depending on player actions. There will also be a _base awareness level_ which is triggered by an enemy reporting their awareness level to the base communications officer (or allied doppleganger) followed by dispatch communicating the awareness level to all other enemies. Some awareness levels do not apply to the base. I'm envisioning an event-driven system with a robust state machine for driving enemy awareness states as well as their ability to coordinate with surrounding enemies or call for back up. What follows is a high level rough draft of the enemy awareness system.
+As is typical in stealth games, rank-and-file enemy awareness will have different states depending on player actions. There will also be a _base awareness level_ which is triggered by an enemy reporting observations to the base communications officer (unless this has been disabled). When the base communications officer is, they will communicate the awareness level change to all other enemies on the base. Some awareness levels do not apply to the base. I'm envisioning an event-driven system with a robust state machine for driving enemy awareness states as well as their ability to coordinate with surrounding enemies or call for back up. What follows is a high level rough draft of the enemy awareness system.
 
 #### PASSIVE
 
-This is the default starting state for enemies. In this state the enemy has no idea the player is around and is conducting their normal patrol. Seeing something from a distance or hearing something innocuous (like a footstep) will drive the enemy into a `CURIOUS` state.
+This is the default starting state for enemies. In this state the enemy has no idea the player is around and is conducting their normal patrol. Seeing something from a distant or brief sights/sounds will drive the enemy into a `CURIOUS` state.
 
 #### CURIOUS
 
-In this state the player has begun to draw the enemy's attention. They will look toward the source of the distraction. If they continue to have their attention drawn they will progress to a `INVESTIGATING` state. Otherwise they will digress back to a `PASSIVE` state.
+In this state the player has begun to draw the enemy's attention. They will look toward the source of the distraction. If they continue to have their attention drawn they will progress to an `INVESTIGATING` state. Otherwise they will digress back to a `PASSIVE` state.
 
 #### INVESTIGATING
 
-In this state the enemy's attention has been drawn enough that they feel the need to investigate. They _may_ also choose to speak out to nearby enemies or radio to central dispatch. This will also put relevant enemies into a `INVESTIGATING` state. If the enemy positively identifies the player, they will enter an `AGRESSIVE` state. If the enemy's concerns are abated, they may return to a `PASSIVE` state. However, if an enemy repeatedly enters an `INVESTIGATING` state they may progress to an `ALERT` state instead.
+In this state the enemy's attention has been drawn enough that they feel the need to investigate. They _may_ also choose to speak out to nearby enemies or radio to the base communications officer. This will also put relevant enemies into a `INVESTIGATING` state. If the enemy positively identifies the player, they will enter an `AGRESSIVE` state. If the enemy's concerns are abated, they may return to a `PASSIVE` state. However, if an enemy repeatedly enters an `INVESTIGATING` state they may progress to an `ALERT` state instead.
 
 #### ALERT
 
-In this state, the enemy is aware there is an intruder, but has no idea on the player's location. Their movements are faster, their patrols will change, and their vision and hearing become more sensitive with a broader range. The same triggers that put an enemy into a `CURIOUS` or `INVESTIGATING` state from a `PASSIVE` state will cause an `ALERT` enemy to enter an `ALERT_INVESTIGATING` state. Certain sounds (like gunshots or explosions) will immediately transition any enemy within earshot into an `ALERT` state unless they are already at a higher state.
+In this state, the enemy is aware there is an intruder, but has no idea of the player's location. Their movements are faster, their patrols will change, and their vision and hearing become more sensitive with a broader range. The same triggers that put an enemy into a `CURIOUS` or `INVESTIGATING` state from a `PASSIVE` state will cause an `ALERT` enemy to enter an `ALERT_INVESTIGATING` state. Certain sounds (like gunshots or explosions) will immediately transition any enemy within earshot into an `ALERT` state unless they are already at a higher state.
 
 After a time of remaining undected, enemies and the base will return from an `ALERT` state to a `PASSIVE` state.
 
