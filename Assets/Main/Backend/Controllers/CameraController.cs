@@ -14,7 +14,6 @@ namespace OSBE.Controllers {
         private CinemachineVirtualCamera[] cams;
         private bool isShaking = false;
 
-        // Start is called before the first frame update
         private void Start() {
             system = FindObjectOfType<GameController>();
             cams = transform.parent.GetComponentsInChildren<CinemachineVirtualCamera>();

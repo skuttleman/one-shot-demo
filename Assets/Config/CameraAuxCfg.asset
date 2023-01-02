@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <fire>k__BackingField:
     <amp>k__BackingField: 0.75
-    <freq>k__BackingField: 10
+    <freq>k__BackingField: 5
     <duration>k__BackingField: 0.1
   <punch>k__BackingField:
     <amp>k__BackingField: 0
     <freq>k__BackingField: 0
     <duration>k__BackingField: 0
   <fallLand>k__BackingField:
-    <amp>k__BackingField: 3
-    <freq>k__BackingField: 10
-    <duration>k__BackingField: 0.1
+    <amp>k__BackingField: 0
+    <freq>k__BackingField: 0
+    <duration>k__BackingField: 0
   <diveLand>k__BackingField:
-    <amp>k__BackingField: 2
-    <freq>k__BackingField: 1
-    <duration>k__BackingField: 0.075
+    <amp>k__BackingField: 1
+    <freq>k__BackingField: 0.5
+    <duration>k__BackingField: 0.1

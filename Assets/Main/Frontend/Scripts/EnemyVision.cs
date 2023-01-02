@@ -52,7 +52,7 @@ namespace OSFE.Scripts {
                 enemyEyes - playerEyes,
                 out RaycastHit blockedHit,
                 Vector3.Distance(transform.parent.parent.position, playerEyes),
-                LayerMask.GetMask("Opaque", "Obstacles"));
+                LayerMask.GetMask("Opaque", "InsideOpaque"));
 
             if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
             else timeSinceSeeable = -0.25f;

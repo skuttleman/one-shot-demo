@@ -1,6 +1,6 @@
 # POC
 
-You can check out the super rough POC [here]() to give you a quick idea of the kind of game I want to build. Other than the rendered sprites, everything about the POC is actually a 3D game. I originally thought it would be easier to model it in 3D space to allow for some verticality in level design, but it turns out that Unity isn't particularly great at mixing 2D and 3D components so I had to rebuild it as a _fully_ 3D game. This leaves us with an early decision point about the scope of this project.
+You can check out the super rough POC [here](https://one-shot-2ba80.web.app) to give you a quick idea of the kind of game I want to build. Other than the rendered sprites, everything about the POC is actually a 3D game. I originally thought it would be easier to model it in 3D space to allow for some verticality in level design, but it turns out that Unity isn't particularly great at mixing 2D and 3D components so I had to rebuild it as a _fully_ 3D game. This leaves us with an early decision point about the scope of this project.
 
 Should we...
 
@@ -10,7 +10,7 @@ Should we...
 
 ## Controls
 
-I recommend playing with a gamepad. There are mouse/keyboard controls but they're harder to use.
+I recommend playing with a gamepad. There are mouse/keyboard controls but they're harder to use - especially looking/aiming with the mouse.
 
 ### Gamepad
 
@@ -23,7 +23,7 @@ I recommend playing with a gamepad. There are mouse/keyboard controls but they'r
 - Y:                 climb up from ledge hang
 - RIGHT BUMPER:      activate scope
 - LEFT TRIGGER:      aim weapon
-- RIGHT TRIGGER:     fires when aiming; punches when not aiming
+- RIGHT TRIGGER:     fires when aiming / punches when not aiming
 
 ### Mouse + Keyboard
 
@@ -36,11 +36,11 @@ I recommend playing with a gamepad. There are mouse/keyboard controls but they'r
 - E:                  climb up from ledge hang
 - F:                  activate scope
 - RIGHT CLICK:        aim weapon
-- LEFT CLICK:         fires when aiming; punches when not aiming
+- LEFT CLICK:         fires when aiming / punches when not aiming
 
 ## What's There
 
-Bugs. Jenkiness. The graphics are crappy, but hopefully it's good enough for you to tell that there's a two story building to run around in. There are stairs to the partial roof of the first floor from the south side around to the west of the building. The arrows above the stairs point in the direction of "up-the-stairs". There's some basic moving/hiding/line-of-sight features to give a sense of where this would go. There's no objective or win/lose state. Just mess about. I think it's better to let you explore what's there rather than try to explain it.
+Bugs. Jenkiness. The graphics are crappy, but hopefully it's good enough for you to tell that there's a two story building to run around in. There are windows and doors, and some stairs to the partial roof of the first floor from the south side around to the west of the building. Another set of stairs is inside. The arrows above the stairs point in the direction of "up-the-stairs". There's some basic moving/hiding/line-of-sight features to give a sense of where this would go. There's no objective or win/lose state. Just mess about. I think it's better to let you explore what's there rather than try to explain it.
 
 ## Game Design Document
 

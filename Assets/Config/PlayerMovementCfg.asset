@@ -16,32 +16,32 @@ MonoBehaviour:
   <groundedDist>k__BackingField: 0.25
   <sprinting>k__BackingField:
     <moveSpeed>k__BackingField: 75
-    <rotationSpeed>k__BackingField: 11
+    <rotationSpeed>k__BackingField: 15
     <animFactor>k__BackingField: 0.65
-    <maxVelocity>k__BackingField: 4.5
+    <maxVelocity>k__BackingField: 4.75
     <maxVelocitydamper>k__BackingField: 1
     <lookSpeedInhibiter>k__BackingField: 0
   <crouching>k__BackingField:
     <moveSpeed>k__BackingField: 75
     <rotationSpeed>k__BackingField: 12
     <animFactor>k__BackingField: 0.75
-    <maxVelocity>k__BackingField: 2.25
+    <maxVelocity>k__BackingField: 2.35
     <maxVelocitydamper>k__BackingField: 1
     <lookSpeedInhibiter>k__BackingField: 0.25
   <crawling>k__BackingField:
     <moveSpeed>k__BackingField: 20
     <rotationSpeed>k__BackingField: 5
     <animFactor>k__BackingField: 1.25
-    <maxVelocity>k__BackingField: 1
+    <maxVelocity>k__BackingField: 1.35
     <maxVelocitydamper>k__BackingField: 0.25
     <lookSpeedInhibiter>k__BackingField: 0
   <scopeFactor>k__BackingField: 0.75
   <aimFactor>k__BackingField: 0.9
   <diveForce>k__BackingField: 60
-  <hangMoveAmount>k__BackingField: 0.15
+  <hangMoveAmount>k__BackingField: 0.2
   <tbdCooldown>k__BackingField: 5
-  <tbdMinTime>k__BackingField: 0.2
-  <tbdMinTimeDuration>k__BackingField: 0.5
+  <tbdMinTime>k__BackingField: 0.25
+  <tbdMinTimeDuration>k__BackingField: 1
   <tbdMaxTime>k__BackingField: 3
-  <tbdMaxTimeDuration>k__BackingField: 0.05
+  <tbdMaxTimeDuration>k__BackingField: 0.1
   <tbdTransitionSpeed>k__BackingField: 0.075

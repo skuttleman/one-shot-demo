@@ -133,9 +133,10 @@ namespace OSBE.Controllers {
 
         private IEnumerator<YieldInstruction> InitiateTBD() {
             bool crossedOver = false;
+            tbdEffect.position = transform.position;
             while (Time.timeScale > cfg.tbdMinTime) {
                 Time.timeScale = Mathf.Max(cfg.tbdMinTime, Time.timeScale - (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
-                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(40, 40, 40), 1 - Time.timeScale);
+                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(30, 30, 30), 1 - Time.timeScale);
                 yield return new WaitForEndOfFrame();
                 if (Time.timeScale >= 1f) crossedOver = true;
             }
@@ -143,7 +144,7 @@ namespace OSBE.Controllers {
 
             while (!crossedOver || Time.timeScale > 1f) {
                 Time.timeScale = Mathf.Max(1f, Time.timeScale - (cfg.tbdTransitionSpeed * (1 - Time.deltaTime)));
-                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(40, 40, 40), (Time.timeScale - 1) / (cfg.tbdMaxTime - 1));
+                tbdEffect.localScale = Vector3.Lerp(new(0, 0, 0), new(30, 30, 30), (Time.timeScale - 1) / (cfg.tbdMaxTime - 1));
                 yield return new WaitForEndOfFrame();
                 if (Time.timeScale >= 1f) crossedOver = true;
             }
