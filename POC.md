@@ -1,5 +1,7 @@
 # POC
 
+I want to make a game.
+
 You can check out the super rough POC [here](https://one-shot-2ba80.web.app) to give you a quick idea of the kind of game I want to build. Other than the rendered sprites, everything about the POC is actually a 3D game. I originally thought it would be easier to model it in 3D space to allow for some verticality in level design, but it turns out that Unity isn't particularly great at mixing 2D and 3D components so I had to rebuild it as a _fully_ 3D game. This leaves us with an early decision point about the scope of this project.
 
 Should we...
@@ -46,4 +48,4 @@ Bugs. Jenkiness. The graphics are crappy, but hopefully it's good enough for you
 
 When you're done playing with the POC, read through the [game design document](/GDD.md) for a more detailed explanation of what I want to build.
 
-Let's do this!
+Let's do this! Who's with me?
