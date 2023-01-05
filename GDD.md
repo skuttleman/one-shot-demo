@@ -28,6 +28,61 @@ Being a pacifist, Mel doesn't think it will be a problem for her to only kill on
 
 However, Babbit has his own reasons for staying under FS's radar. He had been undermining them and using Cici to lay the groundwork for establishing his own evil organization, Plunderbund Inc. Cici discovered the plot and was captured while trying to thwart Babbit's plans. Mel was abducted to blackmail Cici into finishing the job, but, when Mel showed aptitude by escaping, Babbit adjusted course and started using Mel in Cici's place. Around the time Mel puts the pieces of Babbit's treachery together, Cici escapes on her own - because of course she does; she's a highly capable super assassin. Cici finds Mel, and the two of them team up to stop Babbit before it's too late.
 
+### Characters
+
+#### Mel Cartwright
+
+_Full Name_: Melanie Cartwright
+
+_Birthday_: 12 October
+
+_Age_: 29
+
+_Role_: U.S. Park Ranger Deadly Animal Specialist / Protagonist
+
+_Bio_:
+
+Growing up with her twin sister, Cici, was difficult for Mel. Cici was more popular, excelled academically, and picked up new hobbies and skills effortlessly. Mel, by contrast, is more classically introverted and - in her estimation - has very few skills. In their adolescence, Mel was always quick to point out that she was the older twin - by 13 minutes. This was a shallow attempt to cast some self esteem over her feelings of inadequacies towards her sister. Cici knows this, and gave Mel the nickname "Lil' Sis'" to get on Mel's nerves. It worked.
+
+As an adult, Mel has grown into her own. She loves her job as a U.S. Park Ranger. It gets her outdoors and she doesn't have to interact with a lot of people. Her dad doesn't like how dangerous her job can be sometimes, but she reminds him that she is well trained and equipped.
+
+#### Dick Babbit
+
+_Full Name_: Richard Jeffrey Babbit
+
+_Birthday_: 7 July
+
+_Age_: 48
+
+_Role_: Furtive Solutions Agent Handler / Antagonist
+
+As a child, Dick Babbit only ever wanted one thing: to grow up and build an elite team of globetrotting super assassins for hire. His business never completely took off. It was a scrappy four-person operation, but they managed to make ends meet. Right around the time they were starting to establish real legitimacy, Furtive Solutions swooped in - with their deep pockets and technologically advanced gear - and started syphoning business. Before long they had taken over the market and bought Babbit out. The dream was over, and Babbit never really felt whole after that.
+
+It was a good buy-out deal. They even gave him a job - though not a great one. Working for Furtive Solutions, however, only served as a daily reminder that he had failed. Before long he began plotting his revenge.
+
+Step 1: Steal Furtive Solutions' plans and prototypes
+Step 2: Sell to competitor
+Step 3: Use profits to buy controlling shares of Furtive Solutions
+Step 4: Vote out the CEO and install himself as new CEO! Muahahahaha!
+
+All he needed was a naive agent with talent and potential that he could trick into doing the leg work.
+
+#### Cici Cartwright
+
+_Full Name_: Fancine Cartwright
+
+_Birthday_: 12 October
+
+_Age_: 29
+
+_Role_: Furtive Solutions Agent
+
+_Bio_:
+
+Cici always seemed to have life handed to her. She never cared that she was popular. She got good grades without applying herself. Frankly, it was boring always succeeding at everything she tried. When she met a Furtive Solutions talent scout, she saw it as an opportunity to finally be challenged.
+
+Mel and Cici were always close, but Cici's new job has demanding hours and requires a lot of international travel. This, combined with the inability to be honest about her career, has caused Mel and Cici to drift apart over the last few years.
+
 ## Gameplay
 
 The main structure of the game will feature a series of large "bases" to infiltrate. As each level is completed, the area is unlocked for main mission replay as well as additional randomized side challenges. Completing levels is the primary mechanism for progressing the story.
@@ -50,7 +105,7 @@ Some example mission objectives:
 
 ### Systemic Opportunities
 
-We'll provide the player with some exploitable, systemic opportunities for sneaking through the level unseen, so they can dynamically adjust the difficult to suit their tastes (like grinding).
+We'll provide the player with some exploitable, systemic opportunities for sneaking through the level unseen, so they can dynamically adjust the difficulty to suit their tastes (like grinding).
 
 - Rotating patrols
   Each level has multiple patrol areas/paths for guards to monitor. The patrols will be assigned randomly. Periodically, a guard will have their patrol reassigned causing them to navigate to a different part of the level.
@@ -83,17 +138,17 @@ In earnest, this game is mechanically a spiritual successor to Metal Gear Solid 
 During normal play, the player will move about the space in different stances. Each stance effects how easily the player is seen, how loud the player's movement is, and how well the player can see the surrounding level.
 
 - Crouching
-    - The default stance allows the player to move and see around the level at the risk of being seen or heard by the enemy
-    - scope/aim/melee/shooting can be done while staying still or moving in this stance
-    - player can see over shorter obstacles/windows/etc
+  - The default stance allows the player to move and see around the level at the risk of being seen or heard by the enemy
+  - scope/aim/melee/shooting can be done while staying still or moving in this stance
+  - player can see over shorter obstacles/windows/etc
 - Crawling
-    - The player is difficult to see and very difficult to hear in this stance at the cost of their movement and viewport being less favorable
-    - scope/aim/melee/shooting can _only_ be done while staying still in this stance
-    - player cannot see over short obstacles into windows
+  - The player is difficult to see and very difficult to hear in this stance at the cost of their movement and viewport being less favorable
+  - scope/aim/melee/shooting can _only_ be done while staying still in this stance
+  - player cannot see over short obstacles into windows
 - Running
-    - enemies will see and hear the player running from further away
-    - primarily used for retreating from combat or covering large distances quickly
-    - limited equipment use while running
+  - enemies will see and hear the player running from further away
+  - primarily used for retreating from combat or covering large distances quickly
+  - limited equipment use while running
 
 #### Player Movement Speed
 
