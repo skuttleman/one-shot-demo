@@ -30,8 +30,8 @@ namespace OSCore.System.Interfaces {
 
     namespace Events {
         public interface IPubSub : IComponentLifecycle {
-            void Publish<T>(T item) where T : IEvent;
-            long Subscribe<T>(Action<T> action) where T : IEvent;
+            void Publish(IEvent item);
+            long Subscribe(Action<IEvent> action);
             void Unsubscribe(long id);
         }
     }

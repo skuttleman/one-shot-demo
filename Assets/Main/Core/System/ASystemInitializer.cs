@@ -1,13 +1,15 @@
 using OSCore.Data.Events;
 using OSCore.System.Interfaces.Events;
 using OSCore.System.Interfaces;
-using OSCore.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace OSCore.System {
     public abstract class ASystemInitializer : MonoBehaviour {
         protected IGameSystem system;
+
+        /*
+         * Lifecycle Methods
+         */
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
@@ -17,7 +19,7 @@ namespace OSCore.System {
     public abstract class ASystemInitializer<A> : MonoBehaviour
         where A : IEvent {
         protected IGameSystem system;
-        private IEnumerable<long> subs;
+        private long sub;
 
         protected abstract void OnEvent(A e);
 
@@ -27,24 +29,25 @@ namespace OSCore.System {
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
-            subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
-                new long[] {
-                    pubsub.Subscribe<A>(OnEvent),
-                });
+            sub = system.Send<IPubSub, long>(pubsub =>
+                pubsub.Subscribe(e => {
+                    switch (e) {
+                        case A ev: OnEvent(ev); break;
+                    }
+                }));
         }
 
         protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
-                subs.ForEach(sub => pubsub.Unsubscribe(sub)));
+                system.Send<IPubSub>(pubsub => pubsub.Unsubscribe(sub)));
         }
-
     }
 
     public abstract class ASystemInitializer<A, B> : MonoBehaviour
         where A : IEvent
         where B : IEvent {
         protected IGameSystem system;
-        private IEnumerable<long> subs;
+        private long sub;
 
         protected abstract void OnEvent(A e);
         protected abstract void OnEvent(B e);
@@ -55,16 +58,18 @@ namespace OSCore.System {
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
-            subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
-                new long[] {
-                    pubsub.Subscribe<A>(OnEvent),
-                    pubsub.Subscribe<B>(OnEvent),
-                });
+            sub = system.Send<IPubSub, long>(pubsub =>
+                pubsub.Subscribe(e => {
+                    switch (e) {
+                        case A ev: OnEvent(ev); break;
+                        case B ev: OnEvent(ev); break;
+                    }
+                }));
         }
 
         protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
-                subs.ForEach(sub => pubsub.Unsubscribe(sub)));
+                system.Send<IPubSub>(pubsub => pubsub.Unsubscribe(sub)));
         }
     }
 
@@ -73,7 +78,7 @@ namespace OSCore.System {
         where B : IEvent
         where C : IEvent {
         protected IGameSystem system;
-        private IEnumerable<long> subs;
+        private long sub;
 
         protected abstract void OnEvent(A e);
         protected abstract void OnEvent(B e);
@@ -85,17 +90,19 @@ namespace OSCore.System {
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
-            subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
-                new long[] {
-                    pubsub.Subscribe<A>(OnEvent),
-                    pubsub.Subscribe<B>(OnEvent),
-                    pubsub.Subscribe<C>(OnEvent),
-                });
+            sub = system.Send<IPubSub, long>(pubsub =>
+                pubsub.Subscribe(e => {
+                    switch (e) {
+                        case A ev: OnEvent(ev); break;
+                        case B ev: OnEvent(ev); break;
+                        case C ev: OnEvent(ev); break;
+                    }
+                }));
         }
 
         protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
-                subs.ForEach(sub => pubsub.Unsubscribe(sub)));
+                system.Send<IPubSub>(pubsub => pubsub.Unsubscribe(sub)));
         }
     }
 
@@ -105,7 +112,7 @@ namespace OSCore.System {
         where C : IEvent
         where D : IEvent {
         protected IGameSystem system;
-        private IEnumerable<long> subs;
+        private long sub;
 
         protected abstract void OnEvent(A e);
         protected abstract void OnEvent(B e);
@@ -118,18 +125,20 @@ namespace OSCore.System {
 
         protected virtual void OnEnable() {
             system = FindObjectOfType<GameController>();
-            subs = system.Send<IPubSub, IEnumerable<long>>(pubsub =>
-                new long[] {
-                    pubsub.Subscribe<A>(OnEvent),
-                    pubsub.Subscribe<B>(OnEvent),
-                    pubsub.Subscribe<C>(OnEvent),
-                    pubsub.Subscribe<D>(OnEvent),
-                });
+            sub = system.Send<IPubSub, long>(pubsub =>
+                pubsub.Subscribe(e => {
+                    switch (e) {
+                        case A ev: OnEvent(ev); break;
+                        case B ev: OnEvent(ev); break;
+                        case C ev: OnEvent(ev); break;
+                        case D ev: OnEvent(ev); break;
+                    }
+                }));
         }
 
         protected virtual void OnDisable() {
             system.Send<IPubSub>(pubsub =>
-                subs.ForEach(sub => pubsub.Unsubscribe(sub)));
+                system.Send<IPubSub>(pubsub => pubsub.Unsubscribe(sub)));
         }
     }
 }
