@@ -13,7 +13,7 @@ namespace OSBE.Controllers {
             IStateReceiver<EnemyAnim> receiver = Transforms
                 .Body(transform)
                 .GetComponentInChildren<IStateReceiver<EnemyAnim>>();
-            Init(receiver, cfg.Init(), new() {
+            Init(cfg.animator, receiver, cfg.Init(), new() {
                 isMoving = false,
                 isAiming = false,
                 isAttacking = false,

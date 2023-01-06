@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a66efe7ebd474f2e82cdfd771200384, type: 3}
   m_Name: EnemyAnimatorCfg
   m_EditorClassIdentifier: 
+  <animator>k__BackingField: {fileID: 9100000, guid: 49ccc526f767d4a418662ba821767dad,
+    type: 2}
   <defaultSpeed>k__BackingField: 0.2
   <aimingSpeed>k__BackingField: 0.25
   <meleeSpeed>k__BackingField: 1.75

@@ -1,3 +1,4 @@
+using Cinemachine;
 using OSCore.Data.Animations;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces;
@@ -13,7 +14,7 @@ namespace OSBE.Controllers {
             IStateReceiver<PlayerAnim> receiver = Transforms
                 .Body(transform)
                 .GetComponentInChildren<IStateReceiver<PlayerAnim>>();
-            Init(receiver, cfg.Init(), new() {
+            Init(cfg.animator, receiver, cfg.Init(), new() {
                 fall = false,
                 attack = false,
                 aim = false,
@@ -23,6 +24,9 @@ namespace OSBE.Controllers {
                 hang = false,
                 climb = false,
             });
+
+            FindObjectOfType<CinemachineStateDrivenCamera>()
+                .m_AnimatedTarget = GetComponent<Animator>();
         }
     }
 }

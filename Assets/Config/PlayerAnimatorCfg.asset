@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06129d99dace54f7ead26fc9d1295e2b, type: 3}
   m_Name: PlayerAnimatorCfg
   m_EditorClassIdentifier: 
+  <animator>k__BackingField: {fileID: 9100000, guid: 825d6f5c48dd24ccc847d39315107653,
+    type: 2}
   <defaultSpeed>k__BackingField: 0.2
   <aimingSpeed>k__BackingField: 0.25
   <scopingSpeed>k__BackingField: 0.15

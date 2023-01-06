@@ -7,6 +7,7 @@ using static OSCore.ScriptableObjects.PlayerAnimationCfgSO;
 namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/player/animator")]
     public class PlayerAnimationCfgSO : ACharacterAnimatorCfgSO<PlayerAnim, PlayerAnimState> {
+        [field: Header("Transition speeds")]
         [field: SerializeField] public float defaultSpeed { get; private set; }
         [field: SerializeField] public float aimingSpeed { get; private set; }
         [field: SerializeField] public float scopingSpeed { get; private set; }
