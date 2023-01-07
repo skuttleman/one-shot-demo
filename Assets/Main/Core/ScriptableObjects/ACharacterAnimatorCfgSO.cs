@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OSCore.System;
+using UnityEditor;
 using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
