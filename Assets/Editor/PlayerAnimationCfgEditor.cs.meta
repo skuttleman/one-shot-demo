@@ -4,7 +4,9 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
   - tree: {fileID: 9197481963319205126, guid: 65f01349322334879b0c0f26c04cfe64, type: 3}
+  - cfg: {fileID: 11400000, guid: a4ed30324cef1463894586661182bea2, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

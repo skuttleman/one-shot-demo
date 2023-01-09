@@ -26,18 +26,21 @@ namespace OSCore.ScriptableObjects {
     }
 
     public abstract class AnimSONode<State> : ScriptableObject {
-        public string id;
+        [HideInInspector] public string id;
+        [HideInInspector] public Vector2 position;
         public State state;
         public float animSpeed;
     }
 
     public abstract class AnimSOEdge : ScriptableObject {
-        public string from;
-        public string to;
-        public List<AnimConditions> conditions;
+        [HideInInspector] public string from;
+        [HideInInspector] public string to;
+        public List<AndCondition> conditions;
+
+        [Serializable] public class AndCondition : List<PropComparator> { }
 
         [Serializable]
-        public struct AnimCondition {
+        public struct PropComparator {
             public string prop;
             public Comparator comparator;
             public float floatValue;
@@ -48,7 +51,5 @@ namespace OSCore.ScriptableObjects {
         public enum Comparator {
             EQ, NE, GT, GTE, LT, LTE
         }
-
-        [Serializable] public class AnimConditions : List<AnimCondition> { }
     }
 }
