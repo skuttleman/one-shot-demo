@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace OSCore.System {
-    public abstract record StateDetails<State> {
+    [Serializable]
+    public abstract record AStateDetails<State> {
         public float timeInState { get; init; }
     }
 
-    public abstract class AStateNode<State, Details> where Details : StateDetails<State> {
+    [Serializable]
+    public abstract class AStateNode<State, Details> where Details : AStateDetails<State> {
         public readonly State state;
 
         protected readonly IList<(Predicate<Details>, AStateNode<State, Details>)> edges;
@@ -19,7 +21,7 @@ namespace OSCore.System {
             edges = new List<(Predicate<Details>, AStateNode<State, Details>)>();
         }
 
-        public void AddTransition(Predicate<StateDetails<State>> pred, AStateNode<State, Details> node) {
+        public void AddTransition(Predicate<AStateDetails<State>> pred, AStateNode<State, Details> node) {
             edges.Add((pred, node));
         }
 
@@ -39,7 +41,7 @@ namespace OSCore.System {
     }
 
     public abstract class AStateMachine<State, Details> : MonoBehaviour
-            where Details : StateDetails<State> {
+            where Details : AStateDetails<State> {
 
         public State state => node == null ? default : node.state;
 
@@ -79,7 +81,6 @@ namespace OSCore.System {
 
         private void Update() {
             if (node is null) return;
-
             TransitionTo(node.Next(Enrich(details with {
                 timeInState = timeInState,
             })));

@@ -18,6 +18,12 @@ namespace OSEditor {
             tree.CloneTree(rootVisualElement);
             Button element = rootVisualElement.Q<Button>();
             element.clickable.clickedWithEventInfo += OnSave;
+
+            PlayerAnimatorEditorInspectorView inspector =
+                rootVisualElement.Q<PlayerAnimatorEditorInspectorView>();
+            rootVisualElement.Q<PlayerAnimatorGraphView>()
+                .Init(inspector);
+
         }
 
         private void OnSave(EventBase obj) {

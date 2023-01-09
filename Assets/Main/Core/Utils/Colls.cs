@@ -3,7 +3,7 @@ using System;
 
 namespace OSCore.Utils {
     public static class Colls {
-        public static L Add<L, T>(L coll, T item) where L : ICollection<T> {
+        public static L With<L, T>(this L coll, T item) where L : ICollection<T> {
             coll.Add(item);
             return coll;
         }

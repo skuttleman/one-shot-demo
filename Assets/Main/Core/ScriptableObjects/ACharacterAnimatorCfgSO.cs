@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using OSCore.System;
-using UnityEditor;
 using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
@@ -24,5 +23,32 @@ namespace OSCore.ScriptableObjects {
                 result.Add((T)item);
             return result;
         }
+    }
+
+    public abstract class AnimSONode<State> : ScriptableObject {
+        public string id;
+        public State state;
+        public float animSpeed;
+    }
+
+    public abstract class AnimSOEdge : ScriptableObject {
+        public string from;
+        public string to;
+        public List<AnimConditions> conditions;
+
+        [Serializable]
+        public struct AnimCondition {
+            public string prop;
+            public Comparator comparator;
+            public float floatValue;
+            public bool boolValue;
+        }
+
+        [Serializable]
+        public enum Comparator {
+            EQ, NE, GT, GTE, LT, LTE
+        }
+
+        [Serializable] public class AnimConditions : List<AnimCondition> { }
     }
 }
