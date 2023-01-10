@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor;
 using UnityEngine.UIElements;
+using OSCore.Data.Animations;
 
 namespace OSEditor {
     public class PlayerAnimatorGraphView : GraphView {
@@ -46,17 +47,22 @@ namespace OSEditor {
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt) {
             evt.menu.AppendAction("Add State", action => {
-                AddNode(cfg.CreateNode(action.eventInfo.localMousePosition));
+                AddNode(cfg.CreateNode<PlayerAnimSONode>(action.eventInfo.localMousePosition));
                 AssetDatabase.SaveAssets();
             });
         }
+
+
+
+
+
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange) {
             graphViewChange.edgesToCreate?.ForEach(edge => {
                 if (edge.input.node is PlayerAnimatorGraphNodeView nin
                     && edge.output.node is PlayerAnimatorGraphNodeView nout
                 ) {
-                    PlayerAnimSOEdge e = cfg.SetEdge(nout.node.id, nin.node.id);
+                    PlayerAnimSOEdge e = cfg.SetEdge<PlayerAnimSOEdge>(nout.node.id, nin.node.id);
                     edge.RegisterCallback<MouseDownEvent>(EdgeClick);
                     edgeViews[(e.from, e.to)] = new PlayerAnimatorGraphEdgeView() { edge = e };
                 }
@@ -72,29 +78,29 @@ namespace OSEditor {
             return graphViewChange;
         }
 
-        private void AddNode(PlayerAnimSONode node) {
+        private void AddNode(AnimSONode<PlayerAnim> node) {
             PlayerAnimatorGraphNodeView el = new(
                 inspector,
                 RemoveGraphElement,
-                node);
+                (PlayerAnimSONode)node);
             AddElement(el);
             nodeViews.Add(node.id, el);
         }
 
-        private void AddEdge(PlayerAnimSOEdge edge) {
+        private void AddEdge(AnimSOEdge edge) {
             PlayerAnimatorGraphNodeView from = nodeViews[edge.from];
             PlayerAnimatorGraphNodeView to = nodeViews[edge.to];
 
             Edge e = from.output.ConnectTo(to.input);
             e.RegisterCallback<MouseDownEvent>(EdgeClick);
-            edgeViews[(edge.from, edge.to)] = new PlayerAnimatorGraphEdgeView() { edge = edge };
+            edgeViews[(edge.from, edge.to)] = new PlayerAnimatorGraphEdgeView() { edge = (PlayerAnimSOEdge)edge };
             AddElement(e);
         }
 
         private void Draw() {
             graphElements.ForEach(RemoveElement);
             nodeViews = new Dictionary<string, PlayerAnimatorGraphNodeView>();
-            edgeViews = new Dictionary<(string,string), PlayerAnimatorGraphEdgeView>();
+            edgeViews = new Dictionary<(string, string), PlayerAnimatorGraphEdgeView>();
             cfg.nodes.ForEach(AddNode);
             cfg.edges.ForEach(AddEdge);
         }

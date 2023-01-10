@@ -23,9 +23,6 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public float lungingSpeed { get; private set; }
         [field: SerializeField] public float ledgeShimmySpeed { get; private set; }
 
-        [field: SerializeField] public List<PlayerAnimSONode> nodes { get; private set; }
-        [field: SerializeField] public List<PlayerAnimSOEdge> edges { get; private set; }
-
         private void BuildAsset() {
             nodes.RemoveAll(node => {
                 if (node != null) AssetDatabase.RemoveObjectFromAsset(node);
@@ -39,33 +36,33 @@ namespace OSCore.ScriptableObjects {
             Vector2 position = Vector2.zero;
 
             Vector2 toPosition() => position += new Vector2(20, 20);
-            string stand_idle = CreateNode(PlayerAnim.stand_idle, toPosition());
-            string stand_move = CreateNode(PlayerAnim.stand_move, toPosition());
-            string stand_punch = CreateNode(PlayerAnim.stand_punch, toPosition());
-            string stand_fall = CreateNode(PlayerAnim.stand_fall, toPosition());
-            string crouch_idle_bino = CreateNode(PlayerAnim.crouch_idle_bino, toPosition());
-            string crouch_move_bino = CreateNode(PlayerAnim.crouch_move_bino, toPosition());
-            string crouch_tobino = CreateNode(PlayerAnim.crouch_tobino, toPosition());
-            string crouch_idle = CreateNode(PlayerAnim.crouch_idle, toPosition());
-            string crouch_move = CreateNode(PlayerAnim.crouch_move, toPosition());
-            string crouch_punch = CreateNode(PlayerAnim.crouch_punch, toPosition());
-            string crouch_toaim = CreateNode(PlayerAnim.crouch_toaim, toPosition());
-            string crouch_idle_aim = CreateNode(PlayerAnim.crouch_idle_aim, toPosition());
-            string crouch_move_aim = CreateNode(PlayerAnim.crouch_move_aim, toPosition());
-            string crouch_fire = CreateNode(PlayerAnim.crouch_fire, toPosition());
-            string crawl_idle_bino = CreateNode(PlayerAnim.crawl_idle_bino, toPosition());
-            string crawl_tobino = CreateNode(PlayerAnim.crawl_tobino, toPosition());
-            string crawl_idle = CreateNode(PlayerAnim.crawl_idle, toPosition());
-            string crawl_move = CreateNode(PlayerAnim.crawl_move, toPosition());
-            string crawl_punch = CreateNode(PlayerAnim.crawl_punch, toPosition());
-            string crawl_toaim = CreateNode(PlayerAnim.crawl_toaim, toPosition());
-            string crawl_idle_aim = CreateNode(PlayerAnim.crawl_idle_aim, toPosition());
-            string crawl_fire = CreateNode(PlayerAnim.crawl_fire, toPosition());
-            string crawl_dive = CreateNode(PlayerAnim.crawl_dive, toPosition());
-            string hang_lunge = CreateNode(PlayerAnim.hang_lunge, toPosition());
-            string hang_idle = CreateNode(PlayerAnim.hang_idle, toPosition());
-            string hang_move = CreateNode(PlayerAnim.hang_move, toPosition());
-            string hang_climb = CreateNode(PlayerAnim.hang_climb, toPosition());
+            string stand_idle = CreateNode<PlayerAnimSONode>(PlayerAnim.stand_idle, toPosition());
+            string stand_move = CreateNode<PlayerAnimSONode>(PlayerAnim.stand_move, toPosition());
+            string stand_punch = CreateNode<PlayerAnimSONode>(PlayerAnim.stand_punch, toPosition());
+            string stand_fall = CreateNode<PlayerAnimSONode>(PlayerAnim.stand_fall, toPosition());
+            string crouch_idle_bino = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_idle_bino, toPosition());
+            string crouch_move_bino = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_move_bino, toPosition());
+            string crouch_tobino = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_tobino, toPosition());
+            string crouch_idle = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_idle, toPosition());
+            string crouch_move = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_move, toPosition());
+            string crouch_punch = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_punch, toPosition());
+            string crouch_toaim = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_toaim, toPosition());
+            string crouch_idle_aim = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_idle_aim, toPosition());
+            string crouch_move_aim = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_move_aim, toPosition());
+            string crouch_fire = CreateNode<PlayerAnimSONode>(PlayerAnim.crouch_fire, toPosition());
+            string crawl_idle_bino = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_idle_bino, toPosition());
+            string crawl_tobino = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_tobino, toPosition());
+            string crawl_idle = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_idle, toPosition());
+            string crawl_move = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_move, toPosition());
+            string crawl_punch = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_punch, toPosition());
+            string crawl_toaim = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_toaim, toPosition());
+            string crawl_idle_aim = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_idle_aim, toPosition());
+            string crawl_fire = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_fire, toPosition());
+            string crawl_dive = CreateNode<PlayerAnimSONode>(PlayerAnim.crawl_dive, toPosition());
+            string hang_lunge = CreateNode<PlayerAnimSONode>(PlayerAnim.hang_lunge, toPosition());
+            string hang_idle = CreateNode<PlayerAnimSONode>(PlayerAnim.hang_idle, toPosition());
+            string hang_move = CreateNode<PlayerAnimSONode>(PlayerAnim.hang_move, toPosition());
+            string hang_climb = CreateNode<PlayerAnimSONode>(PlayerAnim.hang_climb, toPosition());
 
             //stand_idle
             Transition(stand_idle, stand_fall,
@@ -410,97 +407,13 @@ namespace OSCore.ScriptableObjects {
         public override AnimNode<PlayerAnim, PlayerAnimState> Init() {
             BuildAsset();
 
-            IDictionary<string, AnimNode<PlayerAnim, PlayerAnimState>> dict =
-                nodes.Reduce(
-                    (acc, item) => {
-                        return acc.With(
-                            new KeyValuePair<string, AnimNode<PlayerAnim, PlayerAnimState>>(
-                                item.id,
-                                new AnimNode<PlayerAnim, PlayerAnimState>(
-                                    item.state,
-                                    item.animSpeed)));
-                    },
-                    new Dictionary<string, AnimNode<PlayerAnim, PlayerAnimState>>());
-
-            edges.ForEach(edge => {
-                PlayerAnimSONode from = nodes.Find(node => node.id == edge.from);
-                PlayerAnimSONode to = nodes.Find(node => node.id == edge.to);
-                if (from == null || to == null) throw new NotSupportedException("BAD");
-
-                dict[from.id].To(ToPred(edge.conditions), dict[to.id]);
-            });
-
-            return dict
+            return BuildNodes()
                 .Values
                 .First(Fns.Filter<AnimNode<PlayerAnim, PlayerAnimState>>(entry =>
                     entry.state == PlayerAnim.crouch_idle));
         }
 
-        public PlayerAnimSONode CreateNode(Vector2 position) {
-            string id = CreateNode(default, position);
-            return nodes.Find(node => node.id == id);
-        }
 
-        public void DeleteNode(string id) {
-            DeleteFrom(edges, edge => edge.from == id || edge.to == id);
-            DeleteFrom(nodes, node => node.id == id);
-        }
-
-        public void DeleteEdge(string from, string to) {
-            DeleteFrom(edges, edge => edge.from == from && edge.to == to);
-        }
-
-        public PlayerAnimSOEdge SetEdge(
-            string from,
-            string to,
-            params AndCondition[] animConditions
-        ) {
-            PlayerAnimSOEdge edge = Edge(from, to);
-
-            if (edge != null) {
-                edge.conditions = new(animConditions);
-            } else {
-                edge = CreateInstance<PlayerAnimSOEdge>();
-                edge.from = from;
-                edge.to = to;
-                edge.conditions = new(animConditions);
-                edges.Add(edge);
-                AssetDatabase.AddObjectToAsset(edge, this);
-            }
-
-            return edge;
-        }
-
-        public PlayerAnimSONode Node(string id) {
-            return nodes.Find(node => node.id == id);
-        }
-
-        public PlayerAnimSOEdge Edge(string from, string to) {
-            return edges.Find(edge => edge.from == from && edge.to == to);
-        }
-
-        private static void DeleteFrom<T>(List<T> objs, Predicate<T> pred) where T : ScriptableObject {
-            objs.RemoveAll(obj => {
-                if (pred(obj)) {
-                    AssetDatabase.RemoveObjectFromAsset(obj);
-                    return true;
-                }
-                return false;
-            });
-        }
-
-        private string CreateNode(PlayerAnim state, Vector2 position, float animSpeed = 1f) {
-            string id = GUID.Generate().ToString();
-            PlayerAnimSONode node = CreateInstance<PlayerAnimSONode>();
-            node.id = id;
-            node.position = position;
-            node.state = state;
-            node.animSpeed = animSpeed;
-            nodes.Add(node);
-            AssetDatabase.AddObjectToAsset(node, this);
-
-            return id;
-        }
 
         private void Transition(
             string from,
@@ -518,7 +431,7 @@ namespace OSCore.ScriptableObjects {
                     new AndCondition())),
                 new List<AndCondition>());
 
-            SetEdge(from, to, edgeConditions.ToArray());
+            SetEdge<PlayerAnimSOEdge>(from, to, edgeConditions.ToArray());
         }
 
         private void Transition(
@@ -527,7 +440,7 @@ namespace OSCore.ScriptableObjects {
             float minTime,
             float minLoops,
             params (string, Comparator, float, bool)[][] conditions
-            ) {
+        ) {
             List<AndCondition> edgeConditions = conditions.Reduce((ors, or) =>
                 ors.With(or.Reduce((ands, and) =>
                     ands.With(new PropComparator() {
@@ -558,7 +471,7 @@ namespace OSCore.ScriptableObjects {
         private bool PropMatches(
             object record,
             (string prop, Comparator comparator, float floatValue, bool boolValue) comp
-            ) {
+        ) {
             IDictionary<string, PropertyInfo> props = record
                 .GetType()
                 .GetProperties()
