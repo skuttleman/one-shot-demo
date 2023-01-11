@@ -2,7 +2,7 @@ using OSCore.Data.Animations;
 using OSCore.ScriptableObjects;
 using UnityEditor;
 
-namespace OSEditor {
+namespace OSEditor.Deprecated {
     [CustomEditor(typeof(PlayerAnimSONode))]
     public class PlayerAnimSONodeEditor : Editor {
         public override void OnInspectorGUI() {

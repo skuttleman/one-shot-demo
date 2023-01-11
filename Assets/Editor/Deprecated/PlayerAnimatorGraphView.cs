@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using OSCore.Data.Animations;
 
-namespace OSEditor {
+namespace OSEditor.Deprecated {
     public class PlayerAnimatorGraphView : GraphView {
         private PlayerAnimatorEditorInspectorView inspector;
         private PlayerAnimationCfgSO cfg;
@@ -21,7 +21,7 @@ namespace OSEditor {
             this.AddManipulator(new RectangleSelector());
 
             StyleSheet style = AssetDatabase
-                .LoadAssetAtPath<StyleSheet>("Assets/Editor/PlayerAnimatorGraphView.uss");
+                .LoadAssetAtPath<StyleSheet>("Assets/Editor/Deprecated/PlayerAnimatorGraphView.uss");
             styleSheets.Add(style);
 
             graphViewChanged += OnGraphViewChanged;

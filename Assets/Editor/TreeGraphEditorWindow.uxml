@@ -2,8 +2,8 @@
     <ui:VisualElement style="flex-direction: row; flex-grow: 0; justify-content: space-between;">
         <ui:Label text="Animation Config" display-tooltip-when-elided="true" />
     </ui:VisualElement>
-    <PlayerAnimatorEditorSplitView fixed-pane-initial-dimension="250">
-        <OSEditor.PlayerAnimatorEditorInspectorView style="width: auto; max-width: none; min-width: auto;" />
-        <OSEditor.PlayerAnimatorGraphView focusable="true" />
-    </PlayerAnimatorEditorSplitView>
+    <OSEditor.TreeGraphSplitView fixed-pane-initial-dimension="250">
+        <OSEditor.TreeGraphInspector style="width: auto; max-width: none; min-width: auto;" />
+        <OSEditor.TreeGraphView focusable="true" />
+    </OSEditor.TreeGraphSplitView>
 </ui:UXML>

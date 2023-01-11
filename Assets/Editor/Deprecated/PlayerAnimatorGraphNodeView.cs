@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace OSEditor {
+namespace OSEditor.Deprecated {
     public class PlayerAnimatorGraphNodeView : Node {
         public readonly PlayerAnimSONode node;
         public readonly Port input;

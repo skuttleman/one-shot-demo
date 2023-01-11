@@ -101,7 +101,7 @@ namespace OSCore.ScriptableObjects {
 
         protected string CreateNode<T>(State state, Vector2 position, float animSpeed = 1f) where T : AnimSONode<State> {
             string id = GUID.Generate().ToString();
-            AnimSONode<State> node = CreateInstance<T>();
+            T node = CreateInstance<T>();
             node.id = id;
             node.position = position;
             node.state = state;

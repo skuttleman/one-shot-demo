@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 using UnityEngine;
 using OSCore.ScriptableObjects;
 
-namespace OSEditor {
+namespace OSEditor.Deprecated {
     public class PlayerAnimationCfgEditor : EditorWindow {
         [SerializeField] private VisualTreeAsset tree;
 

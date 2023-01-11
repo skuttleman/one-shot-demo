@@ -3,9 +3,13 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Linq;
 
 namespace OSEditor {
     public interface ITreeGraphAPI {
+        public IList<TreeGraphViewNode> nodeViews { get; }
+        public IList<Edge> edgeViews { get; }
+
         public TreeGraphViewNode CreateNode(Vector2 position);
         public Edge CreateEdge(TreeGraphViewNode from, TreeGraphViewNode to);
         public void Select(TreeGraphViewNode node);
@@ -33,10 +37,9 @@ namespace OSEditor {
             graphViewChanged += OnGraphViewChanged;
         }
 
-        public void Init(ITreeGraphAPI api, List<TreeGraphViewNode> nodes, List<Edge> edges) {
+        public void Init(ITreeGraphAPI api) {
             this.api = api;
-
-            Draw(nodes, edges);
+            Draw();
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
@@ -52,7 +55,7 @@ namespace OSEditor {
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt) {
             evt.menu.AppendAction("Add Node", action => {
-                api.CreateNode(action.eventInfo.localMousePosition);
+                AddElement(api.CreateNode(action.eventInfo.localMousePosition));
                 AssetDatabase.SaveAssets();
             });
         }
@@ -71,10 +74,10 @@ namespace OSEditor {
             return graphViewChange;
         }
 
-        private void Draw(List<TreeGraphViewNode> nodes, List<Edge> edges) {
+        private void Draw() {
             graphElements.ForEach(RemoveElement);
-            nodes.ForEach(AddElement);
-            edges.ForEach(AddElement);
+            foreach(TreeGraphViewNode node in api.nodeViews) AddElement(node);
+            foreach(Edge edge in api.edgeViews) AddElement(edge);
         }
 
         private void RemoveGraphElement(GraphElement element) {
