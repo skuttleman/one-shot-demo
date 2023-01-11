@@ -15,15 +15,12 @@ namespace OSEditor {
 
             if (GUILayout.Button("Edit State Graph")) {
                 PlayerAnimationCfgSO cfg = (PlayerAnimationCfgSO)target;
-                bool isOpen = EditorWindow.HasOpenInstances<TreeGraphEditorWindow>();
                 TreeGraphEditorWindow window =
                     EditorWindow.GetWindow<TreeGraphEditorWindow>();
                 ITreeGraphAPI api =
                     new PlayerAnimationCfgTreeGraphAPI(window.rootVisualElement, cfg);
 
-                if (isOpen) window.ReInit(api);
-                else window.Init(api);
-
+                window.Init(api);
                 window.Show();
             }
         }
@@ -94,8 +91,22 @@ namespace OSEditor {
             root.Q<TreeGraphInspector>().UpdateSelection(edge);
         }
 
+        public ScriptableObject Script(TreeGraphViewNode node) =>
+            nodeSOLookup[node];
+
+        public ScriptableObject Script(Edge edge) =>
+            edgeSOLookup[edge];
+
+        public void UnSelect(TreeGraphViewNode node) {
+            node.title = nodeSOLookup[node].title;
+        }
+
+        public void UnSelect(Edge edge) { }
+
         private TreeGraphViewNode CreateNode(AnimSONode<PlayerAnim> so) {
             TreeGraphViewNode node = new(Switch(Select, Select), Switch(Delete, Delete));
+            node.title = so.title;
+            node.SetPosition(new Rect(so.position, Vector2.zero));
             nodeSOLookup[node] = so;
             nodeLookup[so.id] = node;
             return node;
@@ -103,6 +114,7 @@ namespace OSEditor {
 
         private Edge CreateEdge(AnimSOEdge so, TreeGraphViewNode from, TreeGraphViewNode to) {
             Edge edge = from.output.ConnectTo(to.input);
+            edge.RegisterCallback<MouseDownEvent>(evt => Select((Edge)evt.target));
             edgeSOLookup[edge] = so;
             edgeLookup[(so.from, so.to)] = edge;
             return edge;

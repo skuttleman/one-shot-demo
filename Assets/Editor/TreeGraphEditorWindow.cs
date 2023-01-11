@@ -1,4 +1,3 @@
-using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,12 +7,10 @@ namespace OSEditor {
         [SerializeField] private VisualTreeAsset tree;
 
         public void Init(ITreeGraphAPI api) {
+            rootVisualElement.Clear();
             tree.CloneTree(rootVisualElement);
-            ReInit(api);
-        }
-
-        public void ReInit(ITreeGraphAPI api) {
             rootVisualElement.Q<TreeGraphView>().Init(api);
+            rootVisualElement.Q<TreeGraphInspector>().Init(api);
         }
     }
 }

@@ -1,9 +1,10 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement style="flex-direction: row; flex-grow: 0; justify-content: space-between;">
-        <ui:Label text="Animation Config" display-tooltip-when-elided="true" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:VisualElement style="flex-direction: row; flex-grow: 0; justify-content: space-between; padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px;">
+        <ui:Label text="Animation Config" display-tooltip-when-elided="true" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+        <ui:Button text="Save" display-tooltip-when-elided="true" style="background-color: rgba(8, 108, 9, 255);" />
     </ui:VisualElement>
     <OSEditor.TreeGraphSplitView fixed-pane-initial-dimension="250">
-        <OSEditor.TreeGraphInspector style="width: auto; max-width: none; min-width: auto;" />
+        <OSEditor.TreeGraphInspector style="width: 300px; max-width: none; min-width: auto; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; height: 100%; min-height: 100%; max-height: 100%;" />
         <OSEditor.TreeGraphView focusable="true" />
     </OSEditor.TreeGraphSplitView>
 </ui:UXML>

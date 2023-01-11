@@ -104,6 +104,7 @@ namespace OSCore.ScriptableObjects {
             T node = CreateInstance<T>();
             node.id = id;
             node.position = position;
+            node.title = state.ToString();
             node.state = state;
             node.animSpeed = animSpeed;
             nodes.Add(node);
@@ -169,6 +170,7 @@ namespace OSCore.ScriptableObjects {
     public abstract class AnimSONode<State> : ScriptableObject {
         [HideInInspector] public string id;
         [HideInInspector] public Vector2 position;
+        public string title;
         public State state;
         public float animSpeed;
     }

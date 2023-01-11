@@ -5,24 +5,38 @@ using UnityEditor.Experimental.GraphView;
 
 namespace OSEditor {
     public class TreeGraphInspector : VisualElement {
-        private Editor editor = null;
+        private Editor editor;
+        private GraphElement target = null;
+        private ITreeGraphAPI api;
+
+        public void Init(ITreeGraphAPI api) {
+            this.api = api;
+        }
 
         public void UpdateSelection(GraphElement nodeView) {
+            switch (target) {
+                case TreeGraphViewNode node:
+                    api.UnSelect(node);
+                    break;
+                case Edge edge:
+                    api.UnSelect(edge);
+                    break;
+            }
             Clear();
             Object.DestroyImmediate(editor);
+            target = nodeView;
 
             if (nodeView != null) {
-
-                //switch (nodeView) {
-                //    case TreeGraphViewNode n:
-                //        editor = Editor.CreateEditor(n);
-                //        Add(new IMGUIContainer(editor.OnInspectorGUI));
-                //        break;
-                //    case PlayerAnimatorGraphEdgeView e:
-                //        editor = Editor.CreateEditor(e.edge);
-                //        Add(new IMGUIContainer(editor.OnInspectorGUI));
-                //        break;
-                //}
+                switch (nodeView) {
+                    case TreeGraphViewNode node:
+                        editor = Editor.CreateEditor(api.Script(node));
+                        Add(new IMGUIContainer(editor.OnInspectorGUI));
+                        break;
+                    case Edge edge:
+                        editor = Editor.CreateEditor(api.Script(edge));
+                        Add(new IMGUIContainer(editor.OnInspectorGUI));
+                        break;
+                }
             }
         }
 
