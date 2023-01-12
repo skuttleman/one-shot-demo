@@ -8114,7 +8114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb75bb2d4ffb5428fb7c1976c57a4957, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cfg: {fileID: 11400000, guid: a4ed30324cef1463894586661182bea2, type: 2}
+  cfg: {fileID: 11400000, guid: 1b06b3cac88b740be9c3702a8e5a96e3, type: 2}
 --- !u!212 &1171720042
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using OSCore.Data.Animations;
 using OSCore.Data.Enums;
 using OSCore.System;
@@ -418,7 +416,7 @@ namespace OSCore.ScriptableObjects {
             string to,
             params (string, Comparator, float, bool)[][] conditions
         ) {
-            List<AndCondition> edgeConditions = conditions.Reduce((ors, or) =>
+            OrConditions edgeConditions = conditions.Reduce((ors, or) =>
                 ors.With(or.Reduce((ands, and) =>
                     ands.With(new PropComparator() {
                         prop = and.Item1,
@@ -426,8 +424,8 @@ namespace OSCore.ScriptableObjects {
                         floatValue = and.Item3,
                         boolValue = and.Item4,
                     }),
-                    new AndCondition())),
-                new List<AndCondition>());
+                    new AndConditions())),
+                    new OrConditions());
 
             SetEdge<PlayerAnimSOEdge>(from, to, edgeConditions.ToArray());
         }
@@ -439,7 +437,7 @@ namespace OSCore.ScriptableObjects {
             float minLoops,
             params (string, Comparator, float, bool)[][] conditions
         ) {
-            List<AndCondition> edgeConditions = conditions.Reduce((ors, or) =>
+            OrConditions edgeConditions = conditions.Reduce((ors, or) =>
                 ors.With(or.Reduce((ands, and) =>
                     ands.With(new PropComparator() {
                         prop = and.Item1,
@@ -455,8 +453,8 @@ namespace OSCore.ScriptableObjects {
                         comparator = Comparator.GTE,
                         floatValue = minLoops,
                     }),
-                    new AndCondition())),
-                new List<AndCondition>()); ;
+                    new AndConditions())),
+                    new OrConditions());
 
             PlayerAnimSOEdge edge = CreateInstance<PlayerAnimSOEdge>();
             edge.from = from;
@@ -464,51 +462,6 @@ namespace OSCore.ScriptableObjects {
             edge.conditions = edgeConditions;
             edges.Add(edge);
             AssetDatabase.AddObjectToAsset(edge, this);
-        }
-
-        private bool PropMatches(
-            object record,
-            (string prop, Comparator comparator, float floatValue, bool boolValue) comp
-        ) {
-            IDictionary<string, PropertyInfo> props = record
-                .GetType()
-                .GetProperties()
-                .Reduce(
-                    (m, prop) => { m.Add(prop.Name, prop); return m; },
-                    new Dictionary<string, PropertyInfo>());
-
-            object propValue = props[comp.prop].GetValue(record);
-            int comparisonResult = propValue switch {
-                bool b => b.CompareTo(comp.boolValue),
-                _ => comp.floatValue.CompareTo(Convert.ChangeType(propValue, typeof(float))),
-            };
-
-            return comp.comparator switch {
-                Comparator.EQ => comparisonResult == 0,
-                Comparator.NE => comparisonResult != 0,
-                Comparator.GT => comparisonResult < 0,
-                Comparator.LT => comparisonResult > 0,
-                Comparator.GTE => comparisonResult <= 0,
-                Comparator.LTE => comparisonResult >= 0,
-                _ => false,
-            };
-        }
-
-        private Predicate<PlayerAnimState> ToPred(List<AndCondition> conditions) {
-            return state => {
-                foreach (AndCondition group in conditions) {
-                    bool all = true;
-                    foreach (PropComparator condition in group) {
-                        if (!PropMatches(state, (condition.prop, condition.comparator, condition.floatValue, condition.boolValue))) {
-                            all = false;
-                            break;
-                        }
-                    }
-                    if (all) return true;
-                }
-
-                return false;
-            };
         }
 
         private (string, Comparator, float, bool)[] And(

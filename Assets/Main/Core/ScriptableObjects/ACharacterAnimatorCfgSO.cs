@@ -45,17 +45,20 @@ namespace OSCore.ScriptableObjects {
         public T SetEdge<T>(
             string from,
             string to,
-            params AndCondition[] animConditions
+            params AndConditions[] animConditions
         ) where T : AnimSOEdge {
             T edge = Edge<T>(from, to);
 
+            OrConditions ors = new();
+            foreach (AndConditions ands in animConditions) ors.Add(ands);
+
             if (edge != null) {
-                edge.conditions = new(animConditions);
+                edge.conditions = ors;
             } else {
                 edge = CreateInstance<T>();
                 edge.from = from;
                 edge.to = to;
-                edge.conditions = new(animConditions);
+                edge.conditions = ors;
                 edges.Add(edge);
                 AssetDatabase.AddObjectToAsset(edge, this);
             }
@@ -142,17 +145,17 @@ namespace OSCore.ScriptableObjects {
             };
         }
 
-        private Predicate<Details> ToPred(List<AndCondition> conditions) {
+        private Predicate<Details> ToPred(List<AndConditions> conditions) {
             return state => {
-                foreach (AndCondition group in conditions) {
+                foreach (AndConditions group in conditions) {
                     bool all = true;
-                    foreach (PropComparator condition in group) {
+                    foreach (PropComparator comparator in group) {
                         if (!PropMatches(
                                 state,
-                                (condition.prop,
-                                condition.comparator,
-                                condition.floatValue,
-                                condition.boolValue))
+                                (comparator.prop,
+                                 comparator.comparator,
+                                 comparator.floatValue,
+                                 comparator.boolValue))
                         ) {
                             all = false;
                             break;
@@ -185,10 +188,10 @@ namespace OSCore.ScriptableObjects {
     public abstract class AnimSOEdge : ScriptableObject {
         [HideInInspector] public string from;
         [HideInInspector] public string to;
-        public List<AndCondition> conditions;
+        public OrConditions conditions;
 
-        [Serializable] public class AndCondition : List<PropComparator> { }
-
+        [Serializable] public class OrConditions : List<AndConditions> { }
+        [Serializable] public class AndConditions : List<PropComparator> { }
         [Serializable]
         public struct PropComparator {
             public string prop;
