@@ -21,6 +21,7 @@ namespace OSEditor {
         public void Delete(TreeGrapStateNode node);
         public void Delete(Edge edge);
 
+        public void Save();
 
         public ScriptableObject Script(Edge edge);
         public ScriptableObject Script(TreeGrapStateNode node);

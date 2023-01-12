@@ -1,9 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement style="flex-direction: row; flex-grow: 0; justify-content: space-between;">
-        <ui:Label text="Animation Config" display-tooltip-when-elided="true" />
-    </ui:VisualElement>
-    <OSEditor.Deprecated.PlayerAnimatorEditorSplitView fixed-pane-initial-dimension="250">
-        <OSEditor.Deprecated.PlayerAnimatorEditorInspectorView style="width: auto; max-width: none; min-width: auto;" />
-        <OSEditor.Deprecated.PlayerAnimatorGraphView focusable="true" />
-    </OSEditor.Deprecated.PlayerAnimatorEditorSplitView>
-</ui:UXML>
