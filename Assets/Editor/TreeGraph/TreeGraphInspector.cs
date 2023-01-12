@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 
-namespace OSEditor {
+namespace OSEditor.TreeGraph {
     public class TreeGraphInspector : VisualElement {
         private Editor editor;
         private GraphElement target = null;

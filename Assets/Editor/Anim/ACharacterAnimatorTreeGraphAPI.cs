@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using OSCore.ScriptableObjects;
+﻿using OSCore.ScriptableObjects;
 using OSCore.System;
-using UnityEditor;
+using OSEditor.TreeGraph;
+using System.Collections.Generic;
+using System;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
+using UnityEditor;
 using UnityEngine.UIElements;
+using UnityEngine;
 
-namespace OSEditor {
+namespace OSEditor.Anim {
     public abstract class ACharacterAnimatorTreeGraphAPI<State, SDetails, NDetails, EDetails> : ITreeGraphAPI
         where SDetails : AnimStateDetails<State>
         where NDetails : AnimSONode<State>
@@ -113,8 +114,8 @@ namespace OSEditor {
 
         private Action<GraphElement> Switch(Action<TreeGrapStateNode> nodeFn, Action<Edge> edgeFn) => el => {
             switch (el) {
-                case TreeGrapStateNode n: nodeFn(n); break;
                 case Edge e: edgeFn(e); break;
+                default: nodeFn((TreeGrapStateNode)el); break;
             }
         };
     }

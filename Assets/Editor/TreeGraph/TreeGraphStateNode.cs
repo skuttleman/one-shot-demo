@@ -1,8 +1,9 @@
 using System;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace OSEditor {
+namespace OSEditor.TreeGraph {
     public class TreeGrapStateNode : Node {
         public readonly Port input;
         public readonly Port output;
@@ -53,6 +54,11 @@ namespace OSEditor {
             base.OnSelected();
 
             select(this);
+        }
+
+        public override void OnUnselected() {
+            base.OnUnselected();
+            select(null);
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace OSEditor {
+namespace OSEditor.TreeGraph {
     public interface ITreeGraphAPI {
         public IList<TreeGrapStateNode> nodeViews { get; }
         public IList<Edge> edgeViews { get; }
@@ -39,7 +39,7 @@ namespace OSEditor {
             this.AddManipulator(new RectangleSelector());
 
             StyleSheet style = AssetDatabase
-                .LoadAssetAtPath<StyleSheet>("Assets/Editor/TreeGraphView.uss");
+                .LoadAssetAtPath<StyleSheet>("Assets/Editor/TreeGraph/TreeGraphView.uss");
             styleSheets.Add(style);
 
             graphViewChanged += OnGraphViewChanged;

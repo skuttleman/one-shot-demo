@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace OSEditor {
+namespace OSEditor.TreeGraph {
     public class TreeGraphEditorWindow : EditorWindow {
         [SerializeField] private VisualTreeAsset tree;
         private ITreeGraphAPI api;

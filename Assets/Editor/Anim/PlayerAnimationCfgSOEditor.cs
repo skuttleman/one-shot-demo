@@ -1,11 +1,12 @@
 using OSCore.Data.Animations;
 using OSCore.ScriptableObjects;
+using OSEditor.TreeGraph;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
 using static OSCore.ScriptableObjects.PlayerAnimationCfgSO;
 
-namespace OSEditor {
+namespace OSEditor.Anim {
     [CustomEditor(typeof(PlayerAnimationCfgSO))]
     public class PlayerAnimationCfgSOEditor : Editor {
         public override void OnInspectorGUI() {
