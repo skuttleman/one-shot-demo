@@ -413,8 +413,6 @@ namespace OSCore.ScriptableObjects {
                     entry.state == PlayerAnim.crouch_idle));
         }
 
-
-
         private void Transition(
             string from,
             string to,

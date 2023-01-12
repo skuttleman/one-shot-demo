@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using OSCore.System;
 using OSCore.Utils;
@@ -13,11 +14,16 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public RuntimeAnimatorController animator { get; private set; }
         [field: SerializeField] public List<AnimSONode<State>> nodes { get; private set; }
         [field: SerializeField] public List<AnimSOEdge> edges { get; private set; }
+        public IDictionary<string, PropertyInfo> props { get; private set; }
 
         public readonly IEnumerable<State> states;
 
         public ACharacterAnimatorCfgSO() {
             states = EnumList<State>();
+            props = Dictionaries.Of(
+                typeof(Details)
+                .GetProperties()
+                .Select(prop => (prop.Name, prop)));
         }
 
         public abstract AnimNode<State, Details> Init();
@@ -116,13 +122,8 @@ namespace OSCore.ScriptableObjects {
         private bool PropMatches(
             object record,
             (string prop, Comparator comparator, float floatValue, bool boolValue) comp
-            ) {
-            IDictionary<string, PropertyInfo> props = record
-                .GetType()
-                .GetProperties()
-                .Reduce(
-                    (m, prop) => { m.Add(prop.Name, prop); return m; },
-                    new Dictionary<string, PropertyInfo>());
+        ) {
+
 
             object propValue = props[comp.prop].GetValue(record);
             int comparisonResult = propValue switch {
@@ -146,7 +147,13 @@ namespace OSCore.ScriptableObjects {
                 foreach (AndCondition group in conditions) {
                     bool all = true;
                     foreach (PropComparator condition in group) {
-                        if (!PropMatches(state, (condition.prop, condition.comparator, condition.floatValue, condition.boolValue))) {
+                        if (!PropMatches(
+                                state,
+                                (condition.prop,
+                                condition.comparator,
+                                condition.floatValue,
+                                condition.boolValue))
+                        ) {
                             all = false;
                             break;
                         }

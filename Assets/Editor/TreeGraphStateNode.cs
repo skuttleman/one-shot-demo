@@ -3,14 +3,14 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
 namespace OSEditor {
-    public class TreeGraphViewNode : Node {
+    public class TreeGrapStateNode : Node {
         public readonly Port input;
         public readonly Port output;
 
         private readonly Action<GraphElement> select;
         private readonly Action<GraphElement> remove;
 
-        public TreeGraphViewNode(
+        public TreeGrapStateNode(
             Action<GraphElement> select,
             Action<GraphElement> remove
         ) {

@@ -6,24 +6,24 @@ using UnityEngine.UIElements;
 
 namespace OSEditor {
     public interface ITreeGraphAPI {
-        public IList<TreeGraphViewNode> nodeViews { get; }
+        public IList<TreeGrapStateNode> nodeViews { get; }
         public IList<Edge> edgeViews { get; }
 
-        public TreeGraphViewNode CreateNode(Vector2 position);
-        public Edge CreateEdge(TreeGraphViewNode from, TreeGraphViewNode to);
+        public TreeGrapStateNode CreateNode(Vector2 position);
+        public Edge CreateEdge(TreeGrapStateNode from, TreeGrapStateNode to);
 
-        public void Select(TreeGraphViewNode node);
+        public void Select(TreeGrapStateNode node);
         public void Select(Edge edge);
-        public void UnSelect(TreeGraphViewNode node);
+        public void UnSelect(TreeGrapStateNode node);
         public void UnSelect(Edge edge);
-        public void OnMove(TreeGraphViewNode node, Vector2 position);
+        public void OnMove(TreeGrapStateNode node, Vector2 position);
 
-        public void Delete(TreeGraphViewNode node);
+        public void Delete(TreeGrapStateNode node);
         public void Delete(Edge edge);
 
 
         public ScriptableObject Script(Edge edge);
-        public ScriptableObject Script(TreeGraphViewNode node);
+        public ScriptableObject Script(TreeGrapStateNode node);
     }
 
     public class TreeGraphView : GraphView {
@@ -70,11 +70,11 @@ namespace OSEditor {
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange) {
             graphViewChange.edgesToCreate?.ForEach(edge =>
                 api.CreateEdge(
-                    (TreeGraphViewNode)edge.input.node,
-                    (TreeGraphViewNode)edge.output.node));
+                    (TreeGrapStateNode)edge.input.node,
+                    (TreeGrapStateNode)edge.output.node));
             graphViewChange.elementsToRemove?.ForEach(RemoveGraphElement);
             graphViewChange.movedElements?.ForEach(el => {
-                if (el is TreeGraphViewNode n) api.OnMove(n, el.GetPosition().position);
+                if (el is TreeGrapStateNode n) api.OnMove(n, el.GetPosition().position);
             });
 
             AssetDatabase.SaveAssets();
@@ -83,13 +83,13 @@ namespace OSEditor {
 
         private void Draw() {
             graphElements.ForEach(RemoveElement);
-            foreach (TreeGraphViewNode node in api.nodeViews) AddElement(node);
+            foreach (TreeGrapStateNode node in api.nodeViews) AddElement(node);
             foreach (Edge edge in api.edgeViews) AddElement(edge);
         }
 
         private void RemoveGraphElement(GraphElement element) {
             switch (element) {
-                case TreeGraphViewNode n: api.Delete(n); break;
+                case TreeGrapStateNode n: api.Delete(n); break;
                 case Edge e: api.Delete(e); break;
             }
             RemoveElement(element);

@@ -27,25 +27,25 @@ namespace OSEditor {
     }
 
     public class PlayerAnimationCfgTreeGraphAPI : ITreeGraphAPI {
-        public IList<TreeGraphViewNode> nodeViews { get; }
+        public IList<TreeGrapStateNode> nodeViews { get; }
         public IList<Edge> edgeViews { get; }
 
         private readonly VisualElement root;
         private readonly PlayerAnimationCfgSO cfg;
 
-        private readonly IDictionary<TreeGraphViewNode, AnimSONode<PlayerAnim>> nodeSOLookup;
-        private readonly IDictionary<string, TreeGraphViewNode> nodeLookup;
+        private readonly IDictionary<TreeGrapStateNode, AnimSONode<PlayerAnim>> nodeSOLookup;
+        private readonly IDictionary<string, TreeGrapStateNode> nodeLookup;
         private readonly IDictionary<Edge, AnimSOEdge> edgeSOLookup;
         private readonly IDictionary<(string, string), Edge> edgeLookup;
 
         public PlayerAnimationCfgTreeGraphAPI(VisualElement root, PlayerAnimationCfgSO cfg) {
             this.root = root;
             this.cfg = cfg;
-            nodeLookup = new Dictionary<string, TreeGraphViewNode>();
-            nodeSOLookup = new Dictionary<TreeGraphViewNode, AnimSONode<PlayerAnim>>();
+            nodeLookup = new Dictionary<string, TreeGrapStateNode>();
+            nodeSOLookup = new Dictionary<TreeGrapStateNode, AnimSONode<PlayerAnim>>();
             edgeSOLookup = new Dictionary<Edge, AnimSOEdge>();
             edgeLookup = new Dictionary<(string, string), Edge>();
-            nodeViews = new List<TreeGraphViewNode>();
+            nodeViews = new List<TreeGrapStateNode>();
             edgeViews = new List<Edge>();
 
             foreach (AnimSONode<PlayerAnim> node in cfg.nodes) {
@@ -56,15 +56,15 @@ namespace OSEditor {
             }
         }
 
-        public Edge CreateEdge(TreeGraphViewNode from, TreeGraphViewNode to) {
+        public Edge CreateEdge(TreeGrapStateNode from, TreeGrapStateNode to) {
             return CreateEdge(cfg.SetEdge<PlayerAnimSOEdge>(nodeSOLookup[from].id, nodeSOLookup[to].id), from, to);
         }
 
-        public TreeGraphViewNode CreateNode(Vector2 position) {
+        public TreeGrapStateNode CreateNode(Vector2 position) {
             return CreateNode(cfg.CreateNode<PlayerAnimSONode>(position));
         }
 
-        public void Delete(TreeGraphViewNode node) {
+        public void Delete(TreeGrapStateNode node) {
             AnimSONode<PlayerAnim> so = nodeSOLookup[node];
             cfg.DeleteNode(so.id);
             nodeLookup.Remove(so.id);
@@ -78,12 +78,12 @@ namespace OSEditor {
             edgeSOLookup.Remove(edge);
         }
 
-        public void OnMove(TreeGraphViewNode node, Vector2 position) {
+        public void OnMove(TreeGrapStateNode node, Vector2 position) {
             node.SetPosition(new Rect(position, Vector2.zero));
             nodeSOLookup[node].position = position;
         }
 
-        public void Select(TreeGraphViewNode node) {
+        public void Select(TreeGrapStateNode node) {
             root.Q<TreeGraphInspector>().UpdateSelection(node);
         }
 
@@ -91,20 +91,20 @@ namespace OSEditor {
             root.Q<TreeGraphInspector>().UpdateSelection(edge);
         }
 
-        public ScriptableObject Script(TreeGraphViewNode node) =>
+        public ScriptableObject Script(TreeGrapStateNode node) =>
             nodeSOLookup[node];
 
         public ScriptableObject Script(Edge edge) =>
             edgeSOLookup[edge];
 
-        public void UnSelect(TreeGraphViewNode node) {
+        public void UnSelect(TreeGrapStateNode node) {
             node.title = nodeSOLookup[node].title;
         }
 
         public void UnSelect(Edge edge) { }
 
-        private TreeGraphViewNode CreateNode(AnimSONode<PlayerAnim> so) {
-            TreeGraphViewNode node = new(Switch(Select, Select), Switch(Delete, Delete));
+        private TreeGrapStateNode CreateNode(AnimSONode<PlayerAnim> so) {
+            TreeGrapStateNode node = new(Switch(Select, Select), Switch(Delete, Delete));
             node.title = so.title;
             node.SetPosition(new Rect(so.position, Vector2.zero));
             nodeSOLookup[node] = so;
@@ -112,7 +112,7 @@ namespace OSEditor {
             return node;
         }
 
-        private Edge CreateEdge(AnimSOEdge so, TreeGraphViewNode from, TreeGraphViewNode to) {
+        private Edge CreateEdge(AnimSOEdge so, TreeGrapStateNode from, TreeGrapStateNode to) {
             Edge edge = from.output.ConnectTo(to.input);
             edge.RegisterCallback<MouseDownEvent>(evt => Select((Edge)evt.target));
             edgeSOLookup[edge] = so;
@@ -120,9 +120,9 @@ namespace OSEditor {
             return edge;
         }
 
-        private Action<GraphElement> Switch(Action<TreeGraphViewNode> nodeFn, Action<Edge> edgeFn) => el => {
+        private Action<GraphElement> Switch(Action<TreeGrapStateNode> nodeFn, Action<Edge> edgeFn) => el => {
             switch (el) {
-                case TreeGraphViewNode n: nodeFn(n); break;
+                case TreeGrapStateNode n: nodeFn(n); break;
                 case Edge e: edgeFn(e); break;
             }
         };

@@ -15,7 +15,7 @@ namespace OSEditor {
 
         public void UpdateSelection(GraphElement nodeView) {
             switch (target) {
-                case TreeGraphViewNode node:
+                case TreeGrapStateNode node:
                     api.UnSelect(node);
                     break;
                 case Edge edge:
@@ -28,7 +28,7 @@ namespace OSEditor {
 
             if (nodeView != null) {
                 switch (nodeView) {
-                    case TreeGraphViewNode node:
+                    case TreeGrapStateNode node:
                         editor = Editor.CreateEditor(api.Script(node));
                         Add(new IMGUIContainer(editor.OnInspectorGUI));
                         break;
