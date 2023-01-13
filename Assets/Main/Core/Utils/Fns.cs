@@ -20,6 +20,9 @@ namespace OSCore.Utils {
         public static IXForm<I, O> Map<I, O>(Func<I, O> fn) =>
             new MapXF<I, O>(fn);
 
+        public static IXForm<I, O> MapIndexed<I, O>(Func<long, I, O> fn) =>
+            new MapIndexedXF<I, O>(fn);
+
         public static IXForm<I, I> Filter<I>(Predicate<I> pred) =>
             new FilterXF<I>(pred);
 
@@ -39,6 +42,13 @@ namespace OSCore.Utils {
     public record MapXF<I, O>(Func<I, O> mapFn) : IXForm<I, O> {
         public RF<A, I> XForm<A>(RF<A, O> rf) =>
             (acc, item) => rf(acc, mapFn(item));
+    }
+
+    public record MapIndexedXF<I, O>(Func<long, I, O> mapFn) : IXForm<I, O> {
+        public RF<A, I> XForm<A>(RF<A, O> rf) {
+            long idx = 0;
+            return (acc, item) => rf(acc, mapFn(idx++, item));
+        }
     }
 
     public record MapCatXF<I, O>(Func<I, IEnumerable<O>> mapFn) : IXForm<I, O> {

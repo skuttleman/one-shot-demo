@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace OSCore.System {
-    public abstract record AnimStateDetails<State> : StateDetails<State> {
+    public abstract record AnimStateDetails<State> : AStateDetails<State> {
         public float loops { get; init; }
     }
 

@@ -17,7 +17,7 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public float lungingSpeed { get; private set; }
         [field: SerializeField] public float ledgeShimmySpeed { get; private set; }
 
-        public override AnimNode<PlayerAnim, PlayerAnimState> Init() {
+        private AnimNode<PlayerAnim, PlayerAnimState> BuildAsset() {
             AnimNode<PlayerAnim, PlayerAnimState> stand_idle = new(PlayerAnim.stand_idle);
             AnimNode<PlayerAnim, PlayerAnimState> stand_move = new(PlayerAnim.stand_move);
             AnimNode<PlayerAnim, PlayerAnimState> stand_punch = new(PlayerAnim.stand_punch);
@@ -197,6 +197,10 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.climb, 0f, 1f, crouch_idle);
 
             return crouch_idle;
+        }
+
+        public override AnimNode<PlayerAnim, PlayerAnimState> Init() {
+            return BuildAsset();
         }
 
         public record PlayerAnimState : AnimStateDetails<PlayerAnim> {

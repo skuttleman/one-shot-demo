@@ -4584,7 +4584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &534283913
 Transform:
   m_ObjectHideFlags: 0
@@ -6187,7 +6187,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2da6960c86f247599a5949cbffc6c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 9100000, guid: 49ccc526f767d4a418662ba821767dad, type: 2}
   cfg: {fileID: 11400000, guid: aa517f220c17545cabc4f4c76886386f, type: 2}
 --- !u!212 &847248307
 SpriteRenderer:
@@ -8115,8 +8114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb75bb2d4ffb5428fb7c1976c57a4957, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 9100000, guid: 825d6f5c48dd24ccc847d39315107653, type: 2}
-  cfg: {fileID: 11400000, guid: a4ed30324cef1463894586661182bea2, type: 2}
+  cfg: {fileID: 11400000, guid: 1b06b3cac88b740be9c3702a8e5a96e3, type: 2}
 --- !u!212 &1171720042
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8706,7 +8704,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1274054073
 Transform:
   m_ObjectHideFlags: 0
@@ -13399,7 +13397,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1645485575
 Transform:
   m_ObjectHideFlags: 0
@@ -17709,7 +17707,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2da6960c86f247599a5949cbffc6c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 9100000, guid: 49ccc526f767d4a418662ba821767dad, type: 2}
   cfg: {fileID: 11400000, guid: aa517f220c17545cabc4f4c76886386f, type: 2}
 --- !u!212 &1954322944
 SpriteRenderer:
@@ -19245,7 +19242,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2da6960c86f247599a5949cbffc6c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 9100000, guid: 49ccc526f767d4a418662ba821767dad, type: 2}
   cfg: {fileID: 11400000, guid: aa517f220c17545cabc4f4c76886386f, type: 2}
 --- !u!212 &2128386643
 SpriteRenderer:

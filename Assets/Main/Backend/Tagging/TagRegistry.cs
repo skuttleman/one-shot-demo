@@ -23,7 +23,7 @@ namespace OSBE.Tagging {
 
         public void Register(IdTag tag, GameObject obj) {
             tags.Update(tag,
-                set => Colls.Add(set, obj),
+                set => Colls.With(set, obj),
                 () => new HashSet<GameObject>());
         }
 
