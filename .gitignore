@@ -72,6 +72,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Clojure, etc.
+.DS_Store
 .idea/
 /[Aa]ssets/[Rr]esources/**/*.png
 /[Aa]ssets/[Rr]esources/**/*.xcf

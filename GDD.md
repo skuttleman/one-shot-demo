@@ -125,7 +125,90 @@ Narrative and character information will be relayed to the player through in-gam
 
 Meatier story/character moments can happen much the same way, but with the aid of on-screen avatars to punctuate the conversations. These will be less frequent and only take place at the beginning/end of levels and/or at key moments within a level (i.e. a mission objective is updated).
 
-The most critical story beats will be delivered through interstitial, skippable cutscenes that will bookend levels. The cutscenes will display as panel-style storyboards with simple parallaxing and minimal (if any) animations. Some examples of games that do this: Infamous, Metal Gear Solid Peacewalker, and Gravity Rush.
+The most critical story beats will be delivered through interstitial, skippable cutscenes that will bookend levels. The cutscenes will display as panel-style storyboards with simple parallaxing and minimal (if any) animations. Some examples of what I mean: Infamous, Metal Gear Solid Peacewalker, and Witcher 3.
+
+### Scenes/Levels Outline
+
+- **\[STORY\]**
+  - PURPOSE: meet Mel & Cici and setup the core conflict
+  - Mel is abducted
+  - Cici explains enough before Mel has to go
+- **\[PLAY\]**
+  - LOCATION: a small military outpost nestled in a canyon
+  - basics of steath and core controls
+  - Mel talks to "Cici" (in her head)
+
+- **\[STORY\]**
+  - meet Babbit over radio
+    - "There's a chance to save Cici if you go back now."
+- **\[PLAY\]**
+  - LOCATION: ^^
+  - rescue Cici
+  - basics of mission layout/completion
+    - interrogate enemies until you have Cici's location
+    - take out base communication officer to create advantages
+  - Ninja boss (uses stealth against you) -- Cici must watch her sister fail
+    - fights and wins (duh)
+  - Cici is taken away in a helicopter
+  - "Babbit come in.... No response. Better get out of here...."
+
+- **\[STORY\]**
+  - meet babbit
+  - daring escape
+- **\[PLAY\]**
+  - LOCATION: Nefarious Industries' satellite R&D Testing facility
+  - steal TBD prototype
+
+- **\[STORY\]**
+  - Babbit & Cici pt 1
+- **\[PLAY\]**
+  - LOCATION: Nefarious Industries' corporate headquarters
+  - steal plans for TBD mk II
+  - plans get destroyed
+
+- **\[STORY\]**
+  - Babbit & Cici pt 2
+- **\[PLAY\]**
+  - LOCATION: Nefarious Industries' satellite R&D Testing facility
+  - rescue TBD Creator
+  - thinks Mel is Cici
+  - doesn't need "rescuing" (real plan was forced abduction)
+
+- **\[STORY\]**
+  - Babbit & Cici pt 3
+- **\[PLAY\]**
+  - LOCATION: Black site location in the muddy jungle
+  - rescue Cici Take 2
+  - Babbit's intentions revealed
+  - fight with ninja (plural)
+
+- **\[STORY\]**
+  - hints of Cici's escape
+  - Babbit destroys TBD
+  - Mel puts pieces together
+- **\[PLAY\]**
+  - LOCATION: Creator's brother's apartment complex - overrun by goons
+  - find Documents in Creator's brother's apartment
+  - discover that the TBD mk II makes its users go insane
+
+- **\[STORY\]**
+  - reunite with Cici
+- **\[PLAY\]**
+  - LOCATION: 
+  - steal TBD mk II prototype before Babbit can
+  - Babbit swoops in and steals prototype - that jerk!
+
+- **\[STORY\]**
+  - TBD
+- **\[PLAY\]**
+  - LOCATION: primary mega military complex of Plunderbund Inc
+  - infiltrate Plunderbund w/Cici and sabotage Babbit's plans
+
+- **\[STORY\]**
+  - Babbit ultimately tries to use the TBD mk II but he goes mad
+  - campaign conclusion: TBD
+- **\[PLAY\]**
+  - continue doing side missions to earn a penny for Cici while she takes a well deserved rest.... "but don't I deserve a rest?"
 
 ## Mechanics
 
@@ -191,12 +274,22 @@ Furtive Solutions is well funded and highly invested in providing state-of-the-a
 
 Yes. It's just a placeholder name. TBD is a device built into Mel's suit which emits a pulse that slows down time for a few seconds. Usage economics (i.e. ammo, cool-down, cost, penalty) are TBD.... see what I did there?
 
+#### Stealth Parachute
+
+Unlocked after collecting all the fill-in-the-blank collectablles. An end-of-game treat. Gives the player more options for where to enter the base.
+
 ## Enemies
 
 ### Enemy Types
 
 - Basic Units
     - most enemies will be of this type. these enemies patrol and protect the base following the AI awareness states outlined below.
+    - patrols are assigned from the Base Communications Center
+- Unit Pairs
+  - Sometimes units will be assigned to a temporary pair to facilitate a two-person patrol
+  - Light Tower Units
+    - tower guard shines light/ground guard investigates suspicious things
+    - will notice each other missing if you neutralize one
 - Snipers
     - stationary
     - see long distances
