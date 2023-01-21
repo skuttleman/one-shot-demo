@@ -57,7 +57,7 @@ Shader "Custom/PVisibleOutside" {
  
             struct v2f {
                 float4 vertex   : SV_POSITION;
-                half4 color    : COLOR;
+                half4 color     : COLOR;
                 half2 texcoord  : TEXCOORD0;
             };
  
@@ -66,6 +66,7 @@ Shader "Custom/PVisibleOutside" {
                 OUT.vertex = TransformObjectToHClip(IN.vertex);
                 OUT.texcoord = IN.texcoord;
                 OUT.color = IN.color * _Color;
+
                 #ifdef PIXELSNAP_ON
                 OUT.vertex = UnityPixelSnap (OUT.vertex);
                 #endif
