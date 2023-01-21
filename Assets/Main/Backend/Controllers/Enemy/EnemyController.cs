@@ -15,7 +15,7 @@ using static OSCore.Data.Controllers.EnemyControllerInput;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 using static OSCore.Data.Patrol.EnemyPatrol;
 
-namespace OSBE.Controllers {
+namespace OSBE.Controllers.Enemy {
     public class EnemyController : ASystemInitializer<MovementChanged>, IController<EnemyControllerInput>, IStateReceiver<EnemyAnim> {
         [SerializeField] private EnemyCfgSO cfg;
         [SerializeField] GameObject footstep;

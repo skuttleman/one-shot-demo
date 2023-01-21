@@ -8,14 +8,15 @@ using static OSCore.Data.Controllers.EnemyControllerInput;
 namespace OSFE.Scripts {
     public class EnemyVision : ASystemInitializer {
         private IController<EnemyControllerInput> controller;
-        private GameObject player;
+        private Transform player;
         private SpriteRenderer rdr;
-        private bool seesPlayer = false;
-        private float timeSinceSeeable = -0.25f;
+        private bool trackPlayer = false;
+        private float timeSinceSeen = 0f;
+        private float timeInSight = 0f;
 
         protected override void OnEnable() {
             base.OnEnable();
-            player = system.Player();
+            player = system.Player().transform;
         }
 
         private void Start() {
@@ -25,48 +26,48 @@ namespace OSFE.Scripts {
         }
 
         private void FixedUpdate() {
-            Vector3 playerPos = player.transform.position;
-            Vector3 playerEyes =
-                Transforms.FindInActiveChildren(player.transform, xform => xform.name == "head")
-                    .First()
-                    .position;
-            Vector3 enemyEyes = transform.parent.position;
-            bool los = false;
+            //Vector3 playerPos = player.position;
+            //Vector3 playerEyes =
+            //    Transforms.FindInActiveChildren(player, xform => xform.name == "head")
+            //        .First()
+            //        .position;
+            //Vector3 enemyEyes = transform.parent.position;
+            //bool los = false;
 
-            if (Physics.Raycast(
-                    enemyEyes,
-                    playerEyes - enemyEyes,
-                    out RaycastHit losHit,
-                    Vector3.Distance(enemyEyes, player.transform.position),
-                    ~LayerMask.GetMask("Enemies", "Geometry"))) {
-                if (losHit.transform.IsChildOf(player.transform)) {
-                    los = true;
-                }
-            }
+            //if (Physics.Raycast(
+            //        enemyEyes,
+            //        playerEyes - enemyEyes,
+            //        out RaycastHit losHit,
+            //        Vector3.Distance(enemyEyes, player.position),
+            //        ~LayerMask.GetMask("Enemies", "Geometry"))) {
+            //    if (losHit.transform.IsChildOf(player)) {
+            //        los = true;
+            //    }
+            //}
 
-            rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
-            controller.On(new PlayerLOS(seesPlayer && los));
+            //rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
+            //controller.On(new PlayerLOS(seesPlayer && los));
 
-            bool isBlocked = Physics.Raycast(
-                playerEyes,
-                enemyEyes - playerEyes,
-                out RaycastHit blockedHit,
-                Vector3.Distance(transform.parent.parent.position, playerEyes),
-                LayerMask.GetMask("Opaque", "InsideOpaque"));
+            //bool isBlocked = Physics.Raycast(
+            //    playerEyes,
+            //    enemyEyes - playerEyes,
+            //    out RaycastHit blockedHit,
+            //    Vector3.Distance(transform.parent.parent.position, playerEyes),
+            //    LayerMask.GetMask("Opaque", "InsideOpaque"));
 
-            if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
-            else timeSinceSeeable = -0.25f;
+            //if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
+            //else timeSinceSeeable = -0.25f;
         }
 
         private void OnTriggerStay(Collider other) {
-            if (other.transform.IsChildOf(player.transform)) {
-                seesPlayer = true;
+            if (other.transform.IsChildOf(player)) {
+                trackPlayer = true;
             }
         }
 
         private void OnTriggerExit(Collider other) {
-            if (other.transform.IsChildOf(player.transform)) {
-                seesPlayer = false;
+            if (other.transform.IsChildOf(player)) {
+                trackPlayer = false;
             }
         }
     }

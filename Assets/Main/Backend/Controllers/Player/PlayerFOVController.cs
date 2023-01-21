@@ -2,7 +2,7 @@ using OSCore.ScriptableObjects;
 using OSCore.Utils;
 using UnityEngine;
 
-namespace OSBE.Controllers {
+namespace OSBE.Controllers.Player {
     public class PlayerFOVController : MonoBehaviour {
         [SerializeField] private PlayerFOVCfgSO cfg;
 

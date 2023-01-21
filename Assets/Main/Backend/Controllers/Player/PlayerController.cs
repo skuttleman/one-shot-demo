@@ -17,7 +17,7 @@ using UnityEngine.InputSystem;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
-namespace OSBE.Controllers {
+namespace OSBE.Controllers.Player {
     public class PlayerController : ASystemInitializer,
         IController<PlayerControllerInput>,
         IPlayerMainController,

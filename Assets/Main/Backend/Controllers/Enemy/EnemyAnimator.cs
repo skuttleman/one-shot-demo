@@ -5,7 +5,7 @@ using OSCore.Utils;
 using UnityEngine;
 using static OSCore.ScriptableObjects.EnemyAnimationCfgSO;
 
-namespace OSBE.Controllers {
+namespace OSBE.Controllers.Enemy {
     public class EnemyAnimator : ACharacterAnimator<EnemyAnim, EnemyAnimState> {
         [SerializeField] private EnemyAnimationCfgSO cfg;
 

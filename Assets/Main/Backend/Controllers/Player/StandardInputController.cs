@@ -137,6 +137,7 @@ namespace OSBE.Controllers.Player {
         private void MovePlayer(MoveConfig moveCfg) {
             if (CanMove()) {
                 float speed = MoveSpeed(moveCfg);
+                Debug.Log("MOVEMENT SPEED: " + speed);
                 float movementSpeed = Mathf.Max(
                     Mathf.Abs(controller.state.movement.x),
                     Mathf.Abs(controller.state.movement.y));

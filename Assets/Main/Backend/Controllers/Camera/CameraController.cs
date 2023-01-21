@@ -8,7 +8,7 @@ using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 using static OSCore.ScriptableObjects.CameraAuxCfgSO;
 
-namespace OSBE.Controllers {
+namespace OSBE.Controllers.Camera {
     public class CameraController : ASystemInitializer<AnimationChanged> {
         [SerializeField] private CameraAuxCfgSO cfg;
         private CinemachineVirtualCamera[] cams;

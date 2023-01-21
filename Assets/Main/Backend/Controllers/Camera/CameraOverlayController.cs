@@ -4,7 +4,7 @@ using OSCore.Utils;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
-namespace OSBE.Controllers {
+namespace OSBE.Controllers.Camera {
     public class CameraOverlayController : ASystemInitializer<ScopingChanged> {
         [SerializeField] private CameraOverlayCfgSO cfg;
 

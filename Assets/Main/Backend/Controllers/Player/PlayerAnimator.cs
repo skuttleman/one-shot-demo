@@ -6,7 +6,7 @@ using OSCore.Utils;
 using UnityEngine;
 using static OSCore.ScriptableObjects.PlayerAnimationCfgSO;
 
-namespace OSBE.Controllers {
+namespace OSBE.Controllers.Player {
     public class PlayerAnimator : ACharacterAnimator<PlayerAnim, PlayerAnimState> {
         [SerializeField] private PlayerAnimationCfgSO cfg;
 
