@@ -8,18 +8,18 @@ namespace OSCore.Utils {
             Transform parent, Predicate<Transform> pred) =>
             FindInChildren(new HashSet<Transform>(), parent, pred);
 
+        public static Transform Body(Transform transform) {
+            Transform entity = transform;
+            while (entity is not null && entity.name != "body") entity = entity.parent;
+            return entity;
+        }
+
         public static ISet<Transform> FindInActiveChildren(
             Transform parent, Predicate<Transform> pred) =>
             FindInChildren(
                 new HashSet<Transform>(),
                 parent,
                 child => child.gameObject.activeInHierarchy && pred(child));
-
-        public static Transform Body(Transform transform) {
-            Transform entity = transform;
-            while (entity is not null && entity.name != "body") entity = entity.parent;
-            return entity;
-        }
 
         private static ISet<Transform> FindInChildren(
             ISet<Transform> results, Transform parent, Predicate<Transform> pred) {
@@ -29,6 +29,31 @@ namespace OSCore.Utils {
             }
             return results;
         }
+
+        public static float VisibilityFrom(Vector3 position, CapsuleCollider collider) {
+            float height = (collider.height / 2) - 0.1f;
+            Vector3 offset = new(
+                collider.direction == 0 ? height : 0,
+                collider.direction == 1 ? height : 0,
+                collider.direction == 2 ? height : 0);
+            Vector3 center = collider.center + collider.transform.position;
+            Vector3 head = center + offset;
+            Vector3 feet = center - offset;
+
+            float result = 0f;
+            if (!IsHit(position, center)) result += 0.65f;
+            if (!IsHit(position, head)) result += 0.25f;
+            if (!IsHit(position, feet)) result += 0.1f;
+
+            return result;
+        }
+
+        private static bool IsHit(Vector3 origin, Vector3 position) =>
+            Physics.Raycast(
+                origin,
+                position - origin,
+                Vector3.Distance(origin, position),
+                LayerMask.GetMask("Opaque", "InsideOpaque"));
     }
 
     public static class Monos {

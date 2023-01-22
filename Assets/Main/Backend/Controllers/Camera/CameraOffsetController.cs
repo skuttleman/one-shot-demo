@@ -21,7 +21,7 @@ namespace OSBE.Controllers.Camera {
         }
 
         protected override void OnEvent(MovementChanged ev) {
-            isMoving = Maths.NonZero(ev.speed);
+            isMoving = ev.speed != PlayerSpeed.STOPPED;
         }
 
         protected override void OnEvent(ScopingChanged ev) {

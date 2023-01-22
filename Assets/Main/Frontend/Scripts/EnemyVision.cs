@@ -1,4 +1,5 @@
 using OSCore.Data.Controllers;
+using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
 using OSCore.System;
 using OSCore.Utils;
@@ -7,12 +8,13 @@ using static OSCore.Data.Controllers.EnemyControllerInput;
 
 namespace OSFE.Scripts {
     public class EnemyVision : ASystemInitializer {
+        [SerializeField] private EnemyCfgSO cfg;
+
         private IController<EnemyControllerInput> controller;
         private Transform player;
         private SpriteRenderer rdr;
-        private bool trackPlayer = false;
-        private float timeSinceSeen = 0f;
-        private float timeInSight = 0f;
+        private CapsuleCollider coll;
+        private float timeSinceSeeable = 0f;
 
         protected override void OnEnable() {
             base.OnEnable();
@@ -23,52 +25,41 @@ namespace OSFE.Scripts {
             Transform entity = Transforms.Body(transform);
             controller = entity.GetComponent<IController<EnemyControllerInput>>();
             rdr = entity.GetComponentInChildren<SpriteRenderer>();
+            coll = entity.GetComponentInChildren<CapsuleCollider>();
         }
 
         private void FixedUpdate() {
-            //Vector3 playerPos = player.position;
-            //Vector3 playerEyes =
-            //    Transforms.FindInActiveChildren(player, xform => xform.name == "head")
-            //        .First()
-            //        .position;
-            //Vector3 enemyEyes = transform.parent.position;
-            //bool los = false;
-
-            //if (Physics.Raycast(
-            //        enemyEyes,
-            //        playerEyes - enemyEyes,
-            //        out RaycastHit losHit,
-            //        Vector3.Distance(enemyEyes, player.position),
-            //        ~LayerMask.GetMask("Enemies", "Geometry"))) {
-            //    if (losHit.transform.IsChildOf(player)) {
-            //        los = true;
-            //    }
-            //}
-
-            //rdr.color = new Color(1, 1, 1, Mathf.Clamp(1 - timeSinceSeeable, 0, 1));
-            //controller.On(new PlayerLOS(seesPlayer && los));
-
-            //bool isBlocked = Physics.Raycast(
-            //    playerEyes,
-            //    enemyEyes - playerEyes,
-            //    out RaycastHit blockedHit,
-            //    Vector3.Distance(transform.parent.parent.position, playerEyes),
-            //    LayerMask.GetMask("Opaque", "InsideOpaque"));
-
-            //if (isBlocked) timeSinceSeeable += Time.fixedDeltaTime;
-            //else timeSinceSeeable = -0.25f;
+            Visibility();
+            rdr.color = new Color(1, 1, 1, Mathf.Clamp(0.75f - timeSinceSeeable, 0, 1));
         }
 
-        private void OnTriggerStay(Collider other) {
-            if (other.transform.IsChildOf(player)) {
-                trackPlayer = true;
-            }
+        private void Visibility() {
+            Vector3 eyes = transform.position;
+            Vector3 playerEyes = Transforms
+                .FindInActiveChildren(player, xform => xform.name == "head")
+                .First()
+                .position;
+            controller.On(BuildLOS(eyes, playerEyes));
+
+            float enemyVisibility = Transforms.VisibilityFrom(playerEyes, coll);
+            if (enemyVisibility > 0f) timeSinceSeeable = 0f;
+            else timeSinceSeeable += Time.fixedDeltaTime;
         }
 
-        private void OnTriggerExit(Collider other) {
-            if (other.transform.IsChildOf(player)) {
-                trackPlayer = false;
+        private PlayerLOS BuildLOS(Vector3 eyes, Vector3 playerEyes) {
+            float rotation = transform.parent.rotation.eulerAngles.y;
+            float angle2Player = Vectors.AngleTo(transform.position - player.position);
+
+            float periphery = Maths.AngleDiff(rotation, angle2Player) / cfg.fovAngle;
+            float distance = Vector3.Distance(eyes, playerEyes);
+
+            if (periphery <= 1f && distance <= cfg.fovDistance) {
+                CapsuleCollider playerColl = player.GetComponentInChildren<CapsuleCollider>();
+                float visibility = Transforms.VisibilityFrom(eyes, playerColl);
+
+                return new PlayerLOS(visibility, distance, 1f - Mathf.Clamp(periphery, 0f, 1f));
             }
+            return new PlayerLOS(0f, distance, 0f);
         }
     }
 }

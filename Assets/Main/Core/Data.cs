@@ -13,6 +13,10 @@ namespace OSCore.Data {
             STANDING, CROUCHING, CRAWLING,
         }
 
+        public enum PlayerSpeed {
+            STOPPED, SLOW, FAST
+        }
+
         public enum AttackMode {
             NONE, HAND, WEAPON, MELEE, FIRING,
         }
@@ -48,7 +52,14 @@ namespace OSCore.Data {
     }
 
     public record EnemyState {
-        public bool isPlayerInView { get; init; }
+        public PlayerStance playerStance { get; init; }
+        public PlayerSpeed playerSpeed { get; init; }
+        public float timeSinceSeenPlayer { get; init; }
+        public float timeSincePlayerMoved { get; init; }
+
+        public float distanceToPlayer { get; init; }
+        public float angleToPlayer { get; init; }
+        public float playerVisibility { get; init; }
     }
 
     namespace Controllers {
@@ -74,7 +85,7 @@ namespace OSCore.Data {
             public record LookInput(Vector2 direction) : EnemyControllerInput();
             public record AimInput(bool isAiming) : EnemyControllerInput();
             public record DamageInput(float damage) : EnemyControllerInput();
-            public record PlayerLOS(bool isInView) : EnemyControllerInput();
+            public record PlayerLOS(float visibility, float distance, float periphery) : EnemyControllerInput();
 
             private EnemyControllerInput() { }
         }
@@ -89,7 +100,7 @@ namespace OSCore.Data {
                     public record AnimationChanged(PlayerAnim prev, PlayerAnim curr) : AnimationEmittedEvent();
                     public record StanceChanged(PlayerStance stance) : AnimationEmittedEvent();
                     public record AttackModeChanged(AttackMode mode) : AnimationEmittedEvent();
-                    public record MovementChanged(float speed) : AnimationEmittedEvent();
+                    public record MovementChanged(PlayerSpeed speed) : AnimationEmittedEvent();
                     public record ScopingChanged(bool isScoping) : AnimationEmittedEvent();
 
                     private AnimationEmittedEvent() { }
@@ -140,17 +151,6 @@ namespace OSCore.Data {
             stand_melee,
             stand_fire,
             stand_fall,
-        }
-    }
-
-    namespace Patrol {
-        public record EnemyPatrol {
-            public record PatrolWait(float seconds) : EnemyPatrol();
-            public record PatrolGoto(Vector3 position) : EnemyPatrol();
-            public record PatrolFace(Vector3 rotation) : EnemyPatrol();
-            public record PatrolRotate(float rotation) : EnemyPatrol();
-
-            private EnemyPatrol() { }
         }
     }
 }

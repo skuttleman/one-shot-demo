@@ -137,15 +137,13 @@ namespace OSBE.Controllers.Player {
         private void MovePlayer(MoveConfig moveCfg) {
             if (CanMove()) {
                 float speed = MoveSpeed(moveCfg);
-                Debug.Log("MOVEMENT SPEED: " + speed);
                 float movementSpeed = Mathf.Max(
                     Mathf.Abs(controller.state.movement.x),
                     Mathf.Abs(controller.state.movement.y));
                 float currSpeed = anim.animSpeed;
                 float animSpeed = controller.state.isMoving ? movementSpeed * speed * moveCfg.animFactor : 1f;
 
-                MovementChanged moveChanged = new(controller.state.isMoving ? animSpeed : 0f);
-                PublishChanged(currSpeed, animSpeed, moveChanged);
+                PublishChanged(currSpeed, animSpeed, MoveChangedEvent(movementSpeed));
 
                 Vector3 dir = MoveDirection(moveCfg, speed, 0f);
                 bool isForceable = rb.velocity.magnitude < moveCfg.maxVelocity;
@@ -157,6 +155,13 @@ namespace OSBE.Controllers.Player {
                     else rb.AddForce(dir);
                 }
             }
+        }
+
+        private MovementChanged MoveChangedEvent(float movementSpeed) {
+            PlayerSpeed playerSpeed = PlayerSpeed.FAST;
+            if (!controller.state.isMoving || movementSpeed < 0.1f) playerSpeed = PlayerSpeed.STOPPED;
+            else if (movementSpeed < 0.725f) playerSpeed = PlayerSpeed.SLOW;
+            return new(playerSpeed);
         }
 
         private bool CanMove() =>
@@ -173,9 +178,7 @@ namespace OSBE.Controllers.Player {
             if (Vectors.NonZero(controller.state.facing)) {
                 float mov = AngleTo(controller.state.movement);
                 float fac = AngleTo(controller.state.facing);
-                float diff = Mathf.Abs(mov - fac);
-
-                if (diff > 180f) diff = Mathf.Abs(diff - 360f);
+                float diff = Maths.AngleDiff(mov, fac);
 
                 speed *= Mathf.Lerp(moveCfg.lookSpeedInhibiter, 1f, 1f - diff / 180f);
             }
@@ -222,7 +225,7 @@ namespace OSBE.Controllers.Player {
 
             if (!isMoving) {
                 system.Send<IPubSub>(pubsub =>
-                    pubsub.Publish(new MovementChanged(0f)));
+                    pubsub.Publish(MoveChangedEvent(0f)));
             }
         }
 
