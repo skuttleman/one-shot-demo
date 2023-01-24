@@ -85,7 +85,7 @@ namespace OSCore.Data {
             public record LookInput(Vector2 direction) : EnemyControllerInput();
             public record AimInput(bool isAiming) : EnemyControllerInput();
             public record DamageInput(float damage) : EnemyControllerInput();
-            public record PlayerLOS(float visibility, float distance, float periphery) : EnemyControllerInput();
+            public record PlayerLOS(float visibility, float distance, float periphery, Vector3 location) : EnemyControllerInput();
 
             private EnemyControllerInput() { }
         }
@@ -151,6 +151,12 @@ namespace OSCore.Data {
             stand_melee,
             stand_fire,
             stand_fall,
+        }
+    }
+
+    namespace AI {
+        public enum EnemyAwareness {
+            PASSIVE, CURIOUS, INVESTIGATING, ALERT, ALERT_INVESTIGATING, AGGRESIVE, SEARCHING
         }
     }
 }

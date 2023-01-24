@@ -57,9 +57,9 @@ namespace OSFE.Scripts {
                 CapsuleCollider playerColl = player.GetComponentInChildren<CapsuleCollider>();
                 float visibility = Transforms.VisibilityFrom(eyes, playerColl);
 
-                return new PlayerLOS(visibility, distance, 1f - Mathf.Clamp(periphery, 0f, 1f));
+                return new PlayerLOS(visibility, distance, 1f - Mathf.Clamp(periphery, 0f, 1f), player.position);
             }
-            return new PlayerLOS(0f, distance, 0f);
+            return new PlayerLOS(0f, distance, 0f, player.position);
         }
     }
 }
