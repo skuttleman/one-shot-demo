@@ -47,19 +47,18 @@ namespace OSFE.Scripts {
         }
 
         private PlayerLOS BuildLOS(Vector3 eyes, Vector3 playerEyes) {
-            float rotation = transform.parent.rotation.eulerAngles.y;
-            float angle2Player = Vectors.AngleTo(transform.position - player.position);
+            float angle2Player = Vector3.Angle(player.position - transform.position, transform.forward);
 
-            float periphery = Maths.AngleDiff(rotation, angle2Player) / cfg.fovAngle;
+            float periphery = angle2Player / cfg.fovAngle;
             float distance = Vector3.Distance(eyes, playerEyes);
 
             if (periphery <= 1f && distance <= cfg.fovDistance) {
                 CapsuleCollider playerColl = player.GetComponentInChildren<CapsuleCollider>();
                 float visibility = Transforms.VisibilityFrom(eyes, playerColl);
 
-                return new PlayerLOS(visibility, distance, 1f - Mathf.Clamp(periphery, 0f, 1f), player.position);
+                return new PlayerLOS(visibility, distance, Mathf.Clamp(periphery, 0f, 1f), player.position);
             }
-            return new PlayerLOS(0f, distance, 0f, player.position);
+            return new PlayerLOS(0f, distance, -1f, player.position);
         }
     }
 }

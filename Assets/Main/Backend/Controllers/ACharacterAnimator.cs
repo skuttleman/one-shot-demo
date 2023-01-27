@@ -3,13 +3,13 @@ using OSCore.System;
 using UnityEngine;
 
 namespace OSBE.Controllers {
-    public abstract class ACharacterAnimator<State, Details> : AStateMachine<State, Details>, IStateReceiver<State>
+    public abstract class ACharacterAnimator<State, Details> : APredicativeStateMachine<State, Details>, IStateReceiver<State>
         where Details : AnimStateDetails<State> {
 
         public float animSpeed { get; private set; } = 1f;
 
         private AnimNode<State, Details> animNode => (AnimNode<State, Details>)node;
-        private IStateReceiver<State> wrappedReceiver;
+        private IStateReceiver<State> receiver;
         private Animator anim;
 
         protected void Init(
@@ -17,7 +17,7 @@ namespace OSBE.Controllers {
             IStateReceiver<State> receiver,
             AnimNode<State, Details> node,
             Details details) {
-            wrappedReceiver = receiver;
+            this.receiver = receiver;
             anim = gameObject.AddComponent<Animator>();
             anim.runtimeAnimatorController = controller;
             anim.speed = animSpeed;
@@ -32,11 +32,11 @@ namespace OSBE.Controllers {
 
         public void OnStateInit(State curr) {
             Play(curr);
-            wrappedReceiver.OnStateInit(curr);
+            receiver.OnStateInit(curr);
         }
         public void OnStateTransition(State prev, State curr) {
             Play(curr);
-            wrappedReceiver.OnStateTransition(prev, curr);
+            receiver.OnStateTransition(prev, curr);
         }
 
         private void Play(State state) {

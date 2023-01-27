@@ -11,9 +11,10 @@ namespace OSFE.Scripts {
         protected override void OnEnable() {
             base.OnEnable();
             system.Send<ITagRegistry>(registry => {
-                foreach (Tag tag in tags)
+                foreach (Tag tag in tags) {
                     if (tag.isUnique) registry.RegisterUnique(tag.tag, gameObject);
                     else registry.Register(tag.tag, gameObject);
+                }
             });
         }
 

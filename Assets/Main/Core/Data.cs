@@ -6,7 +6,13 @@ using UnityEngine;
 namespace OSCore.Data {
     namespace Enums {
         public enum IdTag {
-            PLAYER, ENEMY, PLATFORM_CATCHABLE
+            // Unique Tags
+            PLAYER,
+            DEBUG_LAYER,
+
+            // Non-Unique Tags
+            ENEMY,
+            PLATFORM_CATCHABLE,
         }
 
         public enum PlayerStance {

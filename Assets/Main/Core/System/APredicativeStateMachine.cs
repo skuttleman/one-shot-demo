@@ -6,46 +6,46 @@ using UnityEngine;
 
 namespace OSCore.System {
     [Serializable]
-    public abstract record AStateDetails<State> {
+    public abstract record APredicativeStateDetails<State> {
         public float timeInState { get; init; }
     }
 
     [Serializable]
-    public abstract class AStateNode<State, Details> where Details : AStateDetails<State> {
+    public abstract class APredicativeStateNode<State, Details> where Details : APredicativeStateDetails<State> {
         public readonly State state;
 
-        protected readonly IList<(Predicate<Details>, AStateNode<State, Details>)> edges;
+        protected readonly IList<(Predicate<Details>, APredicativeStateNode<State, Details>)> edges;
 
-        public AStateNode(State state) {
+        public APredicativeStateNode(State state) {
             this.state = state;
-            edges = new List<(Predicate<Details>, AStateNode<State, Details>)>();
+            edges = new List<(Predicate<Details>, APredicativeStateNode<State, Details>)>();
         }
 
-        public void AddTransition(Predicate<AStateDetails<State>> pred, AStateNode<State, Details> node) {
+        public void AddTransition(Predicate<APredicativeStateDetails<State>> pred, APredicativeStateNode<State, Details> node) {
             edges.Add((pred, node));
         }
 
-        public AStateNode<State, Details> Next(Details details) {
+        public APredicativeStateNode<State, Details> Next(Details details) {
             IXForm<
-                (Predicate<Details> pred, AStateNode<State, Details> state),
-                AStateNode<State, Details>> xform =
+                (Predicate<Details> pred, APredicativeStateNode<State, Details> state),
+                APredicativeStateNode<State, Details>> xform =
                     Fns.Filter<(
                         Predicate<Details> pred,
-                        AStateNode<State, Details> state)>(tpl => tpl.pred(details))
+                        APredicativeStateNode<State, Details> state)>(tpl => tpl.pred(details))
                     .Comp(Fns.Map<(
                         Predicate<Details> pred,
-                        AStateNode<State, Details> state),
-                        AStateNode<State, Details>>(tpl => tpl.state));
+                        APredicativeStateNode<State, Details> state),
+                        APredicativeStateNode<State, Details>>(tpl => tpl.state));
             return edges.First(xform) ?? this;
         }
     }
 
-    public abstract class AStateMachine<State, Details> : MonoBehaviour
-            where Details : AStateDetails<State> {
+    public abstract class APredicativeStateMachine<State, Details> : MonoBehaviour
+            where Details : APredicativeStateDetails<State> {
 
         public State state => node == null ? default : node.state;
 
-        protected AStateNode<State, Details> node = null;
+        protected APredicativeStateNode<State, Details> node = null;
 
         private IStateReceiver<State> receiver;
         private Details details;
@@ -53,7 +53,7 @@ namespace OSCore.System {
 
         protected virtual void Init(
             IStateReceiver<State> receiver,
-            AStateNode<State, Details> node,
+            APredicativeStateNode<State, Details> node,
             Details details) {
             this.receiver = receiver;
             this.node = node;
@@ -66,7 +66,7 @@ namespace OSCore.System {
             details = updateFn(details);
         }
 
-        private void TransitionTo(AStateNode<State, Details> node) {
+        private void TransitionTo(APredicativeStateNode<State, Details> node) {
             if (this.node != node) {
                 State prev = this.node.state;
                 this.node = node;

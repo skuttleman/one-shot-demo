@@ -7,7 +7,7 @@ using OSCore.Utils;
 using UnityEngine;
 
 namespace OSBE.Controllers.Enemy {
-    public class EnemyAI : AStateMachine<EnemyAwareness, EnemyAIStateDetails> {
+    public class EnemyAI : APredicativeStateMachine<EnemyAwareness, EnemyAIStateDetails> {
         [SerializeField] private EnemyAICfgSO cfg;
 
         private void Start() {

@@ -1,11 +1,11 @@
 ﻿using System;
 
 namespace OSCore.System {
-    public abstract record AnimStateDetails<State> : AStateDetails<State> {
+    public abstract record AnimStateDetails<State> : APredicativeStateDetails<State> {
         public float loops { get; init; }
     }
 
-    public class AnimNode<State, Details> : AStateNode<State, Details>
+    public class AnimNode<State, Details> : APredicativeStateNode<State, Details>
         where Details : AnimStateDetails<State> {
         public readonly float animSpeed;
 

@@ -2,11 +2,11 @@
 using OSCore.Data.AI;
 
 namespace OSCore.System {
-    public record EnemyAIStateDetails : AStateDetails<EnemyAwareness> {
+    public record EnemyAIStateDetails : APredicativeStateDetails<EnemyAwareness> {
         public float suspicion { get; init; }
     }
 
-    public class EnemyAINode : AStateNode<EnemyAwareness, EnemyAIStateDetails> {
+    public class EnemyAINode : APredicativeStateNode<EnemyAwareness, EnemyAIStateDetails> {
         public EnemyAINode(EnemyAwareness state) : base(state) { }
     }
 
