@@ -1,8 +1,5 @@
-using OSBE.Controllers.Enemy.Behaviors.Flows;
 using OSCore.Data.AI;
-using OSCore.Data.Animations;
 using OSCore.Data.Controllers;
-using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
 using OSCore.System.Interfaces;
@@ -16,25 +13,17 @@ namespace OSBE.Controllers.Enemy {
     public class EnemyController :
         ASystemInitializer,
         IController<EnemyControllerInput>,
-        IStateReceiver<EnemyAnim>,
         IStateReceiver<EnemyAwareness> {
         [SerializeField] private GameObject footstep;
         [SerializeField] private EnemyAICfgSO cfg;
 
-        private EnemyAI ai;
-        private EnemyNavAgent nav;
+        private GameObject player;
         private EnemyBehavior behavior;
         private TextMeshPro speech;
 
-        private AStateNode<EnemyAIStateDetails> patrol;
-        private AStateNode<EnemyAIStateDetails> activeBehavior;
-
-        public void On(EnemyControllerInput e) {
+        public void Handle(EnemyControllerInput e) {
             behavior.UpdateState(e switch {
-                DamageInput => state => state with {
-                    timeSinceSeenPlayer = 0f,
-                    timeSincePlayerMoved = 0f,
-                },
+                DamageInput => HandleDamage,
                 PlayerLOS ev => state => UpdateLOS(ev, state),
                 _ => Fns.Identity
             });
@@ -47,57 +36,41 @@ namespace OSBE.Controllers.Enemy {
         }
 
         public void OnStateInit(EnemyAwareness curr) {
-            Enter(curr);
+            behavior.SetInterruptState(curr);
         }
 
         public void OnStateTransition(EnemyAwareness prev, EnemyAwareness curr) {
-            Enter(curr);
+            behavior.SetInterruptState(curr);
         }
 
-        private EnemyState UpdateLOS(PlayerLOS e, EnemyState details) {
-            return details with {
+        private EnemyAIStateDetails HandleDamage(EnemyAIStateDetails details) =>
+            details with {
+                timeSinceSeenPlayer = 0f,
+                timeSincePlayerMoved = 0f,
+                lastKnownPosition = player.transform.position,
+            };
+
+        private EnemyAIStateDetails UpdateLOS(PlayerLOS e, EnemyAIStateDetails details) =>
+            details with {
                 timeSinceSeenPlayer = e.visibility > 0f ? 0f : details.timeSinceSeenPlayer,
                 playerVisibility = e.visibility,
                 angleToPlayer = e.periphery,
                 distanceToPlayer = e.distance,
             };
-        }
-
-        private void Enter(EnemyAwareness awareness) {
-            nav.Stop();
-            switch (awareness) {
-                case EnemyAwareness.PASSIVE:
-                    activeBehavior = patrol;
-                    break;
-                case EnemyAwareness.CURIOUS:
-                    activeBehavior = new EnemyCurious(transform);
-                    break;
-            }
-        }
 
         /*
          * Lifecycle Methods
          */
 
         private void Start() {
+            player = system.Player();
             behavior = GetComponent<EnemyBehavior>();
-            ai = GetComponent<EnemyAI>();
-            nav = GetComponent<EnemyNavAgent>();
-
-            patrol = new TransformPatrol(transform);
-            patrol.Init();
 
             speech = Transforms
                 .FindInActiveChildren(transform.parent, xform => xform.name == "speech")
                 .First()
                 .GetComponent<TextMeshPro>();
             speech.text = "";
-        }
-
-        private void Update() {
-            AStateNode<EnemyAIStateDetails>.Process(
-                activeBehavior,
-                ai.details with { cfg = cfg.ActiveCfg(ai.state) });
         }
     }
 }

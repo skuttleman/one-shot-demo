@@ -37,7 +37,7 @@ namespace OSBE.Controllers.Player {
             anim = transform.GetComponentInChildren<PlayerAnimator>();
         }
 
-        public void On(PlayerControllerInput e) {
+        public void Handle(PlayerControllerInput e) {
             switch (e) {
                 case MovementInput ev: OnMovementInput(ev.direction); break;
                 case SprintInput ev: OnSprintInput(ev.isSprinting); break;

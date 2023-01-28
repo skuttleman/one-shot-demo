@@ -9,7 +9,7 @@ namespace OSFE.Scripts {
         private IController<EnemyControllerInput> controller;
 
         public void OnAttack(float damage) {
-            controller.On(new DamageInput(damage));
+            controller.Handle(new DamageInput(damage));
         }
 
         /*

@@ -49,8 +49,8 @@ namespace OSBE.Controllers.Player {
         private GameObject crouch;
         private GameObject crawl;
 
-        public void On(PlayerControllerInput e) {
-            Controller().On(e);
+        public void Handle(PlayerControllerInput e) {
+            Controller().Handle(e);
         }
 
         public void Publish(IEvent e) {
@@ -188,6 +188,6 @@ namespace OSBE.Controllers.Player {
     }
 
     internal class NoopInputController : IPlayerInputController {
-        public void On(PlayerControllerInput e) { }
+        public void Handle(PlayerControllerInput e) { }
     }
 }

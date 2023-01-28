@@ -57,20 +57,6 @@ namespace OSCore.Data {
         public bool isGrounded { get; init; }
     }
 
-    public record EnemyState {
-        public PlayerStance playerStance { get; init; }
-        public PlayerSpeed playerSpeed { get; init; }
-
-        public Vector3 lastKnownLocation { get; init; }
-
-        public float timeSinceSeenPlayer { get; init; }
-        public float timeSincePlayerMoved { get; init; }
-
-        public float distanceToPlayer { get; init; }
-        public float angleToPlayer { get; init; }
-        public float playerVisibility { get; init; }
-    }
-
     namespace Controllers {
         public record PlayerControllerInput {
             public record MovementInput(Vector2 direction) : PlayerControllerInput();

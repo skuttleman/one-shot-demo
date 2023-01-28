@@ -63,7 +63,8 @@ namespace OSCore.System {
         }
 
         public void Transition(Func<Details, Details> updateFn) {
-            details = updateFn(details);
+            if (details != null)
+                details = updateFn(details);
         }
 
         private void TransitionTo(APredicativeStateNode<State, Details> node) {

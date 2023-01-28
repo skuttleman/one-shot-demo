@@ -1,4 +1,5 @@
 ﻿using OSCore.Data.AI;
+using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces;
 using OSCore.System;
@@ -17,7 +18,13 @@ namespace OSBE.Controllers.Enemy {
                 lastKnownPosition = Vector3.zero,
                 timeInState = 0f,
                 suspicion = 0f,
-                seesPlayer = false,
+                playerStance = PlayerStance.CROUCHING,
+                playerSpeed = PlayerSpeed.STOPPED,
+                timeSinceSeenPlayer = 0f,
+                timeSincePlayerMoved = 0f,
+                distanceToPlayer = 1000f,
+                angleToPlayer = 0f,
+                playerVisibility = 0f,
             });
         }
     }

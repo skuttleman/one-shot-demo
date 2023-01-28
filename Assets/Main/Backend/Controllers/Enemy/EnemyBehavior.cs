@@ -1,22 +1,55 @@
-﻿using OSCore.Data.AI;
+﻿using OSBE.Controllers.Enemy.Behaviors.Flows;
+using OSCore.Data.AI;
+using OSCore.Data.Animations;
 using OSCore.Data.Enums;
-using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System;
+using OSCore.System.Interfaces;
 using System;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers.Enemy {
-    public class EnemyBehavior : ASystemInitializer<MovementChanged, StanceChanged> {
+    public class EnemyBehavior :
+        ASystemInitializer<MovementChanged, StanceChanged>,
+        IStateReceiver<EnemyAnim> {
+
         [SerializeField] private EnemyAICfgSO cfg;
-        public EnemyState state { get; private set; }
+        public EnemyAIStateDetails state => ai.details;
 
         private EnemyAI ai;
+        private EnemyNavAgent nav;
         private GameObject player;
 
-        public EnemyState UpdateState(Func<EnemyState, EnemyState> updateFn) =>
-            state = updateFn(state);
+        private AStateNode<EnemyAIStateDetails> patrol;
+        private AStateNode<EnemyAIStateDetails> behavior;
+
+        public EnemyAIStateDetails UpdateState(Func<EnemyAIStateDetails, EnemyAIStateDetails> updateFn) {
+            ai.Transition(updateFn);
+
+            return ai.details;
+        }
+
+        public void AssignPatro(AStateNode<EnemyAIStateDetails> patrol) {
+            this.patrol = patrol;
+        }
+
+        public void AssignInterruptBehavior(AStateNode<EnemyAIStateDetails> behavior) {
+            this.behavior = behavior;
+        }
+
+        public void SetInterruptState(EnemyAwareness awareness) {
+            if (nav != null) nav.Stop();
+
+            switch (awareness) {
+                case EnemyAwareness.PASSIVE:
+                    behavior = patrol;
+                    break;
+                case EnemyAwareness.CURIOUS:
+                    behavior = new EnemyCurious(transform);
+                    break;
+            }
+        }
 
         protected override void OnEvent(MovementChanged e) {
             UpdateState(state => state with {
@@ -64,7 +97,6 @@ namespace OSBE.Controllers.Enemy {
             bool isVisible = state.playerVisibility > 0f;
 
             return details with {
-                seesPlayer = isVisible,
                 lastKnownPosition = isVisible
                     ? player.transform.position
                     : details.lastKnownPosition,
@@ -80,20 +112,19 @@ namespace OSBE.Controllers.Enemy {
 
         private void Start() {
             ai = GetComponent<EnemyAI>();
+            nav = GetComponent<EnemyNavAgent>();
             player = system.Player();
 
-            state = new() {
-                playerStance = PlayerStance.CROUCHING,
-                playerSpeed = PlayerSpeed.STOPPED,
-                timeSinceSeenPlayer = 0f,
-                timeSincePlayerMoved = 0f,
-                distanceToPlayer = 1000f,
-                angleToPlayer = 0f,
-                playerVisibility = 0f,
-            };
+            patrol = new TransformPatrol(transform);
+            patrol.Init();
+
         }
 
         private void FixedUpdate() {
+            AStateNode<EnemyAIStateDetails>.Process(
+                behavior,
+                ai.details with { cfg = cfg.ActiveCfg(ai.state) });
+
             UpdateState(state => state with {
                 timeSincePlayerMoved = state.timeSincePlayerMoved + Time.fixedDeltaTime,
                 timeSinceSeenPlayer = state.timeSinceSeenPlayer + Time.fixedDeltaTime,

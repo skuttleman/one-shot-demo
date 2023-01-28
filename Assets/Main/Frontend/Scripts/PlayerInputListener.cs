@@ -12,43 +12,43 @@ namespace OSFE.Scripts {
         private IController<PlayerControllerInput> controller;
 
         public void OnMove(InputValue value) {
-            controller.On(new MovementInput(value.Get<Vector2>()));
+            controller.Handle(new MovementInput(value.Get<Vector2>()));
         }
 
         public void OnSprint(InputValue value) {
-            controller.On(new SprintInput(value.isPressed));
+            controller.Handle(new SprintInput(value.isPressed));
         }
 
         public void OnLook(InputValue value) {
-            controller.On(new LookInput(value.Get<Vector2>(), false));
+            controller.Handle(new LookInput(value.Get<Vector2>(), false));
         }
 
         public void OnMouseLook(InputValue value) {
-            controller.On(new LookInput(value.Get<Vector2>(), true));
+            controller.Handle(new LookInput(value.Get<Vector2>(), true));
         }
 
         public void OnScope(InputValue value) {
-            controller.On(new ScopeInput(Maths.NonZero(value.Get<float>())));
+            controller.Handle(new ScopeInput(Maths.NonZero(value.Get<float>())));
         }
 
         public void OnAim(InputValue value) {
-            controller.On(new AimInput(Maths.NonZero(value.Get<float>())));
+            controller.Handle(new AimInput(Maths.NonZero(value.Get<float>())));
         }
 
         public void OnAttack(InputValue value) {
-            controller.On(new AttackInput(value.isPressed));
+            controller.Handle(new AttackInput(value.isPressed));
         }
 
         public void OnClimb(InputValue _) {
-            controller.On(new ClimbInput(ClimbDirection.UP));
+            controller.Handle(new ClimbInput(ClimbDirection.UP));
         }
 
         public void OnDrop(InputValue _) {
-            controller.On(new ClimbInput(ClimbDirection.DOWN));
+            controller.Handle(new ClimbInput(ClimbDirection.DOWN));
         }
 
         public void OnTBD(InputValue _) {
-            controller.On(new TBDInput());
+            controller.Handle(new TBDInput());
         }
 
         /*
@@ -69,10 +69,10 @@ namespace OSFE.Scripts {
                 .performed += context => {
                     switch (context.interaction) {
                         case MultiTapInteraction interaction:
-                            controller.On(new DiveInput());
+                            controller.Handle(new DiveInput());
                             break;
                         case TapInteraction interaction:
-                            controller.On(new StanceInput());
+                            controller.Handle(new StanceInput());
                             break;
                     }
                 };

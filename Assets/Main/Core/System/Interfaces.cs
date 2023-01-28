@@ -43,7 +43,7 @@ namespace OSCore.System.Interfaces {
 
     namespace Controllers {
         public interface IController<E> {
-            public void On(E e);
+            public void Handle(E e);
             public void OnStep() { }
         }
 

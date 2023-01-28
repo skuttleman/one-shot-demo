@@ -1,4 +1,5 @@
 ﻿using OSCore.Data.AI;
+using OSCore.Data.Enums;
 using System;
 using UnityEngine;
 
@@ -8,7 +9,16 @@ namespace OSCore.System {
 
         public Vector3 lastKnownPosition { get; init; }
         public float suspicion { get; init; }
-        public bool seesPlayer { get; init; }
+
+        public PlayerStance playerStance { get; init; }
+        public PlayerSpeed playerSpeed { get; init; }
+
+        public float timeSinceSeenPlayer { get; init; }
+        public float timeSincePlayerMoved { get; init; }
+
+        public float playerVisibility { get; init; }
+        public float distanceToPlayer { get; init; }
+        public float angleToPlayer { get; init; }
     }
 
     public class EnemyAINode : APredicativeStateNode<EnemyAwareness, EnemyAIStateDetails> {

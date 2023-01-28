@@ -26,7 +26,7 @@ namespace OSBE.Controllers.Player {
             rb = transform.GetComponent<Rigidbody>();
         }
 
-        public void On(PlayerControllerInput e) {
+        public void Handle(PlayerControllerInput e) {
             switch (e) {
                 case ClimbInput ev:
                     anim.transform.localPosition = anim.transform.localPosition

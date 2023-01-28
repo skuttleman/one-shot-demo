@@ -39,7 +39,7 @@ namespace OSFE.Scripts {
                 .FindInActiveChildren(player, xform => xform.name == "head")
                 .First()
                 .position;
-            controller.On(BuildLOS(eyes, playerEyes));
+            controller.Handle(BuildLOS(eyes, playerEyes));
 
             float enemyVisibility = Transforms.VisibilityFrom(playerEyes, coll);
             if (enemyVisibility > 0f) timeSinceSeeable = 0f;
