@@ -13,7 +13,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.location = location;
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
             if (Vector3.Distance(transform.position, location) < 0.2f) {
                 return StateNodeStatus.SUCCESS;
             } else if (!isStarted && nav.Goto(location, details.cfg)) {
@@ -43,7 +43,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.toLocation = toLocation;
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
             if (!isStarted) {
                 isStarted = true;
                 nav.Face(toLocation(details), details.cfg);
@@ -74,8 +74,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             : base(transform, _ => transform.position + direction.normalized) { }
     }
 
-    public class BNodeLookAtLKL : BNodeLookAt {
-        public BNodeLookAtLKL(Transform transform)
+    public class BNodeLookAtLKP : BNodeLookAt {
+        public BNodeLookAtLKP(Transform transform)
             : base(transform, details => details.lastKnownPosition) { }
     }
 }

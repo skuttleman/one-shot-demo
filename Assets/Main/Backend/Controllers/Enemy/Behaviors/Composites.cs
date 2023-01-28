@@ -10,8 +10,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.nodes = nodes;
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
-            StateNodeStatus x = nodes[curr].Process(details);
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+            StateNodeStatus x = Process(nodes[curr], details);
             switch (x) {
                 case StateNodeStatus.FAILURE: return StateNodeStatus.FAILURE;
                 case StateNodeStatus.SUCCESS: curr++; break;
@@ -35,8 +35,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.nodes = nodes;
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
-            switch (nodes[curr].Process(details)) {
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+            switch (Process(nodes[curr], details)) {
                 case StateNodeStatus.SUCCESS: return StateNodeStatus.SUCCESS;
                 case StateNodeStatus.FAILURE: curr++; break;
             }
@@ -59,7 +59,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.time = time;
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
             if (elapsed >= time) {
                 return StateNodeStatus.SUCCESS;
             }
@@ -84,13 +84,13 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.time = time;
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
             if (elapsed >= time) {
                 return childStatus == StateNodeStatus.RUNNING ? StateNodeStatus.SUCCESS : childStatus;
             }
 
             elapsed += Time.deltaTime;
-            childStatus = child.Process(details);
+            childStatus = Process(child, details);
 
             return childStatus;
         }
@@ -109,8 +109,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             child = node;
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
-            switch (child.Process(details)) {
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+            switch (Process(child, details)) {
                 case StateNodeStatus.FAILURE:
                     return StateNodeStatus.FAILURE;
                 case StateNodeStatus.SUCCESS:

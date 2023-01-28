@@ -75,15 +75,6 @@ namespace OSBE.Controllers.Enemy {
             }
         }
 
-        private StateConfig Cfg(EnemyAwareness awareness) =>
-            awareness switch {
-                EnemyAwareness.AGGRESIVE => cfg.aggressiveCfg,
-                EnemyAwareness.SEARCHING => cfg.aggressiveCfg,
-                EnemyAwareness.ALERT => cfg.activeCfg,
-                EnemyAwareness.ALERT_INVESTIGATING => cfg.activeCfg,
-                _ => cfg.passiveCfg,
-            };
-
         /*
          * Lifecycle Methods
          */
@@ -104,7 +95,9 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private void Update() {
-            activeBehavior?.Process(ai.details with { cfg = Cfg(ai.state) });
+            AStateNode<EnemyAIStateDetails>.Process(
+                activeBehavior,
+                ai.details with { cfg = cfg.ActiveCfg(ai.state) });
         }
     }
 }

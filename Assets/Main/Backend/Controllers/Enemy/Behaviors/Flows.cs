@@ -11,8 +11,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
 
         public TransformPatrol(Transform transform) : base(transform) { }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
-            return child.Process(details);
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+            return Process(child, details);
         }
 
         public override void Init() {
@@ -44,12 +44,12 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         public EnemyCurious(Transform transform) : base(transform) {
             tree = new BNodeDoFor(
                 transform,
-                new BNodeRepeat(transform, new BNodeLookAtLKL(transform)),
+                new BNodeRepeat(transform, new BNodeLookAtLKP(transform)),
                 6f);
         }
 
-        public override StateNodeStatus Process(EnemyAIStateDetails details) {
-            StateNodeStatus status = tree.Process(details);
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+            StateNodeStatus status = Process(tree, details);
 
             if (status == StateNodeStatus.SUCCESS) {
                 tree.Init();

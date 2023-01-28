@@ -12,8 +12,27 @@ namespace OSCore.System {
             this.transform = transform;
         }
 
-        public abstract StateNodeStatus Process(T details);
+        protected abstract StateNodeStatus Process(T details);
 
         public abstract void Init();
+
+        public static StateNodeStatus Process(AStateNode<T> node, T details) {
+            if (node == null) return StateNodeStatus.FAILURE;
+
+            StateNodeStatus status = node.Process(details);
+            switch (status) {
+                //case StateNodeStatus.RUNNING:
+                //    Debug.Log(node.GetType().ToString() + " -> " + status);
+                //    break;
+                //case StateNodeStatus.FAILURE:
+                //    Debug.Log(node.GetType().ToString() + " -> " + status);
+                //    break;
+                //case StateNodeStatus.SUCCESS:
+                //    Debug.Log(node.GetType().ToString() + " -> " + status);
+                //    break;
+            }
+
+            return status;
+        }
     }
 }

@@ -2407,7 +2407,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4.66, y: 73.100006, z: -1.0499916}
+  m_LocalPosition: {x: -4.64, y: 74.100006, z: 0.25000885}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3887,6 +3887,8 @@ MonoBehaviour:
   footstep: {fileID: 2824961683968191683, guid: 6ed164c22ab5d405f8076f73f6da5f7d,
     type: 3}
   cfg: {fileID: 11400000, guid: bc964265b4e6d4bfda94d287d66aec70, type: 2}
+  canPassive: 1
+  canCurious: 0
 --- !u!114 &467042522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4923,7 +4925,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 554573574}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4.8120728, y: 73.066086, z: -1.1209818}
+  m_LocalPosition: {x: -4.792073, y: 74.066086, z: 0.17901868}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12401,6 +12403,8 @@ MonoBehaviour:
   footstep: {fileID: 2824961683968191683, guid: 6ed164c22ab5d405f8076f73f6da5f7d,
     type: 3}
   cfg: {fileID: 0}
+  canPassive: 0
+  canCurious: 0
 --- !u!195 &1618761086
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -14299,7 +14303,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1688143288}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4.8120728, y: 73.066086, z: -7.6209836}
+  m_LocalPosition: {x: -4.792073, y: 74.066086, z: -6.320983}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -16558,7 +16562,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1855521951}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.66, y: 0.1, z: -7.55}
+  m_LocalPosition: {x: -4.64, y: 1.1, z: -6.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -17273,6 +17277,8 @@ MonoBehaviour:
   footstep: {fileID: 2824961683968191683, guid: 6ed164c22ab5d405f8076f73f6da5f7d,
     type: 3}
   cfg: {fileID: 0}
+  canPassive: 0
+  canCurious: 0
 --- !u!195 &1904204537
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -17353,7 +17359,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1914129928}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4.8120728, y: 73.066086, z: -7.6209836}
+  m_LocalPosition: {x: -4.792073, y: 74.066086, z: -6.320983}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -17678,7 +17684,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1933146013}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4.8120728, y: 73.066086, z: -7.6209836}
+  m_LocalPosition: {x: -4.792073, y: 74.066086, z: -6.320983}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

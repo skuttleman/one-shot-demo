@@ -35,10 +35,11 @@ namespace OSBE.Controllers.Enemy {
         }
 
         public void Stop() {
+            if (nav != null) nav.ResetPath();
             if (anim != null) {
                 anim.Transition(state => state with { isMoving = false });
             }
-            if (nav != null) nav.isStopped = true;
+
             isMoving = false;
             isTurning = false;
         }

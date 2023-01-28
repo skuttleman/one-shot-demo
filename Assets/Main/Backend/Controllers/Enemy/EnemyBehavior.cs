@@ -32,7 +32,7 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private float CalculateSuspicion(EnemyAIStateDetails details) {
-            StateConfig cfg = Cfg(ai.state);
+            StateConfig config = cfg.ActiveCfg(ai.state);
             float increase = 0.1f;
 
             increase *= state.playerSpeed switch {
@@ -48,27 +48,31 @@ namespace OSBE.Controllers.Enemy {
                 _ => 1f,
             };
 
-            float periphery = state.angleToPlayer / cfg.fovAngle;
-            Debug.Log("PERIPH " + periphery);
-            if (periphery > 0 && state.angleToPlayer <= cfg.fovAngle) increase /= periphery;
+            float periphery = state.angleToPlayer / config.fovAngle;
+            if (periphery > 0 && state.angleToPlayer <= config.fovAngle) increase /= periphery;
             else increase = 0;
 
             increase *= state.playerVisibility;
-            if (state.distanceToPlayer <= cfg.fovDistance) {
+            if (state.distanceToPlayer <= config.fovDistance) {
                 increase /= state.distanceToPlayer;
             }
 
             return Mathf.Clamp(details.suspicion + increase, 0f, 1f);
         }
 
-        private StateConfig Cfg(EnemyAwareness awareness) =>
-            awareness switch {
-                EnemyAwareness.AGGRESIVE => cfg.aggressiveCfg,
-                EnemyAwareness.SEARCHING => cfg.aggressiveCfg,
-                EnemyAwareness.ALERT => cfg.activeCfg,
-                EnemyAwareness.ALERT_INVESTIGATING => cfg.activeCfg,
-                _ => cfg.passiveCfg,
+        private EnemyAIStateDetails ProcessUpdate(EnemyAIStateDetails details) {
+            bool isVisible = state.playerVisibility > 0f;
+
+            return details with {
+                seesPlayer = isVisible,
+                lastKnownPosition = isVisible
+                    ? player.transform.position
+                    : details.lastKnownPosition,
+                suspicion = isVisible
+                    ? CalculateSuspicion(details)
+                    : Mathf.Max(details.suspicion - 0.01f, 0f),
             };
+        }
 
         /*
          * Lifecycle Methods
@@ -95,17 +99,10 @@ namespace OSBE.Controllers.Enemy {
                 timeSinceSeenPlayer = state.timeSinceSeenPlayer + Time.fixedDeltaTime,
             });
 
-            bool playerInView = state.playerVisibility > 0f;
 
-            ai.Transition(details => details with {
-                seesPlayer = playerInView,
-                lastKnownPosition = playerInView
-                    ? player.transform.position
-                    : details.lastKnownPosition,
-                suspicion = playerInView
-                    ? CalculateSuspicion(details)
-                    : Mathf.Max(details.suspicion - 0.01f, 0f),
-            });
+            //bool isInView = isVisible && cfg.ActiveCfg(ai.state).fovAngle 
+
+            ai.Transition(ProcessUpdate);
         }
     }
 }
