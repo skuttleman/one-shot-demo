@@ -6,9 +6,7 @@ using OSCore.System;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers.Enemy {
-    public interface IAIBehavior { }
-
-    public class EnemyBehavior : ASystemInitializer<MovementChanged, StanceChanged>, IAIBehavior {
+    public class EnemyBehavior : ASystemInitializer<MovementChanged, StanceChanged> {
         public EnemyState state { get; private set; }
 
         private EnemyAI ai;

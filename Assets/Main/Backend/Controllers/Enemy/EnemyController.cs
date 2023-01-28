@@ -1,17 +1,17 @@
-using OSBE.Tagging;
 using OSCore.Data.AI;
 using OSCore.Data.Animations;
 using OSCore.Data.Controllers;
 using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
+using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
 using TMPro;
 using UnityEngine;
 using static OSCore.Data.Controllers.EnemyControllerInput;
-using OSCore.System.Interfaces.Tagging;
+using OSBE.Controllers.Enemy.Behaviors.Flows;
 
 namespace OSBE.Controllers.Enemy {
     public class EnemyController :
@@ -49,6 +49,23 @@ namespace OSBE.Controllers.Enemy {
             }
         }
 
+
+        public void OnStateInit(EnemyAwareness curr) {
+            Enter(curr);
+        }
+
+        public void OnStateTransition(EnemyAwareness prev, EnemyAwareness curr) {
+            Enter(curr);
+        }
+
+        private void Enter(EnemyAwareness awareness) {
+            switch (awareness) {
+                case EnemyAwareness.PASSIVE:
+                    ai.Behave(new TransformPatrol(transform));
+                    break;
+            }
+        }
+
         /*
          * Lifecycle Methods
          */
@@ -67,8 +84,10 @@ namespace OSBE.Controllers.Enemy {
             debugTxt.text = "";
         }
 
-        private void FixedUpdate() {
+        private void Update() {
             debugTxt.text = behavior.state.ToString() + "\n\n" + ai.state.ToString();
+
+
         }
     }
 }

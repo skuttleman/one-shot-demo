@@ -34,6 +34,7 @@ namespace OSBE.Controllers {
             Play(curr);
             receiver.OnStateInit(curr);
         }
+
         public void OnStateTransition(State prev, State curr) {
             Play(curr);
             receiver.OnStateTransition(prev, curr);

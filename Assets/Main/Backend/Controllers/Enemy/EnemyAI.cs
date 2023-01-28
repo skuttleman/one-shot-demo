@@ -1,14 +1,14 @@
-﻿using System;
-using OSCore.Data.AI;
+﻿using OSCore.Data.AI;
 using OSCore.ScriptableObjects;
-using OSCore.System;
 using OSCore.System.Interfaces;
+using OSCore.System;
 using OSCore.Utils;
 using UnityEngine;
 
 namespace OSBE.Controllers.Enemy {
     public class EnemyAI : APredicativeStateMachine<EnemyAwareness, EnemyAIStateDetails> {
         [SerializeField] private EnemyAICfgSO cfg;
+        private AStateNode behavior = null;
 
         private void Start() {
             IStateReceiver<EnemyAwareness> receiver = Transforms
@@ -18,6 +18,16 @@ namespace OSBE.Controllers.Enemy {
                 timeInState = 0f,
                 suspicion = 0f,
             });
+        }
+
+        public void Behave(AStateNode behavior) {
+            this.behavior = behavior;
+            behavior.Init();
+        }
+
+        protected override void Update() {
+            base.Update();
+            if (behavior != null) behavior.Process();
         }
     }
 }

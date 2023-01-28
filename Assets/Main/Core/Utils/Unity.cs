@@ -63,4 +63,15 @@ namespace OSCore.Utils {
             yield break;
         }
     }
+
+    public static class LogUtils {
+        public static T FindNull<T>(string id, T item)
+            where T : class {
+
+            if (item == null) {
+                Debug.Log(id + " is Null!");
+            }
+            return item;
+        }
+    }
 }

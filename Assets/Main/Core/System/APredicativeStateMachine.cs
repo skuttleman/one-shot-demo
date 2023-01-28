@@ -79,7 +79,7 @@ namespace OSCore.System {
          * Lifecycle Methods
          */
 
-        private void Update() {
+        protected virtual void Update() {
             if (node is null) return;
             TransitionTo(node.Next(Enrich(details with {
                 timeInState = timeInState,
