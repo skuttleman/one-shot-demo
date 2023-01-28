@@ -20,6 +20,7 @@ namespace OSBE.Controllers.Enemy {
         private GameObject player;
         private EnemyBehavior behavior;
         private TextMeshPro speech;
+        private TMP_Text debug;
 
         public void Handle(EnemyControllerInput e) {
             behavior.UpdateState(e switch {
@@ -71,6 +72,25 @@ namespace OSBE.Controllers.Enemy {
                 .First()
                 .GetComponent<TextMeshPro>();
             speech.text = "";
+
+            debug = FindObjectOfType<TMP_Text>();
+            debug.text = "";
+        }
+
+        private void Update() {
+            debug.text = $@"
+
+playerSpeed       = {behavior.state.playerSpeed}
+playerStance      = {behavior.state.playerStance}
+
+lastKnownPosition = {behavior.state.lastKnownPosition}
+playerVisibility  = {behavior.state.playerVisibility}
+angleToPlayer     = {behavior.state.angleToPlayer}
+distanceToPlayer  = {behavior.state.distanceToPlayer}
+
+suspicion         = {behavior.state.suspicion}
+
+            ".Trim();
         }
     }
 }
