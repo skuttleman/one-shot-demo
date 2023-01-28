@@ -5,20 +5,14 @@ namespace OSCore.System {
         RUNNING, SUCCESS, FAILURE
     }
 
-    public abstract class AStateNode {
+    public abstract class AStateNode<T> {
         public readonly Transform transform;
 
         public AStateNode(Transform transform) {
             this.transform = transform;
         }
 
-        public StateNodeStatus Process() {
-            StateNodeStatus status = ProcessImpl();
-            //Debug.Log("Processing " + GetType() + " -> " + status);
-            return status;
-        }
-
-        protected abstract StateNodeStatus ProcessImpl();
+        public abstract StateNodeStatus Process(T details);
 
         public abstract void Init();
     }

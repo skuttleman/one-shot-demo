@@ -44,11 +44,11 @@ namespace OSCore.System {
             where Details : APredicativeStateDetails<State> {
 
         public State state => node == null ? default : node.state;
+        public Details details { get; private set; }
 
         protected APredicativeStateNode<State, Details> node = null;
 
         private IStateReceiver<State> receiver;
-        private Details details;
         private float timeInState;
 
         protected virtual void Init(

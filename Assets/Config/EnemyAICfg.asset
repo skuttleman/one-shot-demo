@@ -12,3 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 032ad7f1276ed453ebed8f9234c09b4a, type: 3}
   m_Name: EnemyAICfg
   m_EditorClassIdentifier: 
+  <passiveCfg>k__BackingField:
+    <moveSpeed>k__BackingField: 0.9
+    <rotationSpeed>k__BackingField: 5
+    <fovAngle>k__BackingField: 60
+    <fovDistance>k__BackingField: 5
+  <activeCfg>k__BackingField:
+    <moveSpeed>k__BackingField: 1.75
+    <rotationSpeed>k__BackingField: 7
+    <fovAngle>k__BackingField: 45
+    <fovDistance>k__BackingField: 7
+  <aggressiveCfg>k__BackingField:
+    <moveSpeed>k__BackingField: 2.5
+    <rotationSpeed>k__BackingField: 8
+    <fovAngle>k__BackingField: 75
+    <fovDistance>k__BackingField: 10

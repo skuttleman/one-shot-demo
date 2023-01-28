@@ -1,6 +1,7 @@
-﻿using OSCore.Utils;
-using UnityEngine;
+﻿using OSCore.Data.AI;
+using OSCore.Utils;
 using UnityEngine.AI;
+using UnityEngine;
 
 namespace OSBE.Controllers.Enemy {
     public class EnemyNavAgent : MonoBehaviour {
@@ -9,20 +10,24 @@ namespace OSBE.Controllers.Enemy {
 
         private EnemyAnimator anim;
         private NavMeshAgent nav;
+        private StateConfig cfg;
+
         private Vector3 turnPos;
         private Vector3 prevPos;
         private float buffer;
 
-        public bool Goto(Vector3 location) {
+        public bool Goto(Vector3 location, StateConfig cfg) {
             NavMeshPath path = new();
 
             if (nav.CalculatePath(location, path)
                 && Vector3.Distance(location, nav.pathEndPosition) > 0.1f
             ) {
+                this.cfg = cfg;
                 anim.Transition(state => state with { isMoving = true });
                 isMoving = true;
                 buffer = -0.25f;
                 nav.SetPath(path);
+                nav.speed = cfg.moveSpeed;
 
                 return true;
             }
@@ -33,11 +38,13 @@ namespace OSBE.Controllers.Enemy {
             if (anim != null) {
                 anim.Transition(state => state with { isMoving = false });
             }
+            if (nav != null) nav.isStopped = true;
             isMoving = false;
             isTurning = false;
         }
 
-        public void Face(Vector3 location) {
+        public void Face(Vector3 location, StateConfig cfg) {
+            this.cfg = cfg;
             isTurning = true;
             turnPos = location;
         }
@@ -48,7 +55,7 @@ namespace OSBE.Controllers.Enemy {
             float diff = Maths.AngleDiff(rotation.eulerAngles.y, face.eulerAngles.y);
 
             if (diff >= 1f) {
-                transform.rotation = Quaternion.Lerp(rotation, face, 20f * Time.deltaTime);
+                transform.rotation = Quaternion.Lerp(rotation, face, cfg.rotationSpeed * Time.deltaTime);
             } else {
                 isTurning = false;
             }
@@ -60,7 +67,7 @@ namespace OSBE.Controllers.Enemy {
                 transform.rotation = Quaternion.Lerp(
                     transform.rotation,
                     Quaternion.LookRotation(transform.position - prevPos),
-                    10f * Time.deltaTime);
+                    cfg.rotationSpeed * Time.deltaTime);
             }
 
             if (buffer > 0f && (nav.isStopped || nav.remainingDistance < 0.25f)) {
@@ -91,21 +98,6 @@ namespace OSBE.Controllers.Enemy {
 
             prevPos = transform.position;
             buffer += Time.deltaTime;
-
-
-
-
-
-
-
-            // TODO - REMOVE ME : Click to move enemy
-            if (Input.GetMouseButtonDown(0)) {
-                Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                if (Physics.Raycast(ray, out RaycastHit hit)) {
-                    Goto(hit.point);
-                }
-            }
         }
     }
 }

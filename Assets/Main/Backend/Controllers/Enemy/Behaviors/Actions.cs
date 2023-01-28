@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Actions {
-    public class BNodeGoto : AStateNode {
+    public class BNodeGoto : AStateNode<EnemyAIStateDetails> {
         private readonly EnemyNavAgent nav;
         private readonly Vector3 location;
         private bool isStarted;
@@ -13,10 +13,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.location = location;
         }
 
-        protected override StateNodeStatus ProcessImpl() {
+        public override StateNodeStatus Process(EnemyAIStateDetails details) {
             if (Vector3.Distance(transform.position, location) < 0.2f) {
                 return StateNodeStatus.SUCCESS;
-            } else if (!isStarted && nav.Goto(location)) {
+            } else if (!isStarted && nav.Goto(location, details.cfg)) {
                 isStarted = true;
                 return StateNodeStatus.RUNNING;
             } else if (!isStarted) {
@@ -33,20 +33,20 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
     }
 
-    public abstract class ABNodeLookAt : AStateNode {
+    public class BNodeLookAt : AStateNode<EnemyAIStateDetails> {
         private readonly EnemyNavAgent nav;
-        private readonly Func<Vector3> locationFn;
+        private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
         private bool isStarted;
 
-        public ABNodeLookAt(Transform transform, Func<Vector3> locationFn) : base(transform) {
+        public BNodeLookAt(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
             nav = transform.GetComponent<EnemyNavAgent>();
-            this.locationFn = locationFn;
+            this.toLocation = toLocation;
         }
 
-        protected override StateNodeStatus ProcessImpl() {
+        public override StateNodeStatus Process(EnemyAIStateDetails details) {
             if (!isStarted) {
                 isStarted = true;
-                nav.Face(locationFn());
+                nav.Face(toLocation(details), details.cfg);
             } else if (!nav.isTurning) {
                 return StateNodeStatus.SUCCESS;
             }
@@ -59,18 +59,23 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
     }
 
-    public class BNodeLookAtTransform : ABNodeLookAt {
+    public class BNodeLookAtTransform : BNodeLookAt {
         public BNodeLookAtTransform(Transform transform, Transform target)
-            : base(transform, () => target.position) { }
+            : base(transform, _ => target.position) { }
     }
 
-    public class BNodeLookAtLocation : ABNodeLookAt {
+    public class BNodeLookAtLocation : BNodeLookAt {
         public BNodeLookAtLocation(Transform transform, Vector3 location)
-            : base(transform, () => location) { }
+            : base(transform, _ => location) { }
     }
 
-    public class BNodeLookAtDirection : ABNodeLookAt {
+    public class BNodeLookAtDirection : BNodeLookAt {
         public BNodeLookAtDirection(Transform transform, Vector3 direction)
-            : base(transform, () => transform.position + direction.normalized) { }
+            : base(transform, _ => transform.position + direction.normalized) { }
+    }
+
+    public class BNodeLookAtLKL : BNodeLookAt {
+        public BNodeLookAtLKL(Transform transform)
+            : base(transform, details => details.lastKnownPosition) { }
     }
 }

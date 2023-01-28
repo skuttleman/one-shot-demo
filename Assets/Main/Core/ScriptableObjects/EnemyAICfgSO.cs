@@ -1,13 +1,25 @@
-﻿using System;
-using OSCore.Data.AI;
+﻿using OSCore.Data.AI;
 using OSCore.System;
 using UnityEngine;
 
 namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/enemy/ai")]
     public class EnemyAICfgSO : ScriptableObject {
+        [field: SerializeField] public StateConfig passiveCfg { get; private set; }
+        [field: SerializeField] public StateConfig activeCfg { get; private set; }
+        [field: SerializeField] public StateConfig aggressiveCfg { get; private set; }
+
         public EnemyAINode Init() =>
             BuildAsset();
+
+        public StateConfig ActiveCfg(EnemyAwareness awareness) =>
+            awareness switch {
+                EnemyAwareness.AGGRESIVE => aggressiveCfg,
+                EnemyAwareness.SEARCHING => aggressiveCfg,
+                EnemyAwareness.ALERT => activeCfg,
+                EnemyAwareness.ALERT_INVESTIGATING => activeCfg,
+                _ => passiveCfg,
+            };
 
         private EnemyAINode BuildAsset() {
             EnemyAINode passive = new(EnemyAwareness.PASSIVE);

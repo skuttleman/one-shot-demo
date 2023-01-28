@@ -1,9 +1,14 @@
-﻿using System;
-using OSCore.Data.AI;
+﻿using OSCore.Data.AI;
+using System;
+using UnityEngine;
 
 namespace OSCore.System {
     public record EnemyAIStateDetails : APredicativeStateDetails<EnemyAwareness> {
+        public StateConfig cfg { get; init; }
+
+        public Vector3 lastKnownPosition { get; init; }
         public float suspicion { get; init; }
+        public bool seesPlayer { get; init; }
     }
 
     public class EnemyAINode : APredicativeStateNode<EnemyAwareness, EnemyAIStateDetails> {

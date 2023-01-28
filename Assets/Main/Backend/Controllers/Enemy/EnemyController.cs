@@ -1,17 +1,16 @@
+using OSBE.Controllers.Enemy.Behaviors.Flows;
 using OSCore.Data.AI;
 using OSCore.Data.Animations;
 using OSCore.Data.Controllers;
-using OSCore.Data.Enums;
+using OSCore.Data;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
-using OSCore.System.Interfaces.Tagging;
 using OSCore.System.Interfaces;
 using OSCore.System;
 using OSCore.Utils;
 using TMPro;
 using UnityEngine;
 using static OSCore.Data.Controllers.EnemyControllerInput;
-using OSBE.Controllers.Enemy.Behaviors.Flows;
 
 namespace OSBE.Controllers.Enemy {
     public class EnemyController :
@@ -19,14 +18,16 @@ namespace OSBE.Controllers.Enemy {
         IController<EnemyControllerInput>,
         IStateReceiver<EnemyAnim>,
         IStateReceiver<EnemyAwareness> {
-        [SerializeField] private EnemyCfgSO cfg;
-        [SerializeField] GameObject footstep;
+        [SerializeField] private GameObject footstep;
+        [SerializeField] private EnemyAICfgSO cfg;
 
         private EnemyAI ai;
-        private TextMeshPro speech;
-        private TMP_Text debugTxt;
+        private EnemyNavAgent nav;
         private EnemyBehavior behavior;
-        private AStateNode patrol;
+        private TextMeshPro speech;
+
+        private AStateNode<EnemyAIStateDetails> patrol;
+        private AStateNode<EnemyAIStateDetails> activeBehavior;
 
         public void On(EnemyControllerInput e) {
             behavior.UpdateState(e switch {
@@ -34,12 +35,7 @@ namespace OSBE.Controllers.Enemy {
                     timeSinceSeenPlayer = 0f,
                     timeSincePlayerMoved = 0f,
                 },
-                PlayerLOS ev => state => state with {
-                    timeSinceSeenPlayer = ev.visibility > 0f ? 0f : state.timeSinceSeenPlayer,
-                    playerVisibility = ev.visibility,
-                    angleToPlayer = ev.periphery,
-                    distanceToPlayer = ev.distance,
-                },
+                PlayerLOS ev => state => UpdateLOS(ev, state),
                 _ => Fns.Identity
             });
         }
@@ -58,13 +54,35 @@ namespace OSBE.Controllers.Enemy {
             Enter(curr);
         }
 
+        private EnemyState UpdateLOS(PlayerLOS e, EnemyState details) {
+            return details with {
+                timeSinceSeenPlayer = e.visibility > 0f ? 0f : details.timeSinceSeenPlayer,
+                playerVisibility = e.visibility,
+                angleToPlayer = e.periphery,
+                distanceToPlayer = e.distance,
+            };
+        }
+
         private void Enter(EnemyAwareness awareness) {
+            nav.Stop();
             switch (awareness) {
                 case EnemyAwareness.PASSIVE:
-                    ai.Behave(patrol);
+                    activeBehavior = patrol;
+                    break;
+                case EnemyAwareness.CURIOUS:
+                    activeBehavior = new EnemyCurious(transform);
                     break;
             }
         }
+
+        private StateConfig Cfg(EnemyAwareness awareness) =>
+            awareness switch {
+                EnemyAwareness.AGGRESIVE => cfg.aggressiveCfg,
+                EnemyAwareness.SEARCHING => cfg.aggressiveCfg,
+                EnemyAwareness.ALERT => cfg.activeCfg,
+                EnemyAwareness.ALERT_INVESTIGATING => cfg.activeCfg,
+                _ => cfg.passiveCfg,
+            };
 
         /*
          * Lifecycle Methods
@@ -73,6 +91,7 @@ namespace OSBE.Controllers.Enemy {
         private void Start() {
             behavior = GetComponent<EnemyBehavior>();
             ai = GetComponent<EnemyAI>();
+            nav = GetComponent<EnemyNavAgent>();
 
             patrol = new TransformPatrol(transform);
             patrol.Init();
@@ -82,15 +101,10 @@ namespace OSBE.Controllers.Enemy {
                 .First()
                 .GetComponent<TextMeshPro>();
             speech.text = "";
-
-            debugTxt = system.Send<ITagRegistry, GameObject>(
-                registry => registry.GetUnique(IdTag.DEBUG_LAYER))
-                .GetComponentInChildren<TMP_Text>();
-            debugTxt.text = "";
         }
 
         private void Update() {
-            debugTxt.text = behavior.state.ToString() + "\n\n" + ai.state.ToString();
+            activeBehavior?.Process(ai.details with { cfg = Cfg(ai.state) });
         }
     }
 }

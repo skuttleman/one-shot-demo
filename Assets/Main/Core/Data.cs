@@ -60,6 +60,9 @@ namespace OSCore.Data {
     public record EnemyState {
         public PlayerStance playerStance { get; init; }
         public PlayerSpeed playerSpeed { get; init; }
+
+        public Vector3 lastKnownLocation { get; init; }
+
         public float timeSinceSeenPlayer { get; init; }
         public float timeSincePlayerMoved { get; init; }
 
@@ -164,6 +167,13 @@ namespace OSCore.Data {
         public enum EnemyAwareness {
             PASSIVE, CURIOUS, INVESTIGATING, ALERT, ALERT_INVESTIGATING, AGGRESIVE, SEARCHING
         }
+
+        [Serializable]
+        public struct StateConfig {
+            [field: SerializeField] public float moveSpeed { get; private set; }
+            [field: SerializeField] public float rotationSpeed { get; private set; }
+            [field: SerializeField] public float fovAngle { get; private set; }
+            [field: SerializeField] public float fovDistance { get; private set; }
+        }
     }
 }
-
