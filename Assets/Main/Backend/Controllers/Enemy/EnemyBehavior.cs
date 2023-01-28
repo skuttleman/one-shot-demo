@@ -66,7 +66,7 @@ namespace OSBE.Controllers.Enemy {
 
         private float CalculateSuspicion(EnemyAIStateDetails details) {
             StateConfig config = cfg.ActiveCfg(ai.state);
-            float increase = 0.1f;
+            float increase = config.suspicionIncrease;
 
             increase *= state.playerSpeed switch {
                 PlayerSpeed.FAST => 5f,
@@ -90,7 +90,7 @@ namespace OSBE.Controllers.Enemy {
                 increase /= state.distanceToPlayer;
             }
 
-            return Mathf.Clamp(details.suspicion + increase, 0f, 1f);
+            return Mathf.Clamp(details.suspicion + increase * Time.fixedDeltaTime, 0f, 1f);
         }
 
         private EnemyAIStateDetails ProcessUpdate(EnemyAIStateDetails details) {
@@ -129,9 +129,6 @@ namespace OSBE.Controllers.Enemy {
                 timeSincePlayerMoved = state.timeSincePlayerMoved + Time.fixedDeltaTime,
                 timeSinceSeenPlayer = state.timeSinceSeenPlayer + Time.fixedDeltaTime,
             });
-
-
-            //bool isInView = isVisible && cfg.ActiveCfg(ai.state).fovAngle 
 
             ai.Transition(ProcessUpdate);
         }
