@@ -22,12 +22,11 @@ namespace OSBE.Controllers.Enemy {
 
         public void Behave(AStateNode behavior) {
             this.behavior = behavior;
-            behavior.Init();
         }
 
         protected override void Update() {
             base.Update();
-            if (behavior != null) behavior.Process();
+            behavior?.Process();
         }
     }
 }

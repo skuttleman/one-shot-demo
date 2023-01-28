@@ -77,6 +77,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         private readonly AStateNode child;
         private readonly float time;
         private float elapsed;
+        private StateNodeStatus childStatus;
 
         public BNodeDoFor(Transform transform, AStateNode node, float time) : base(transform) {
             child = node;
@@ -85,15 +86,18 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
 
         protected override StateNodeStatus ProcessImpl() {
             if (elapsed >= time) {
-                return StateNodeStatus.SUCCESS;
+                return childStatus == StateNodeStatus.RUNNING ? StateNodeStatus.SUCCESS : childStatus;
             }
 
             elapsed += Time.deltaTime;
-            return child.Process();
+            childStatus = child.Process();
+
+            return childStatus;
         }
 
         public override void Init() {
             elapsed = 0f;
+            childStatus = StateNodeStatus.RUNNING;
             child.Init();
         }
     }

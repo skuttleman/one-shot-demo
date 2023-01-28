@@ -26,6 +26,7 @@ namespace OSBE.Controllers.Enemy {
         private TextMeshPro speech;
         private TMP_Text debugTxt;
         private EnemyBehavior behavior;
+        private AStateNode patrol;
 
         public void On(EnemyControllerInput e) {
             behavior.UpdateState(e switch {
@@ -49,7 +50,6 @@ namespace OSBE.Controllers.Enemy {
             }
         }
 
-
         public void OnStateInit(EnemyAwareness curr) {
             Enter(curr);
         }
@@ -61,7 +61,7 @@ namespace OSBE.Controllers.Enemy {
         private void Enter(EnemyAwareness awareness) {
             switch (awareness) {
                 case EnemyAwareness.PASSIVE:
-                    ai.Behave(new TransformPatrol(transform));
+                    ai.Behave(patrol);
                     break;
             }
         }
@@ -73,21 +73,24 @@ namespace OSBE.Controllers.Enemy {
         private void Start() {
             behavior = GetComponent<EnemyBehavior>();
             ai = GetComponent<EnemyAI>();
+
+            patrol = new TransformPatrol(transform);
+            patrol.Init();
+
             speech = Transforms
                 .FindInActiveChildren(transform.parent, xform => xform.name == "speech")
                 .First()
                 .GetComponent<TextMeshPro>();
+            speech.text = "";
+
             debugTxt = system.Send<ITagRegistry, GameObject>(
                 registry => registry.GetUnique(IdTag.DEBUG_LAYER))
                 .GetComponentInChildren<TMP_Text>();
-            speech.text = "";
             debugTxt.text = "";
         }
 
         private void Update() {
             debugTxt.text = behavior.state.ToString() + "\n\n" + ai.state.ToString();
-
-
         }
     }
 }

@@ -23,13 +23,13 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                 .ForEach(xform => {
                     float waitTime = xform.localScale.z;
                     float rotation = xform.rotation.eulerAngles.y;
+                    Vector3 direction = Vectors.ToVector3(xform.rotation.eulerAngles.y);
 
                     nodes.Add(new BNodeGoto(transform, xform.position));
-                    if (waitTime > 0 && rotation >= 0) {
-                        nodes.Add(new BNodeLookAtDirection(transform, Vectors.ToVector3(rotation)));
-                    }
+
                     if (waitTime > 0) {
-                        nodes.Add(new BNodeWait(transform, 0f));
+                        nodes.Add(new BNodeLookAtDirection(transform, direction));
+                        nodes.Add(new BNodeWait(transform, waitTime));
                     }
                 });
 

@@ -44,7 +44,7 @@ namespace OSBE.Controllers.Enemy {
 
         private void UpdateTurn() {
             Quaternion rotation = transform.rotation;
-            Quaternion face = Quaternion.LookRotation(turnPos);
+            Quaternion face = Quaternion.LookRotation(turnPos - transform.position);
             float diff = Maths.AngleDiff(rotation.eulerAngles.y, face.eulerAngles.y);
 
             if (diff >= 1f) {
