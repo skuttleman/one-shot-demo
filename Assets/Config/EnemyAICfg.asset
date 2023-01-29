@@ -22,8 +22,8 @@ MonoBehaviour:
       <highThresh>k__BackingField: 0.75
     <distance>k__BackingField:
       <limit>k__BackingField: 4
-      <lowThresh>k__BackingField: 3.5
-      <highThresh>k__BackingField: 3
+      <lowThresh>k__BackingField: 3
+      <highThresh>k__BackingField: 3.4
     <angle>k__BackingField:
       <limit>k__BackingField: 60
       <lowThresh>k__BackingField: 40
@@ -38,8 +38,8 @@ MonoBehaviour:
       <highThresh>k__BackingField: 0.75
     <distance>k__BackingField:
       <limit>k__BackingField: 5.5
-      <lowThresh>k__BackingField: 4
-      <highThresh>k__BackingField: 3
+      <lowThresh>k__BackingField: 3
+      <highThresh>k__BackingField: 4
     <angle>k__BackingField:
       <limit>k__BackingField: 75
       <lowThresh>k__BackingField: 30

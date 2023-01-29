@@ -30,11 +30,13 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
 
                     if (waitTime > 0) {
                         nodes.Add(new BNodeLookAtDirection(transform, direction));
-                        nodes.Add(new BNodeWait(transform, waitTime));
+                        nodes.Add(new BNodeWait<EnemyAIStateDetails>(transform, waitTime));
                     }
                 });
 
-            child = new BNodeRepeat(transform, new BNodeAnd(transform, nodes.ToArray()));
+            child = new BNodeRepeat<EnemyAIStateDetails>(
+                transform,
+                new BNodeAnd<EnemyAIStateDetails>(transform, nodes.ToArray()));
             child.Init();
         }
     }
@@ -43,10 +45,12 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         private readonly AStateNode<EnemyAIStateDetails> tree;
 
         public EnemyCurious(Transform transform) : base(transform) {
-            tree = new BNodeParallel(
+            tree = new BNodeParallel<EnemyAIStateDetails>(
                 transform,
-                new BNodeSpeak(transform, "???"),
-                new BNodeRepeat(transform, new BNodeLookAtLKP(transform)));
+                new BNodeSpeak(transform, "..."),
+                new BNodeRepeat<EnemyAIStateDetails>(
+                    transform,
+                    new BNodeLookAtLKP(transform)));
         }
 
         protected override void Process(EnemyAIStateDetails details) {
@@ -64,11 +68,11 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         private readonly AStateNode<EnemyAIStateDetails> tree;
 
         public EnemyInvestigating(Transform transform) : base(transform) {
-            tree = new BNodeRepeat(
+            tree = new BNodeParallel<EnemyAIStateDetails>(
                 transform,
-                new BNodeParallel(
+                new BNodeSpeak(transform, "???"),
+                new BNodeRepeat<EnemyAIStateDetails>(
                     transform,
-                    new BNodeSpeak(transform, "I'm investigating now"),
                     new BNodeGoto(transform, details => details.lastKnownPosition)));
         }
 

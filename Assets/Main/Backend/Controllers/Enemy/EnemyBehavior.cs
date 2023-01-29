@@ -42,7 +42,6 @@ namespace OSBE.Controllers.Enemy {
 
         public void SetInterruptState(EnemyAwareness awareness) {
             if (nav != null) nav.Stop();
-            if (speech != null) speech.Stop();
 
             if (patrol == null) {
                 AssignPatrol(new TransformPatrol(transform));

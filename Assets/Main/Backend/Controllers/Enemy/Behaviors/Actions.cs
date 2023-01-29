@@ -1,4 +1,5 @@
 ﻿using OSCore.System;
+using OSCore.Utils;
 using System;
 using UnityEngine;
 
@@ -6,7 +7,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
     public class BNodeGoto : AStateNode<EnemyAIStateDetails> {
         private readonly EnemyNavAgent nav;
         private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
-        private bool isStarted;
+        private float destElapsed = 0f;
+        private Vector3 destination;
 
         public BNodeGoto(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
             nav = transform.GetComponent<EnemyNavAgent>();
@@ -15,21 +17,29 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
 
         protected override void Process(EnemyAIStateDetails details) {
             status = StateNodeStatus.RUNNING;
-            if (Vector3.Distance(transform.position, toLocation(details)) < 0.2f) {
+
+            if (Vector3.Distance(transform.position, destination) < 0.1f) {
+                nav.Stop();
                 status = StateNodeStatus.SUCCESS;
-            } else if (!isStarted && nav.Goto(toLocation(details), details.cfg)) {
-                isStarted = true;
-                status = StateNodeStatus.RUNNING;
-            } else if (!isStarted) {
-                status = StateNodeStatus.FAILURE;
-            } else if (!nav.isMoving) {
-                status = StateNodeStatus.SUCCESS;
+            } else if (destElapsed <= 0f) {
+                Vector3 loc = toLocation(details);
+                destElapsed = 0.5f;
+
+                if (Vectors.NonZero(loc - destination) || !nav.isMoving) {
+                    destination = loc;
+
+                    if (!nav.Goto(destination, details.cfg)) {
+                        status = StateNodeStatus.FAILURE;
+                    }
+                }
             }
+
+            destElapsed -= Time.deltaTime;
         }
 
         public override void Init() {
             status = StateNodeStatus.RUNNING;
-            isStarted = false;
+            destination = Vector3.negativeInfinity;
             nav.Stop();
         }
     }

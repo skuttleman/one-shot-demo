@@ -12,9 +12,12 @@ public class EnemySpeechAgent : MonoBehaviour {
     private float elapsed;
 
     public void Say(string message) {
-        isSpeaking = true;
-        speech.text = message.Trim();
-        elapsed = 0f;
+        message = message.Trim();
+        if (message.Length > 0) {
+            isSpeaking = true;
+            speech.text = message.Trim();
+            elapsed = 0f;
+        }
     }
 
     public void Stop() {
@@ -36,9 +39,9 @@ public class EnemySpeechAgent : MonoBehaviour {
             speech.transform.position = transform.position + new Vector3(0f, 0f, 0.75f);
 
             elapsed += Time.deltaTime;
-            float duration = speech.text.Length * cfg.speechSpeed;
+            float duration = Mathf.Max(speech.text.Length * cfg.speechSpeed, 1.5f);
 
-            if (speech.text.Length > 0 && elapsed >= duration) {
+            if (elapsed >= duration) {
                 Stop();
             }
         }

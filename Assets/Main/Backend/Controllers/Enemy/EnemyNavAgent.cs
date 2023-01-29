@@ -20,7 +20,7 @@ namespace OSBE.Controllers.Enemy {
             NavMeshPath path = new();
 
             if (nav.CalculatePath(location, path)
-                && Vector3.Distance(location, nav.pathEndPosition) > 0.1f
+                && Vector3.Distance(location, nav.pathEndPosition) > 0.025f
             ) {
                 anim.Transition(state => state with { isMoving = true });
                 anim.SetSpeed(cfg.moveSpeed / 2.5f);
@@ -74,7 +74,7 @@ namespace OSBE.Controllers.Enemy {
                     cfg.rotationSpeed * Time.deltaTime);
             }
 
-            if (buffer > 0f && (nav.isStopped || nav.remainingDistance < 0.25f)) {
+            if (isMoving && buffer > 0f && (nav.isStopped || nav.remainingDistance < 0.025f)) {
                 anim.Transition(state => state with { isMoving = false });
                 isMoving = false;
                 nav.isStopped = true;

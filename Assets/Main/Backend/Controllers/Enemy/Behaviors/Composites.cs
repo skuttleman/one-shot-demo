@@ -2,16 +2,16 @@
 using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Composites {
-    public class BNodeAnd : AStateNode<EnemyAIStateDetails> {
-        private readonly AStateNode<EnemyAIStateDetails>[] nodes;
+    public class BNodeAnd<T> : AStateNode<T> {
+        private readonly AStateNode<T>[] nodes;
         private int curr;
 
-        public BNodeAnd(Transform transform, params AStateNode<EnemyAIStateDetails>[] nodes) : base(transform) {
+        public BNodeAnd(Transform transform, params AStateNode<T>[] nodes) : base(transform) {
             this.nodes = nodes;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
-            AStateNode<EnemyAIStateDetails> node = nodes[curr];
+        protected override void Process(T details) {
+            AStateNode<T> node = nodes[curr];
             Process(node, details);
             status = StateNodeStatus.RUNNING;
 
@@ -30,20 +30,20 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         public override void Init() {
             status = StateNodeStatus.RUNNING;
             curr = 0;
-            foreach (AStateNode<EnemyAIStateDetails> node in nodes) node.Init();
+            foreach (AStateNode<T> node in nodes) node.Init();
         }
     }
 
-    public class BNodeOr : AStateNode<EnemyAIStateDetails> {
-        private readonly AStateNode<EnemyAIStateDetails>[] nodes;
+    public class BNodeOr<T> : AStateNode<T> {
+        private readonly AStateNode<T>[] nodes;
         private int curr;
 
-        public BNodeOr(Transform transform, params AStateNode<EnemyAIStateDetails>[] nodes) : base(transform) {
+        public BNodeOr(Transform transform, params AStateNode<T>[] nodes) : base(transform) {
             this.nodes = nodes;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
-            AStateNode<EnemyAIStateDetails> node = nodes[curr];
+        protected override void Process(T details) {
+            AStateNode<T> node = nodes[curr];
             Process(node, details);
             status = StateNodeStatus.RUNNING;
 
@@ -62,11 +62,11 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         public override void Init() {
             status = StateNodeStatus.RUNNING;
             curr = 0;
-            foreach (AStateNode<EnemyAIStateDetails> node in nodes) node.Init();
+            foreach (AStateNode<T> node in nodes) node.Init();
         }
     }
 
-    public class BNodeWait : AStateNode<EnemyAIStateDetails> {
+    public class BNodeWait<T> : AStateNode<T> {
         private readonly float time;
         private float elapsed;
 
@@ -74,7 +74,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.time = time;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
+        protected override void Process(T details) {
             status = StateNodeStatus.RUNNING;
 
             if (elapsed >= time) {
@@ -90,17 +90,17 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         }
     }
 
-    public class BNodeDoFor : AStateNode<EnemyAIStateDetails> {
-        private readonly AStateNode<EnemyAIStateDetails> child;
+    public class BNodeDoFor<T> : AStateNode<T> {
+        private readonly AStateNode<T> child;
         private readonly float time;
         private float elapsed;
 
-        public BNodeDoFor(Transform transform, AStateNode<EnemyAIStateDetails> node, float time) : base(transform) {
+        public BNodeDoFor(Transform transform, AStateNode<T> node, float time) : base(transform) {
             child = node;
             this.time = time;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
+        protected override void Process(T details) {
             if (elapsed >= time) {
                 return;
             }
@@ -117,14 +117,14 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         }
     }
 
-    public class BNodeRepeat : AStateNode<EnemyAIStateDetails> {
-        private readonly AStateNode<EnemyAIStateDetails> child;
+    public class BNodeRepeat<T> : AStateNode<T> {
+        private readonly AStateNode<T> child;
 
-        public BNodeRepeat(Transform transform, AStateNode<EnemyAIStateDetails> node) : base(transform) {
+        public BNodeRepeat(Transform transform, AStateNode<T> node) : base(transform) {
             child = node;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
+        protected override void Process(T details) {
             Process(child, details);
             status = StateNodeStatus.RUNNING;
             switch (child.status) {
@@ -143,18 +143,18 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         }
     }
 
-    public class BNodeParallel : AStateNode<EnemyAIStateDetails> {
-        private readonly AStateNode<EnemyAIStateDetails>[] children;
+    public class BNodeParallel<T> : AStateNode<T> {
+        private readonly AStateNode<T>[] children;
 
-        public BNodeParallel(Transform transform, params AStateNode<EnemyAIStateDetails>[] children) : base(transform) {
+        public BNodeParallel(Transform transform, params AStateNode<T>[] children) : base(transform) {
             this.children = children;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
+        protected override void Process(T details) {
             if (status == StateNodeStatus.FAILURE) return;
             bool running = false;
 
-            foreach (AStateNode<EnemyAIStateDetails> child in children) {
+            foreach (AStateNode<T> child in children) {
                 Process(child, details);
 
 
@@ -171,7 +171,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
 
         public override void Init() {
             status = StateNodeStatus.RUNNING;
-            foreach (AStateNode<EnemyAIStateDetails> child in children) child.Init();
+            foreach (AStateNode<T> child in children) child.Init();
         }
     }
 }

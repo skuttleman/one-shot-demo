@@ -38,7 +38,7 @@ namespace OSCore.ScriptableObjects {
             curious
                 //.To(state => state.suspicion >= 10f, aggressive)
                 .To(state => state.unSightedElapsed > 2f && state.suspicion < 0.1f, passive)
-                .To(state => state.suspicion >= 1f, investigating);
+                .To(state => state.suspicion >= 2.5f, investigating);
             investigating
                 //.To(state => state.suspicion >= 10f, aggressive)
                 .To(state => state.unSightedElapsed > 5f && state.suspicion < 0.1f, passive);
