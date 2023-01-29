@@ -9,6 +9,8 @@ namespace OSCore.ScriptableObjects {
         [field: SerializeField] public StateConfig activeCfg { get; private set; }
         [field: SerializeField] public StateConfig aggressiveCfg { get; private set; }
 
+        [field: SerializeField] public float speechSpeed { get; private set; }
+
         public EnemyAINode Init() =>
             BuildAsset();
 

@@ -19,7 +19,6 @@ namespace OSBE.Controllers.Enemy {
 
         private GameObject player;
         private EnemyBehavior behavior;
-        private TextMeshPro speech;
         private TMP_Text debug;
 
         public void Handle(EnemyControllerInput e) {
@@ -66,12 +65,6 @@ namespace OSBE.Controllers.Enemy {
         private void Start() {
             player = system.Player();
             behavior = GetComponent<EnemyBehavior>();
-
-            speech = Transforms
-                .FindInActiveChildren(transform.parent, xform => xform.name == "speech")
-                .First()
-                .GetComponent<TextMeshPro>();
-            speech.text = "";
 
             debug = FindObjectOfType<TMP_Text>();
             debug.text = "";

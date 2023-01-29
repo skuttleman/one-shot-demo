@@ -78,4 +78,31 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         public BNodeLookAtLKP(Transform transform)
             : base(transform, details => details.lastKnownPosition) { }
     }
+
+    public class BNodeSpeak : AStateNode<EnemyAIStateDetails> {
+        private readonly EnemySpeechAgent speech;
+        private readonly string message;
+        private bool isStarted;
+
+        public BNodeSpeak(Transform transform, string message) : base(transform) {
+            speech = transform.GetComponent<EnemySpeechAgent>();
+            this.message = message;
+        }
+
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+            if (!isStarted) {
+                speech.Say(message);
+                isStarted = true;
+            } else if (!speech.isSpeaking || speech.message != message) {
+                return StateNodeStatus.SUCCESS;
+            }
+
+            return StateNodeStatus.RUNNING;
+        }
+
+        public override void Init() {
+            isStarted = false;
+            speech.Stop();
+        }
+    }
 }

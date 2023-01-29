@@ -19,6 +19,7 @@ namespace OSBE.Controllers.Enemy {
 
         private EnemyAI ai;
         private EnemyNavAgent nav;
+        private EnemySpeechAgent speech;
         private GameObject player;
 
         private AStateNode<EnemyAIStateDetails> patrol;
@@ -30,7 +31,7 @@ namespace OSBE.Controllers.Enemy {
             return ai.details;
         }
 
-        public void AssignPatro(AStateNode<EnemyAIStateDetails> patrol) {
+        public void AssignPatrol(AStateNode<EnemyAIStateDetails> patrol) {
             this.patrol = patrol;
         }
 
@@ -40,13 +41,19 @@ namespace OSBE.Controllers.Enemy {
 
         public void SetInterruptState(EnemyAwareness awareness) {
             if (nav != null) nav.Stop();
+            if (speech != null) speech.Stop();
+
+            if (patrol == null) {
+                AssignPatrol(new TransformPatrol(transform));
+                patrol.Init();
+            }
 
             switch (awareness) {
                 case EnemyAwareness.PASSIVE:
-                    behavior = patrol;
+                    AssignInterruptBehavior(patrol);
                     break;
                 case EnemyAwareness.CURIOUS:
-                    behavior = new EnemyCurious(transform);
+                    AssignInterruptBehavior(new EnemyCurious(transform));
                     break;
             }
         }
@@ -113,11 +120,9 @@ namespace OSBE.Controllers.Enemy {
         private void Start() {
             ai = GetComponent<EnemyAI>();
             nav = GetComponent<EnemyNavAgent>();
+            speech = GetComponent<EnemySpeechAgent>();
+
             player = system.Player();
-
-            patrol = new TransformPatrol(transform);
-            patrol.Init();
-
         }
 
         private void FixedUpdate() {

@@ -15,15 +15,19 @@ MonoBehaviour:
   <passiveCfg>k__BackingField:
     <moveSpeed>k__BackingField: 0.9
     <rotationSpeed>k__BackingField: 5
+    <suspicionIncrease>k__BackingField: 8
     <fovAngle>k__BackingField: 60
     <fovDistance>k__BackingField: 5
   <activeCfg>k__BackingField:
     <moveSpeed>k__BackingField: 1.75
     <rotationSpeed>k__BackingField: 7
+    <suspicionIncrease>k__BackingField: 0
     <fovAngle>k__BackingField: 45
     <fovDistance>k__BackingField: 7
   <aggressiveCfg>k__BackingField:
     <moveSpeed>k__BackingField: 2.5
     <rotationSpeed>k__BackingField: 8
+    <suspicionIncrease>k__BackingField: 0
     <fovAngle>k__BackingField: 75
     <fovDistance>k__BackingField: 10
+  <speechSpeed>k__BackingField: 0.185

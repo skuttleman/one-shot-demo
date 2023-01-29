@@ -125,4 +125,36 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             child.Init();
         }
     }
+
+    public class BNodeParallel : AStateNode<EnemyAIStateDetails> {
+        private readonly AStateNode<EnemyAIStateDetails>[] children;
+        private bool failed;
+
+        public BNodeParallel(Transform transform, params AStateNode<EnemyAIStateDetails>[] children) : base(transform) {
+            this.children = children;
+            failed = false;
+        }
+
+        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+            if (failed) return StateNodeStatus.FAILURE;
+            bool running = false;
+
+            foreach (AStateNode<EnemyAIStateDetails> child in children) {
+                StateNodeStatus status = Process(child, details);
+
+                if (status == StateNodeStatus.FAILURE) {
+                    failed = true;
+                    return StateNodeStatus.FAILURE;
+                } else if (status == StateNodeStatus.RUNNING) {
+                    running = true;
+                }
+            }
+
+            return running ? StateNodeStatus.RUNNING : StateNodeStatus.SUCCESS;
+        }
+
+        public override void Init() {
+            foreach (AStateNode<EnemyAIStateDetails> child in children) child.Init();
+        }
+    }
 }

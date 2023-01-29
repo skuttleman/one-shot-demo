@@ -42,10 +42,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         private readonly AStateNode<EnemyAIStateDetails> tree;
 
         public EnemyCurious(Transform transform) : base(transform) {
-            tree = new BNodeDoFor(
+            tree = new BNodeParallel(
                 transform,
-                new BNodeRepeat(transform, new BNodeLookAtLKP(transform)),
-                6f);
+                new BNodeSpeak(transform, "???"),
+                new BNodeRepeat(transform, new BNodeLookAtLKP(transform)));
         }
 
         protected override StateNodeStatus Process(EnemyAIStateDetails details) {
