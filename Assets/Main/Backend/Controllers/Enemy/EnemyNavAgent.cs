@@ -22,10 +22,13 @@ namespace OSBE.Controllers.Enemy {
             if (nav.CalculatePath(location, path)
                 && Vector3.Distance(location, nav.pathEndPosition) > 0.1f
             ) {
-                this.cfg = cfg;
                 anim.Transition(state => state with { isMoving = true });
+                anim.SetSpeed(cfg.moveSpeed / 2.5f);
+
+                this.cfg = cfg;
                 isMoving = true;
                 buffer = -0.25f;
+
                 nav.SetPath(path);
                 nav.speed = cfg.moveSpeed;
 

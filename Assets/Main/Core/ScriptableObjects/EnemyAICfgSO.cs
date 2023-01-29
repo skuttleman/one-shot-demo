@@ -6,7 +6,7 @@ namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/enemy/ai")]
     public class EnemyAICfgSO : ScriptableObject {
         [field: SerializeField] public StateConfig passiveCfg { get; private set; }
-        [field: SerializeField] public StateConfig activeCfg { get; private set; }
+        [field: SerializeField] public StateConfig alertCfg { get; private set; }
         [field: SerializeField] public StateConfig aggressiveCfg { get; private set; }
 
         [field: SerializeField] public float speechSpeed { get; private set; }
@@ -18,8 +18,8 @@ namespace OSCore.ScriptableObjects {
             awareness switch {
                 EnemyAwareness.AGGRESIVE => aggressiveCfg,
                 EnemyAwareness.SEARCHING => aggressiveCfg,
-                EnemyAwareness.ALERT => activeCfg,
-                EnemyAwareness.ALERT_INVESTIGATING => activeCfg,
+                EnemyAwareness.ALERT => alertCfg,
+                EnemyAwareness.ALERT_INVESTIGATING => alertCfg,
                 _ => passiveCfg,
             };
 
@@ -33,10 +33,15 @@ namespace OSCore.ScriptableObjects {
             EnemyAINode searching = new(EnemyAwareness.SEARCHING);
 
             passive
+                //.To(state => state.suspicion >= 10f, aggressive)
                 .To(state => state.suspicion >= 0.5f, curious);
             curious
-                .To(state => state.suspicion < 0.1f, passive)
+                //.To(state => state.suspicion >= 10f, aggressive)
+                .To(state => state.unSightedElapsed > 2f && state.suspicion < 0.1f, passive)
                 .To(state => state.suspicion >= 1f, investigating);
+            investigating
+                //.To(state => state.suspicion >= 10f, aggressive)
+                .To(state => state.unSightedElapsed > 5f && state.suspicion < 0.1f, passive);
 
             return passive;
         }

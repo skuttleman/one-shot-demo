@@ -28,9 +28,9 @@ namespace OSFE.Scripts {
             coll = entity.GetComponentInChildren<CapsuleCollider>();
         }
 
-        private void FixedUpdate() {
+        private void Update() {
             Visibility();
-            rdr.color = new Color(1, 1, 1, Mathf.Clamp(0.75f - timeSinceSeeable, 0, 1));
+            rdr.color = new Color(1, 1, 1, Mathf.Clamp(0.75f - timeSinceSeeable, /*0f*/0.333f, 1));
         }
 
         private void Visibility() {
@@ -53,7 +53,11 @@ namespace OSFE.Scripts {
             CapsuleCollider playerColl = player.GetComponentInChildren<CapsuleCollider>();
             float visibility = Transforms.VisibilityFrom(eyes, playerColl);
 
-            return new PlayerLOS(visibility, distance, angle2Player, player.position);
+            return new PlayerLOS(
+                visibility,
+                distance,
+                angle2Player,
+                player.position);
         }
     }
 }

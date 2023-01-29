@@ -10,18 +10,25 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.nodes = nodes;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
-            StateNodeStatus x = Process(nodes[curr], details);
-            switch (x) {
-                case StateNodeStatus.FAILURE: return StateNodeStatus.FAILURE;
-                case StateNodeStatus.SUCCESS: curr++; break;
+        protected override void Process(EnemyAIStateDetails details) {
+            AStateNode<EnemyAIStateDetails> node = nodes[curr];
+            Process(node, details);
+            status = StateNodeStatus.RUNNING;
+
+            switch (node.status) {
+                case StateNodeStatus.FAILURE:
+                    status = StateNodeStatus.FAILURE;
+                    break;
+                case StateNodeStatus.SUCCESS:
+                    curr++;
+                    break;
             }
 
-            if (curr >= nodes.Length) return StateNodeStatus.SUCCESS;
-            return StateNodeStatus.RUNNING;
+            if (curr >= nodes.Length) status = StateNodeStatus.SUCCESS;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             curr = 0;
             foreach (AStateNode<EnemyAIStateDetails> node in nodes) node.Init();
         }
@@ -35,17 +42,25 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.nodes = nodes;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
-            switch (Process(nodes[curr], details)) {
-                case StateNodeStatus.SUCCESS: return StateNodeStatus.SUCCESS;
-                case StateNodeStatus.FAILURE: curr++; break;
+        protected override void Process(EnemyAIStateDetails details) {
+            AStateNode<EnemyAIStateDetails> node = nodes[curr];
+            Process(node, details);
+            status = StateNodeStatus.RUNNING;
+
+            switch (node.status) {
+                case StateNodeStatus.SUCCESS:
+                    status = StateNodeStatus.SUCCESS;
+                    break;
+                case StateNodeStatus.FAILURE:
+                    curr++;
+                    break;
             }
 
-            if (curr >= nodes.Length) return StateNodeStatus.FAILURE;
-            return StateNodeStatus.RUNNING;
+            if (curr >= nodes.Length) status = StateNodeStatus.FAILURE;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             curr = 0;
             foreach (AStateNode<EnemyAIStateDetails> node in nodes) node.Init();
         }
@@ -59,16 +74,18 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             this.time = time;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override void Process(EnemyAIStateDetails details) {
+            status = StateNodeStatus.RUNNING;
+
             if (elapsed >= time) {
-                return StateNodeStatus.SUCCESS;
+                status = StateNodeStatus.SUCCESS;
             }
 
             elapsed += Time.deltaTime;
-            return StateNodeStatus.RUNNING;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             elapsed = 0f;
         }
     }
@@ -77,27 +94,25 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         private readonly AStateNode<EnemyAIStateDetails> child;
         private readonly float time;
         private float elapsed;
-        private StateNodeStatus childStatus;
 
         public BNodeDoFor(Transform transform, AStateNode<EnemyAIStateDetails> node, float time) : base(transform) {
             child = node;
             this.time = time;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override void Process(EnemyAIStateDetails details) {
             if (elapsed >= time) {
-                return childStatus == StateNodeStatus.RUNNING ? StateNodeStatus.SUCCESS : childStatus;
+                return;
             }
 
             elapsed += Time.deltaTime;
-            childStatus = Process(child, details);
-
-            return childStatus;
+            Process(child, details);
+            status = child.status;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             elapsed = 0f;
-            childStatus = StateNodeStatus.RUNNING;
             child.Init();
         }
     }
@@ -109,51 +124,53 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             child = node;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
-            switch (Process(child, details)) {
+        protected override void Process(EnemyAIStateDetails details) {
+            Process(child, details);
+            status = StateNodeStatus.RUNNING;
+            switch (child.status) {
                 case StateNodeStatus.FAILURE:
-                    return StateNodeStatus.FAILURE;
+                    status = StateNodeStatus.FAILURE;
+                    break;
                 case StateNodeStatus.SUCCESS:
                     child.Init();
                     break;
             }
-
-            return StateNodeStatus.RUNNING;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             child.Init();
         }
     }
 
     public class BNodeParallel : AStateNode<EnemyAIStateDetails> {
         private readonly AStateNode<EnemyAIStateDetails>[] children;
-        private bool failed;
 
         public BNodeParallel(Transform transform, params AStateNode<EnemyAIStateDetails>[] children) : base(transform) {
             this.children = children;
-            failed = false;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
-            if (failed) return StateNodeStatus.FAILURE;
+        protected override void Process(EnemyAIStateDetails details) {
+            if (status == StateNodeStatus.FAILURE) return;
             bool running = false;
 
             foreach (AStateNode<EnemyAIStateDetails> child in children) {
-                StateNodeStatus status = Process(child, details);
+                Process(child, details);
+
 
                 if (status == StateNodeStatus.FAILURE) {
-                    failed = true;
-                    return StateNodeStatus.FAILURE;
+                    status = StateNodeStatus.FAILURE;
+                    break;
                 } else if (status == StateNodeStatus.RUNNING) {
                     running = true;
                 }
             }
 
-            return running ? StateNodeStatus.RUNNING : StateNodeStatus.SUCCESS;
+            status = running ? StateNodeStatus.RUNNING : StateNodeStatus.SUCCESS;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             foreach (AStateNode<EnemyAIStateDetails> child in children) child.Init();
         }
     }

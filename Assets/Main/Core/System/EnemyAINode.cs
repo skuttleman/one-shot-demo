@@ -4,21 +4,24 @@ using System;
 using UnityEngine;
 
 namespace OSCore.System {
+    public enum Visibility { NONE, LOW, MED, HIGH }
+    public enum ViewDistance { OOV, NEAR, MED, FAR }
+    public enum ViewAngle { OOV, PERIPHERY, BROAD, MAIN }
+
     public record EnemyAIStateDetails : APredicativeStateDetails<EnemyAwareness> {
         public StateConfig cfg { get; init; }
 
-        public Vector3 lastKnownPosition { get; init; }
-        public float suspicion { get; init; }
-
         public PlayerStance playerStance { get; init; }
         public PlayerSpeed playerSpeed { get; init; }
+        public Visibility playerVisibility { get; init; }
+        public ViewDistance playerDistance { get; init; }
+        public ViewAngle playerAngle { get; init; }
+        public Vector3 lastKnownPosition { get; init; }
 
-        public float timeSinceSeenPlayer { get; init; }
-        public float timeSincePlayerMoved { get; init; }
+        public float unSightedElapsed { get; init; }
+        public float unMovedElapsed { get; init; }
 
-        public float playerVisibility { get; init; }
-        public float distanceToPlayer { get; init; }
-        public float angleToPlayer { get; init; }
+        public float suspicion { get; init; }
     }
 
     public class EnemyAINode : APredicativeStateNode<EnemyAwareness, EnemyAIStateDetails> {

@@ -80,7 +80,8 @@ namespace OSCore.Data {
             public record LookInput(Vector2 direction) : EnemyControllerInput();
             public record AimInput(bool isAiming) : EnemyControllerInput();
             public record DamageInput(float damage) : EnemyControllerInput();
-            public record PlayerLOS(float visibility, float distance, float periphery, Vector3 location) : EnemyControllerInput();
+            public record PlayerLOS(float visibility, float distance, float angle, Vector3 location)
+                : EnemyControllerInput();
 
             private EnemyControllerInput() { }
         }
@@ -161,8 +162,18 @@ namespace OSCore.Data {
 
             [field: SerializeField] public float suspicionIncrease { get; private set; }
 
-            [field: SerializeField] public float fovAngle { get; private set; }
-            [field: SerializeField] public float fovDistance { get; private set; }
+            [field: Header("FOV")]
+            [field: SerializeField] public TripleThreshold visibility { get; private set; }
+            [field: SerializeField] public TripleThreshold distance { get; private set; }
+            [field: SerializeField] public TripleThreshold angle { get; private set; }
+        }
+
+        [Serializable]
+        public struct TripleThreshold {
+            [field: SerializeField] public float limit { get; private set; }
+            [field: SerializeField] public float lowThresh { get; private set; }
+            [field: SerializeField] public float highThresh { get; private set; }
         }
     }
+
 }

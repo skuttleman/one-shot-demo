@@ -30,7 +30,7 @@ namespace OSBE.Controllers.Enemy {
         }
 
         public void OnStep() {
-            if (behavior.state.timeSincePlayerMoved > 0.5f) {
+            if (behavior.details.unMovedElapsed > 0.5f) {
                 Instantiate(footstep, transform.position, Quaternion.Euler(90f, 0f, 0f));
             }
         }
@@ -45,18 +45,49 @@ namespace OSBE.Controllers.Enemy {
 
         private EnemyAIStateDetails HandleDamage(EnemyAIStateDetails details) =>
             details with {
-                timeSinceSeenPlayer = 0f,
-                timeSincePlayerMoved = 0f,
+                unSightedElapsed = 0f,
+                unMovedElapsed = 0f,
                 lastKnownPosition = player.transform.position,
             };
 
-        private EnemyAIStateDetails UpdateLOS(PlayerLOS e, EnemyAIStateDetails details) =>
-            details with {
-                timeSinceSeenPlayer = e.visibility > 0f ? 0f : details.timeSinceSeenPlayer,
-                playerVisibility = e.visibility,
-                angleToPlayer = e.periphery,
-                distanceToPlayer = e.distance,
+        private EnemyAIStateDetails UpdateLOS(PlayerLOS e, EnemyAIStateDetails details) {
+            StateConfig config = cfg.ActiveCfg(behavior.state);
+
+            return details with {
+                cfg = config,
+                playerVisibility = CalculatePlayerVisibility(config, e.visibility),
+                playerDistance = CalculateViewDistance(config, e.distance),
+                playerAngle = CalculateViewAngle(config, e.angle),
             };
+        }
+
+        private static Visibility CalculatePlayerVisibility(StateConfig cfg, float visibility) {
+            TripleThreshold threshholds = cfg.visibility;
+
+            if (visibility < threshholds.limit) return Visibility.NONE;
+            if (visibility < threshholds.lowThresh) return Visibility.LOW;
+            if (visibility < threshholds.highThresh) return Visibility.MED;
+            return Visibility.HIGH;
+        }
+
+        private static ViewDistance CalculateViewDistance(StateConfig cfg, float distance) {
+            TripleThreshold threshholds = cfg.distance;
+
+            if (distance > threshholds.limit) return ViewDistance.OOV;
+            if (distance < threshholds.lowThresh) return ViewDistance.NEAR;
+            if (distance < threshholds.highThresh) return ViewDistance.MED;
+            return ViewDistance.FAR;
+        }
+
+        private static ViewAngle CalculateViewAngle(StateConfig cfg, float angle) {
+            TripleThreshold threshholds = cfg.angle;
+
+            if (angle > threshholds.limit) return ViewAngle.OOV;
+            if (angle < threshholds.lowThresh) return ViewAngle.MAIN;
+            if (angle < threshholds.highThresh) return ViewAngle.BROAD;
+
+            return ViewAngle.PERIPHERY;
+        }
 
         /*
          * Lifecycle Methods
@@ -73,15 +104,18 @@ namespace OSBE.Controllers.Enemy {
         private void Update() {
             debug.text = $@"
 
-playerSpeed       = {behavior.state.playerSpeed}
-playerStance      = {behavior.state.playerStance}
+state                     = {GetComponent<EnemyAI>().state}
 
-lastKnownPosition = {behavior.state.lastKnownPosition}
-playerVisibility  = {behavior.state.playerVisibility}
-angleToPlayer     = {behavior.state.angleToPlayer}
-distanceToPlayer  = {behavior.state.distanceToPlayer}
+playerStance              = {behavior.details.playerStance}
+playerSpeed               = {behavior.details.playerSpeed}
+playerVisibility          = {behavior.details.playerVisibility}
+playerDistance            = {behavior.details.playerDistance}
+playerAngle               = {behavior.details.playerAngle}
 
-suspicion         = {behavior.state.suspicion}
+unSightedElapsed          = {behavior.details.unSightedElapsed}
+
+suspicion                 = {behavior.details.suspicion}
+lastKnownPosition         = {behavior.details.lastKnownPosition}
 
             ".Trim();
         }

@@ -15,16 +15,18 @@ namespace OSBE.Controllers.Enemy {
                 .Body(transform)
                 .GetComponentInChildren<IStateReceiver<EnemyAwareness>>();
             Init(receiver, cfg.Init(), new() {
-                lastKnownPosition = Vector3.zero,
                 timeInState = 0f,
-                suspicion = 0f,
                 playerStance = PlayerStance.CROUCHING,
                 playerSpeed = PlayerSpeed.STOPPED,
-                timeSinceSeenPlayer = 0f,
-                timeSincePlayerMoved = 0f,
-                distanceToPlayer = 1000f,
-                angleToPlayer = 0f,
-                playerVisibility = 0f,
+                playerVisibility = Visibility.NONE,
+                playerDistance = ViewDistance.OOV,
+                playerAngle = ViewAngle.OOV,
+                lastKnownPosition = Vector3.zero,
+
+                unSightedElapsed = 0f,
+                unMovedElapsed = 0f,
+
+                suspicion = 0f,
             });
         }
     }

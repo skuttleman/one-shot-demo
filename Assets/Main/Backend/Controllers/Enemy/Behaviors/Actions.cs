@@ -5,32 +5,38 @@ using UnityEngine;
 namespace OSBE.Controllers.Enemy.Behaviors.Actions {
     public class BNodeGoto : AStateNode<EnemyAIStateDetails> {
         private readonly EnemyNavAgent nav;
-        private readonly Vector3 location;
+        private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
         private bool isStarted;
 
-        public BNodeGoto(Transform transform, Vector3 location) : base(transform) {
+        public BNodeGoto(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
             nav = transform.GetComponent<EnemyNavAgent>();
-            this.location = location;
+            this.toLocation = toLocation;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
-            if (Vector3.Distance(transform.position, location) < 0.2f) {
-                return StateNodeStatus.SUCCESS;
-            } else if (!isStarted && nav.Goto(location, details.cfg)) {
+        protected override void Process(EnemyAIStateDetails details) {
+            status = StateNodeStatus.RUNNING;
+            if (Vector3.Distance(transform.position, toLocation(details)) < 0.2f) {
+                status = StateNodeStatus.SUCCESS;
+            } else if (!isStarted && nav.Goto(toLocation(details), details.cfg)) {
                 isStarted = true;
-                return StateNodeStatus.RUNNING;
+                status = StateNodeStatus.RUNNING;
             } else if (!isStarted) {
-                return StateNodeStatus.FAILURE;
+                status = StateNodeStatus.FAILURE;
             } else if (!nav.isMoving) {
-                return StateNodeStatus.SUCCESS;
+                status = StateNodeStatus.SUCCESS;
             }
-            return StateNodeStatus.RUNNING;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             isStarted = false;
             nav.Stop();
         }
+    }
+
+    public class BNodeGotoLocation : BNodeGoto {
+        public BNodeGotoLocation(Transform transform, Vector3 location)
+            : base(transform, _ => location) { }
     }
 
     public class BNodeLookAt : AStateNode<EnemyAIStateDetails> {
@@ -43,17 +49,18 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.toLocation = toLocation;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override void Process(EnemyAIStateDetails details) {
+            status = StateNodeStatus.RUNNING;
             if (!isStarted) {
                 isStarted = true;
                 nav.Face(toLocation(details), details.cfg);
             } else if (!nav.isTurning) {
-                return StateNodeStatus.SUCCESS;
+                status = StateNodeStatus.SUCCESS;
             }
-            return StateNodeStatus.RUNNING;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             isStarted = false;
             nav.Stop();
         }
@@ -89,18 +96,19 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.message = message;
         }
 
-        protected override StateNodeStatus Process(EnemyAIStateDetails details) {
+        protected override void Process(EnemyAIStateDetails details) {
+            status = StateNodeStatus.RUNNING;
+
             if (!isStarted) {
                 speech.Say(message);
                 isStarted = true;
             } else if (!speech.isSpeaking || speech.message != message) {
-                return StateNodeStatus.SUCCESS;
+                status = StateNodeStatus.SUCCESS;
             }
-
-            return StateNodeStatus.RUNNING;
         }
 
         public override void Init() {
+            status = StateNodeStatus.RUNNING;
             isStarted = false;
             speech.Stop();
         }
