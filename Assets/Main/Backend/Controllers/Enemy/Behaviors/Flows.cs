@@ -67,7 +67,9 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                 new BNodeSpeak(transform, "???"),
                 new BNodeRepeat<EnemyAIStateDetails>(
                     transform,
-                    new BNodeGoto(transform, details => details.lastKnownPosition)));
+                    new BNodeGoto(
+                        transform,
+                        details => details.lastKnownPosition)));
         }
 
         protected override void Process(EnemyAIStateDetails details) {

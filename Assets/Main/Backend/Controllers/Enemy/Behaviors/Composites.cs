@@ -90,7 +90,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         private readonly float time;
         private float elapsed;
 
-        public BNodeDoFor(Transform transform, AStateNode<T> node, float time) : base(transform) {
+        public BNodeDoFor(Transform transform, AStateNode<T> node, float time)
+            : base(transform) {
             child = node;
             this.time = time;
         }
