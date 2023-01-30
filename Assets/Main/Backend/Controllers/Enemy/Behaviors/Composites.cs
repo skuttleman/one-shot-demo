@@ -27,10 +27,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             if (curr >= nodes.Length) status = StateNodeStatus.SUCCESS;
         }
 
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
+        protected override void Init() {
             curr = 0;
-            foreach (AStateNode<T> node in nodes) node.Init();
         }
     }
 
@@ -59,10 +57,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             if (curr >= nodes.Length) status = StateNodeStatus.FAILURE;
         }
 
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
+        protected override void Init() {
             curr = 0;
-            foreach (AStateNode<T> node in nodes) node.Init();
         }
     }
 
@@ -84,8 +80,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             elapsed += Time.deltaTime;
         }
 
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
+        protected override void Init() {
             elapsed = 0f;
         }
     }
@@ -110,10 +105,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             status = child.status;
         }
 
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
+        protected override void Init() {
             elapsed = 0f;
-            child.Init();
         }
     }
 
@@ -132,14 +125,9 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
                     status = StateNodeStatus.FAILURE;
                     break;
                 case StateNodeStatus.SUCCESS:
-                    child.Init();
+                    Init(child);
                     break;
             }
-        }
-
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
-            child.Init();
         }
     }
 
@@ -167,11 +155,6 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             }
 
             status = running ? StateNodeStatus.RUNNING : StateNodeStatus.SUCCESS;
-        }
-
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
-            foreach (AStateNode<T> child in children) child.Init();
         }
     }
 }

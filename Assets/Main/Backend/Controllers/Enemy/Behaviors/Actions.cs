@@ -37,8 +37,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             destElapsed -= Time.deltaTime;
         }
 
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
+        protected override void Init() {
             destination = Vector3.negativeInfinity;
             nav.Stop();
         }
@@ -69,8 +68,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             }
         }
 
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
+        protected override void Init() {
             isStarted = false;
             nav.Stop();
         }
@@ -117,8 +115,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             }
         }
 
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
+        protected override void Init() {
             isStarted = false;
             speech.Stop();
         }

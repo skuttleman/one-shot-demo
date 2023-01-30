@@ -16,7 +16,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
             status = child.status;
         }
 
-        public override void Init() {
+        protected override void Init() {
             List<AStateNode<EnemyAIStateDetails>> nodes = new();
 
             Transforms
@@ -37,7 +37,6 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
             child = new BNodeRepeat<EnemyAIStateDetails>(
                 transform,
                 new BNodeAnd<EnemyAIStateDetails>(transform, nodes.ToArray()));
-            child.Init();
         }
     }
 
@@ -57,11 +56,6 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
             Process(tree, details);
             status = tree.status;
         }
-
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
-            tree.Init();
-        }
     }
 
     public class EnemyInvestigating : AStateNode<EnemyAIStateDetails> {
@@ -79,11 +73,6 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         protected override void Process(EnemyAIStateDetails details) {
             Process(tree, details);
             status = tree.status;
-        }
-
-        public override void Init() {
-            status = StateNodeStatus.RUNNING;
-            tree.Init();
         }
     }
 }
