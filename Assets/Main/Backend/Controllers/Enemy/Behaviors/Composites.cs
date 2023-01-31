@@ -1,4 +1,5 @@
-﻿using OSCore.System;
+﻿using System;
+using OSCore.System;
 using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Composites {
@@ -123,6 +124,31 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         }
     }
 
+    public class BNodeDoWhile<T> : AStateNode<T> {
+        private readonly AStateNode<T> child;
+        private readonly Predicate<T> pred;
+
+        public BNodeDoWhile(Transform transform, AStateNode<T> child, Predicate<T> pred)
+            : base(transform) {
+            this.child = child;
+            this.pred = pred;
+        }
+
+        protected override void Process(T details) {
+            if (pred(details)) {
+                status = StateNodeStatus.SUCCESS;
+                return;
+            }
+
+            Process(child, details);
+            status = child.status;
+        }
+
+        protected override void ReInit() {
+            ReInit(child);
+        }
+    }
+
     public class BNodeRepeat<T> : AStateNode<T> {
         private readonly AStateNode<T> child;
 
@@ -173,6 +199,31 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             }
 
             status = running ? StateNodeStatus.RUNNING : StateNodeStatus.SUCCESS;
+        }
+
+        protected override void ReInit() {
+            foreach (AStateNode<T> child in children) ReInit(child);
+        }
+    }
+
+    public class BNodeParallelAny<T> : AStateNode<T> {
+        private readonly AStateNode<T>[] children;
+
+        public BNodeParallelAny(Transform transform, params AStateNode<T>[] children) : base(transform) {
+            this.children = children;
+        }
+
+        protected override void Process(T details) {
+            foreach (AStateNode<T> child in children) {
+                Process(child, details);
+                status = child.status;
+
+                if (child.status == StateNodeStatus.SUCCESS
+                    || child.status == StateNodeStatus.FAILURE
+                ) {
+                    return;
+                }
+            }
         }
 
         protected override void ReInit() {

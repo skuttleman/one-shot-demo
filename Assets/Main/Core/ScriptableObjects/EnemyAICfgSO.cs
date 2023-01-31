@@ -45,7 +45,11 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.unSightedElapsed > 2f && state.suspicion < 0.1f, return_passive)
                 .To(state => state.suspicion >= 2.5f, investigating);
             investigating
-                .To(state => state.unSightedElapsed > 5f && state.suspicion < 0.1f, return_passive);
+                .To(state => state.suspicion < 0.1f
+                        && (state.timeInState > 10f
+                            || state.status == StateNodeStatus.SUCCESS
+                            || state.status == StateNodeStatus.FAILURE),
+                    return_passive);
 
             return passive;
         }

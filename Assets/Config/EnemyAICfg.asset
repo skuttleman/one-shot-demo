@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: EnemyAICfg
   m_EditorClassIdentifier: 
   <passiveCfg>k__BackingField:
-    <moveSpeed>k__BackingField: 0.9
-    <rotationSpeed>k__BackingField: 5
-    <suspicionIncrease>k__BackingField: 8
+    <moveSpeed>k__BackingField: 0.8
+    <rotationSpeed>k__BackingField: 4
+    <suspicionIncrease>k__BackingField: 7
     <visibility>k__BackingField:
       <limit>k__BackingField: 0.25
       <lowThresh>k__BackingField: 0.5

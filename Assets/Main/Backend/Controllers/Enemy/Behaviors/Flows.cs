@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OSBE.Controllers.Enemy.Behaviors.Actions;
 using OSBE.Controllers.Enemy.Behaviors.Composites;
 using OSCore.System;
@@ -50,7 +51,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         private readonly AStateNode<EnemyAIStateDetails> tree;
 
         public EnemyCurious(Transform transform) : base(transform) {
-            tree = new BNodeParallel<EnemyAIStateDetails>(
+            tree = new BNodeAnd<EnemyAIStateDetails>(
                 transform,
                 new BNodeSpeak(transform, "..."),
                 new BNodeRepeat<EnemyAIStateDetails>(
@@ -68,18 +69,57 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         }
     }
 
+    public class EnemyLookAround : AStateNode<EnemyAIStateDetails> {
+        private readonly AStateNode<EnemyAIStateDetails> tree;
+
+        public EnemyLookAround(Transform transform) : base(transform) {
+            tree = new BNodeAnd<EnemyAIStateDetails>(
+                transform,
+                new BNodeLookAt(transform, _ =>
+                    transform.position
+                        + transform.TransformDirection(new Vector3(3f, 0, 1f))),
+                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f),
+                new BNodeLookAt(transform, _ =>
+                    transform.position
+                        + transform.TransformDirection(new Vector3(-3f, 0, 1f))),
+                new BNodeLookAt(transform, _ =>
+                    transform.position
+                        + transform.TransformDirection(new Vector3(-3f, 0, 1f))),
+                new BNodeWait<EnemyAIStateDetails>(transform, 1.5f),
+                new BNodeLookAt(transform, _ =>
+                    transform.position
+                        + transform.TransformDirection(new Vector3(3f, 0, 1f))),
+                new BNodeWait<EnemyAIStateDetails>(transform, 1f));
+        }
+
+        protected override void ReInit() {
+            ReInit(tree);
+        }
+
+        protected override void Process(EnemyAIStateDetails details) {
+            Process(tree, details);
+            status = tree.status;
+        }
+    }
+
     public class EnemyInvestigating : AStateNode<EnemyAIStateDetails> {
         private readonly AStateNode<EnemyAIStateDetails> tree;
 
         public EnemyInvestigating(Transform transform) : base(transform) {
-            tree = new BNodeParallel<EnemyAIStateDetails>(
+            tree = new BNodeAnd<EnemyAIStateDetails>(
                 transform,
-                new BNodeSpeak(transform, "???"),
-                new BNodeRepeat<EnemyAIStateDetails>(
+                new BNodeParallelAny<EnemyAIStateDetails>(
+                    transform,
+                    new BNodeSpeak(transform, "???"),
+                    new BNodeRepeat<EnemyAIStateDetails>(
+                        transform,
+                        new BNodeLookAtLKP(transform))),
+                new BNodeDoWhile<EnemyAIStateDetails>(
                     transform,
                     new BNodeGoto(
                         transform,
-                        details => details.lastKnownPosition)));
+                        details => details.lastKnownPosition),
+                    details => Vector3.Distance(details.lastKnownPosition, transform.position) < 0.5f));
         }
 
         protected override void ReInit() {

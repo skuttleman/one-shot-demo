@@ -1,4 +1,5 @@
 ﻿using OSBE.Controllers.Enemy.Behaviors.Actions;
+using OSBE.Controllers.Enemy.Behaviors.Composites;
 using OSBE.Controllers.Enemy.Behaviors.Flows;
 using OSCore.Data.AI;
 using OSCore.Data.Animations;
@@ -50,7 +51,12 @@ namespace OSBE.Controllers.Enemy {
                     AssignInterruptBehavior(patrol);
                     break;
                 case EnemyAwareness.RETURN_PASSIVE:
-                    AssignInterruptBehavior(new BNodeSpeak(transform, "¯\\_( )_/¯"));
+                    AssignInterruptBehavior(
+                        new BNodeAnd<EnemyAIStateDetails>(
+                            transform,
+                            new EnemyLookAround(transform),
+                            new BNodeSpeak(transform, "¯\\_( )_/¯"))
+                        );
                     break;
                 case EnemyAwareness.CURIOUS:
                     AssignInterruptBehavior(new EnemyCurious(transform));

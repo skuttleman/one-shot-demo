@@ -30,7 +30,7 @@ namespace OSFE.Scripts {
 
         private void Update() {
             Visibility();
-            rdr.color = new Color(1, 1, 1, Mathf.Clamp(0.75f - timeSinceSeeable, /*0f*/0.333f, 1));
+            rdr.color = new Color(1, 1, 1, Mathf.Clamp(0.75f - timeSinceSeeable, 0.25f, 1));
         }
 
         private void Visibility() {
