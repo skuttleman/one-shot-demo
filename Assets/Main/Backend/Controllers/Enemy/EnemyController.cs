@@ -55,6 +55,7 @@ namespace OSBE.Controllers.Enemy {
 
             return details with {
                 cfg = config,
+                status = behavior.details.status,
                 playerVisibility = CalculatePlayerVisibility(config, e.visibility),
                 playerDistance = CalculateViewDistance(config, e.distance),
                 playerAngle = CalculateViewAngle(config, e.angle),

@@ -1,4 +1,5 @@
-﻿using OSBE.Controllers.Enemy.Behaviors.Flows;
+﻿using OSBE.Controllers.Enemy.Behaviors.Actions;
+using OSBE.Controllers.Enemy.Behaviors.Flows;
 using OSCore.Data.AI;
 using OSCore.Data.Animations;
 using OSCore.Data.Enums;
@@ -45,7 +46,11 @@ namespace OSBE.Controllers.Enemy {
 
             switch (awareness) {
                 case EnemyAwareness.PASSIVE:
+                    AStateNode<EnemyAIStateDetails>.ReInit(patrol);
                     AssignInterruptBehavior(patrol);
+                    break;
+                case EnemyAwareness.RETURN_PASSIVE:
+                    AssignInterruptBehavior(new BNodeSpeak(transform, "¯\\_( )_/¯"));
                     break;
                 case EnemyAwareness.CURIOUS:
                     AssignInterruptBehavior(new EnemyCurious(transform));
@@ -137,16 +142,17 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private void Update() {
+            UpdateState(state => ProcessUpdate(state) with {
+                unMovedElapsed = state.unMovedElapsed + Time.deltaTime,
+                unSightedElapsed = state.unSightedElapsed + Time.deltaTime,
+                status = behavior?.status ?? StateNodeStatus.INIT,
+            });
+
             AStateNode<EnemyAIStateDetails>.Process(
                 behavior,
                 ai.details with {
                     cfg = cfg.ActiveCfg(ai.state),
                 });
-
-            UpdateState(state => ProcessUpdate(state) with {
-                unMovedElapsed = state.unMovedElapsed + Time.deltaTime,
-                unSightedElapsed = state.unSightedElapsed + Time.deltaTime,
-            });
         }
     }
 }

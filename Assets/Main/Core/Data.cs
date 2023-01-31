@@ -152,7 +152,7 @@ namespace OSCore.Data {
 
     namespace AI {
         public enum EnemyAwareness {
-            PASSIVE, CURIOUS, INVESTIGATING, ALERT, ALERT_INVESTIGATING, AGGRESIVE, SEARCHING
+            PASSIVE, RETURN_PASSIVE, CURIOUS, INVESTIGATING, RETURN_ALERT, ALERT, ALERT_INVESTIGATING, AGGRESIVE, SEARCHING
         }
 
         [Serializable]

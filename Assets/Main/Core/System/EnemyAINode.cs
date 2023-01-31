@@ -10,6 +10,7 @@ namespace OSCore.System {
 
     public record EnemyAIStateDetails : APredicativeStateDetails<EnemyAwareness> {
         public StateConfig cfg { get; init; }
+        public StateNodeStatus status { get; init; }
 
         public PlayerStance playerStance { get; init; }
         public PlayerSpeed playerSpeed { get; init; }

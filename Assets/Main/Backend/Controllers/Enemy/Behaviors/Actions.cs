@@ -15,6 +15,11 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.toLocation = toLocation;
         }
 
+        protected override void Init() {
+            destination = Vector3.negativeInfinity;
+            nav.Stop();
+        }
+
         protected override void Process(EnemyAIStateDetails details) {
             status = StateNodeStatus.RUNNING;
 
@@ -35,11 +40,6 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             }
 
             destElapsed -= Time.deltaTime;
-        }
-
-        protected override void Init() {
-            destination = Vector3.negativeInfinity;
-            nav.Stop();
         }
     }
 
@@ -110,7 +110,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             if (!isStarted) {
                 speech.Say(message);
                 isStarted = true;
-            } else if (!speech.isSpeaking || speech.message != message) {
+            } else if (!speech.isSpeaking) {
                 status = StateNodeStatus.SUCCESS;
             }
         }

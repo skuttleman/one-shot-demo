@@ -17,26 +17,32 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         }
 
         protected override void Init() {
-            List<AStateNode<EnemyAIStateDetails>> nodes = new();
+            if (child == null) {
+                List<AStateNode<EnemyAIStateDetails>> nodes = new();
 
-            Transforms
-                .FindInChildren(transform.parent, node => node.name.Contains("position"))
-                .ForEach(xform => {
-                    float waitTime = xform.localScale.y;
-                    float rotation = xform.rotation.eulerAngles.y;
-                    Vector3 direction = Vectors.ToVector3(xform.rotation.eulerAngles.y);
+                Transforms
+                    .FindInChildren(transform.parent, node => node.name.Contains("position"))
+                    .ForEach(xform => {
+                        float waitTime = xform.localScale.y;
+                        float rotation = xform.rotation.eulerAngles.y;
+                        Vector3 direction = Vectors.ToVector3(xform.rotation.eulerAngles.y);
 
-                    nodes.Add(new BNodeGotoLocation(transform, xform.position));
+                        nodes.Add(new BNodeGotoLocation(transform, xform.position));
 
-                    if (waitTime > 0) {
-                        nodes.Add(new BNodeLookAtDirection(transform, direction));
-                        nodes.Add(new BNodeWait<EnemyAIStateDetails>(transform, waitTime));
-                    }
-                });
+                        if (waitTime > 0) {
+                            nodes.Add(new BNodeLookAtDirection(transform, direction));
+                            nodes.Add(new BNodeWait<EnemyAIStateDetails>(transform, waitTime));
+                        }
+                    });
 
-            child = new BNodeRepeat<EnemyAIStateDetails>(
-                transform,
-                new BNodeAnd<EnemyAIStateDetails>(transform, nodes.ToArray()));
+                child = new BNodeRepeat<EnemyAIStateDetails>(
+                    transform,
+                    new BNodeAnd<EnemyAIStateDetails>(transform, nodes.ToArray()));
+            }
+        }
+
+        protected override void ReInit() {
+            ReInit(child);
         }
     }
 
@@ -50,6 +56,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                 new BNodeRepeat<EnemyAIStateDetails>(
                     transform,
                     new BNodeLookAtLKP(transform)));
+        }
+
+        protected override void ReInit() {
+            ReInit(tree);
         }
 
         protected override void Process(EnemyAIStateDetails details) {
@@ -70,6 +80,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                     new BNodeGoto(
                         transform,
                         details => details.lastKnownPosition)));
+        }
+
+        protected override void ReInit() {
+            ReInit(tree);
         }
 
         protected override void Process(EnemyAIStateDetails details) {

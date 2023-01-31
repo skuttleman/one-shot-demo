@@ -15,16 +15,19 @@ namespace OSCore.System {
 
         protected virtual void Init() { }
 
+        protected virtual void ReInit() { }
+
         protected abstract void Process(T details);
 
-        public static void Init(AStateNode<T> node) {
+        public static void ReInit(AStateNode<T> node) {
             node.Init();
+            node.status = StateNodeStatus.RUNNING;
+            node.ReInit();
         }
 
         public static void Process(AStateNode<T> node, T details) {
-            if (node == null) return;
             if (node.status == StateNodeStatus.INIT) {
-                Init(node);
+                node.Init();
                 node.status = StateNodeStatus.RUNNING;
                 return;
             }

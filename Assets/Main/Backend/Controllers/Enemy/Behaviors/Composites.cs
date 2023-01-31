@@ -30,6 +30,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         protected override void Init() {
             curr = 0;
         }
+
+        protected override void ReInit() {
+            foreach (AStateNode<T> node in nodes) ReInit(node);
+        }
     }
 
     public class BNodeOr<T> : AStateNode<T> {
@@ -59,6 +63,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
 
         protected override void Init() {
             curr = 0;
+        }
+
+        protected override void ReInit() {
+            foreach (AStateNode<T> node in nodes) ReInit(node);
         }
     }
 
@@ -109,6 +117,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         protected override void Init() {
             elapsed = 0f;
         }
+
+        protected override void ReInit() {
+            ReInit(child);
+        }
     }
 
     public class BNodeRepeat<T> : AStateNode<T> {
@@ -119,16 +131,21 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         }
 
         protected override void Process(T details) {
-            Process(child, details);
             status = StateNodeStatus.RUNNING;
+            Process(child, details);
+
             switch (child.status) {
                 case StateNodeStatus.FAILURE:
                     status = StateNodeStatus.FAILURE;
                     break;
                 case StateNodeStatus.SUCCESS:
-                    Init(child);
+                    ReInit(child);
                     break;
             }
+        }
+
+        protected override void ReInit() {
+            ReInit(child);
         }
     }
 
@@ -156,6 +173,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
             }
 
             status = running ? StateNodeStatus.RUNNING : StateNodeStatus.SUCCESS;
+        }
+
+        protected override void ReInit() {
+            foreach (AStateNode<T> child in children) ReInit(child);
         }
     }
 }
