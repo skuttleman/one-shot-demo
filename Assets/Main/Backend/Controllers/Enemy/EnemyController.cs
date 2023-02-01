@@ -51,7 +51,7 @@ namespace OSBE.Controllers.Enemy {
             };
 
         private EnemyAIStateDetails UpdateLOS(PlayerLOS e, EnemyAIStateDetails details) {
-            StateConfig config = cfg.ActiveCfg(behavior.state);
+            BehaviorConfig config = cfg.ActiveCfg(behavior.state);
 
             return details with {
                 cfg = config,
@@ -62,8 +62,8 @@ namespace OSBE.Controllers.Enemy {
             };
         }
 
-        private static Visibility CalculatePlayerVisibility(StateConfig cfg, float visibility) {
-            TripleThreshold threshholds = cfg.visibility;
+        private static Visibility CalculatePlayerVisibility(BehaviorConfig cfg, float visibility) {
+            SensorConfig threshholds = cfg.visibility;
 
             if (visibility < threshholds.limit) return Visibility.NONE;
             if (visibility < threshholds.lowThresh) return Visibility.LOW;
@@ -71,8 +71,8 @@ namespace OSBE.Controllers.Enemy {
             return Visibility.HIGH;
         }
 
-        private static ViewDistance CalculateViewDistance(StateConfig cfg, float distance) {
-            TripleThreshold threshholds = cfg.distance;
+        private static ViewDistance CalculateViewDistance(BehaviorConfig cfg, float distance) {
+            SensorConfig threshholds = cfg.distance;
 
             if (distance > threshholds.limit) return ViewDistance.OOV;
             if (distance < threshholds.lowThresh) return ViewDistance.NEAR;
@@ -80,8 +80,8 @@ namespace OSBE.Controllers.Enemy {
             return ViewDistance.FAR;
         }
 
-        private static ViewAngle CalculateViewAngle(StateConfig cfg, float angle) {
-            TripleThreshold threshholds = cfg.angle;
+        private static ViewAngle CalculateViewAngle(BehaviorConfig cfg, float angle) {
+            SensorConfig threshholds = cfg.angle;
 
             if (angle > threshholds.limit) return ViewAngle.OOV;
             if (angle < threshholds.lowThresh) return ViewAngle.MAIN;

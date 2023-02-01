@@ -73,5 +73,10 @@ namespace OSCore.Utils {
             }
             return item;
         }
+
+        public static T Spy<T>(string message, T item) {
+            Debug.Log($"{message}: {item}");
+            return item;
+        }
     }
 }

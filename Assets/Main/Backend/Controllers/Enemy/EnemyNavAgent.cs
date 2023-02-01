@@ -10,13 +10,13 @@ namespace OSBE.Controllers.Enemy {
 
         private EnemyAnimator anim;
         private NavMeshAgent nav;
-        private StateConfig cfg;
+        private BehaviorConfig cfg;
 
         private Vector3 turnPos;
         private Vector3 prevPos;
         private float buffer;
 
-        public bool Goto(Vector3 location, StateConfig cfg) {
+        public bool Goto(Vector3 location, BehaviorConfig cfg) {
             NavMeshPath path = new();
 
             if (nav.CalculatePath(location, path)
@@ -47,7 +47,7 @@ namespace OSBE.Controllers.Enemy {
             isTurning = false;
         }
 
-        public void Face(Vector3 location, StateConfig cfg) {
+        public void Face(Vector3 location, BehaviorConfig cfg) {
             this.cfg = cfg;
             isTurning = true;
             turnPos = location;

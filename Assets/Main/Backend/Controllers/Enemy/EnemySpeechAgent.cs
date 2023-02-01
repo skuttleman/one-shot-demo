@@ -1,10 +1,9 @@
-using OSCore.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 
 public class EnemySpeechAgent : MonoBehaviour {
     [SerializeField] private TextMeshPro speech;
-    [SerializeField] private EnemyAICfgSO cfg;
+    [SerializeField] private float speechSpeed;
 
     public bool isSpeaking { get; private set; }
     public string message => speech.text;
@@ -39,7 +38,7 @@ public class EnemySpeechAgent : MonoBehaviour {
             speech.transform.position = transform.position + new Vector3(0f, 0f, 0.75f);
 
             elapsed += Time.deltaTime;
-            float duration = Mathf.Max(speech.text.Length * cfg.speechSpeed, 1.5f);
+            float duration = Mathf.Max(speech.text.Length * speechSpeed, 1.5f);
 
             if (elapsed >= duration) {
                 Stop();

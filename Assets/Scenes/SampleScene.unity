@@ -3925,12 +3925,12 @@ GameObject:
   - component: {fileID: 467042518}
   - component: {fileID: 467042517}
   - component: {fileID: 467042520}
+  - component: {fileID: 467042524}
+  - component: {fileID: 467042526}
   - component: {fileID: 467042521}
   - component: {fileID: 467042522}
   - component: {fileID: 467042523}
-  - component: {fileID: 467042524}
   - component: {fileID: 467042525}
-  - component: {fileID: 467042526}
   m_Layer: 9
   m_Name: body
   m_TagString: Untagged
@@ -4086,7 +4086,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speech: {fileID: 1045710818}
-  cfg: {fileID: 11400000, guid: bc964265b4e6d4bfda94d287d66aec70, type: 2}
+  speechSpeed: 0.2
 --- !u!1 &467456007
 GameObject:
   m_ObjectHideFlags: 0
@@ -18166,7 +18166,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 1
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0

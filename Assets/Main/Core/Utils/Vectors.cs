@@ -2,6 +2,14 @@
 
 namespace OSCore.Utils {
     public static class Vectors {
+        public static bool IsNegativeInfinity(this Vector2 vector) =>
+            IsNegativeInfinity(vector.Upgrade(float.NegativeInfinity));
+
+        public static bool IsNegativeInfinity(this Vector3 vector) =>
+            float.IsNegativeInfinity(vector.x)
+                && float.IsNegativeInfinity(vector.y)
+                && float.IsNegativeInfinity(vector.z);
+
         public static Vector3 Sign(this Vector3 vector) =>
             new(Mathf.Sign(vector.x), Mathf.Sign(vector.y), Mathf.Sign(vector.z));
 

@@ -1,6 +1,6 @@
 ﻿using OSBE.Controllers.Enemy.Behaviors.Actions;
 using OSBE.Controllers.Enemy.Behaviors.Composites;
-using OSBE.Controllers.Enemy.Behaviors.Flows;
+using OSBE.Controllers.Enemy.Behaviors.Main;
 using OSCore.Data.AI;
 using OSCore.Data.Animations;
 using OSCore.Data.Enums;
@@ -43,7 +43,7 @@ namespace OSBE.Controllers.Enemy {
 
         public void SetInterruptState(EnemyAwareness awareness) {
             if (nav != null) nav.Stop();
-            if (patrol == null) AssignPatrol(new TransformPatrol(transform));
+            if (patrol == null) AssignPatrol(EnemyBehaviors.TransformPatrol(transform));
 
             switch (awareness) {
                 case EnemyAwareness.PASSIVE:
@@ -51,18 +51,13 @@ namespace OSBE.Controllers.Enemy {
                     AssignInterruptBehavior(patrol);
                     break;
                 case EnemyAwareness.RETURN_PASSIVE:
-                    AssignInterruptBehavior(
-                        new BNodeAnd<EnemyAIStateDetails>(
-                            transform,
-                            new EnemyLookAround(transform),
-                            new BNodeSpeak(transform, "¯\\_( )_/¯"))
-                        );
+                    AssignInterruptBehavior(EnemyBehaviors.ReturnToPassive(transform));
                     break;
                 case EnemyAwareness.CURIOUS:
-                    AssignInterruptBehavior(new EnemyCurious(transform));
+                    AssignInterruptBehavior(EnemyBehaviors.Curious(transform));
                     break;
                 case EnemyAwareness.INVESTIGATING:
-                    AssignInterruptBehavior(new EnemyInvestigating(transform));
+                    AssignInterruptBehavior(EnemyBehaviors.Investigate(transform));
                     break;
             }
         }
@@ -81,34 +76,34 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private float CalculateSuspicion(EnemyAIStateDetails details, bool isVisible) {
-            StateConfig config = cfg.ActiveCfg(ai.state);
+            BehaviorConfig config = cfg.ActiveCfg(ai.state);
             float increase = -1f;
 
             if (isVisible) {
-                increase = config.suspicionIncrease;
+                increase = config.baseSuspicion;
 
                 increase *= details.playerSpeed switch {
-                    PlayerSpeed.FAST => 2f,
-                    PlayerSpeed.STOPPED => 0.2f,
+                    PlayerSpeed.FAST => config.speed_FAST,
+                    PlayerSpeed.STOPPED => config.speed_STOPPED,
                     _ => 1f,
                 };
 
                 increase *= details.playerStance switch {
-                    PlayerStance.STANDING => 5f,
-                    PlayerStance.CROUCHING => 3f,
+                    PlayerStance.STANDING => config.stance_STANDING,
+                    PlayerStance.CROUCHING => config.stance_CROUCHING,
                     _ => 1f,
                 };
 
                 increase *= details.playerVisibility switch {
-                    Visibility.LOW => 0.33f,
-                    Visibility.MED => 0.66f,
+                    Visibility.LOW => config.vis_LOW,
+                    Visibility.MED => config.vis_MED,
                     _ => 1f,
                 };
 
                 increase *= details.playerDistance switch {
-                    ViewDistance.NEAR => 0.8f,
-                    ViewDistance.MED => 0.5f,
-                    ViewDistance.FAR => 0.2f,
+                    ViewDistance.NEAR => config.dist_NEAR,
+                    ViewDistance.MED => config.dist_MED,
+                    ViewDistance.FAR => config.dist_FAR,
                     _ => 1f,
                 };
 
@@ -120,7 +115,7 @@ namespace OSBE.Controllers.Enemy {
                 };
             }
 
-            return Mathf.Clamp(details.suspicion + increase * Time.fixedDeltaTime, 0f, 10f);
+            return Mathf.Clamp(details.suspicion + increase * Time.fixedDeltaTime, 0f, cfg.maxSuspicion);
         }
 
         private EnemyAIStateDetails ProcessUpdate(EnemyAIStateDetails details) {

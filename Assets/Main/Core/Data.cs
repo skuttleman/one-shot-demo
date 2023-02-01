@@ -156,20 +156,39 @@ namespace OSCore.Data {
         }
 
         [Serializable]
-        public struct StateConfig {
+        public struct BehaviorConfig {
             [field: SerializeField] public float moveSpeed { get; private set; }
             [field: SerializeField] public float rotationSpeed { get; private set; }
 
-            [field: SerializeField] public float suspicionIncrease { get; private set; }
+
+            [field: Header("Suspicion Increase")]
+            [field: SerializeField] public float baseSuspicion { get; private set; }
+
+            [field: SerializeField] public float speed_FAST { get; private set; }
+            [field: SerializeField] public float speed_STOPPED { get; private set; }
+            [field: SerializeField] public float stance_STANDING { get; private set; }
+            [field: SerializeField] public float stance_CROUCHING { get; private set; }
+
+            [field: SerializeField] public float vis_LOW { get; private set; }
+            [field: SerializeField] public float vis_MED { get; private set; }
+
+            [field: SerializeField] public float dist_NEAR { get; private set; }
+            [field: SerializeField] public float dist_MED { get; private set; }
+            [field: SerializeField] public float dist_FAR { get; private set; }
+
+            [field: SerializeField] public float angle_MAIN { get; private set; }
+            [field: SerializeField] public float angle_BROAD { get; private set; }
+            [field: SerializeField] public float angle_PERIPHERY { get; private set; }
+
 
             [field: Header("FOV")]
-            [field: SerializeField] public TripleThreshold visibility { get; private set; }
-            [field: SerializeField] public TripleThreshold distance { get; private set; }
-            [field: SerializeField] public TripleThreshold angle { get; private set; }
+            [field: SerializeField] public SensorConfig visibility { get; private set; }
+            [field: SerializeField] public SensorConfig distance { get; private set; }
+            [field: SerializeField] public SensorConfig angle { get; private set; }
         }
 
         [Serializable]
-        public struct TripleThreshold {
+        public struct SensorConfig {
             [field: SerializeField] public float limit { get; private set; }
             [field: SerializeField] public float lowThresh { get; private set; }
             [field: SerializeField] public float highThresh { get; private set; }

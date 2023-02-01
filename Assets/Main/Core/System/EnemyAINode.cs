@@ -9,7 +9,7 @@ namespace OSCore.System {
     public enum ViewAngle { OOV, PERIPHERY, BROAD, MAIN }
 
     public record EnemyAIStateDetails : APredicativeStateDetails<EnemyAwareness> {
-        public StateConfig cfg { get; init; }
+        public BehaviorConfig cfg { get; init; }
         public StateNodeStatus status { get; init; }
 
         public PlayerStance playerStance { get; init; }

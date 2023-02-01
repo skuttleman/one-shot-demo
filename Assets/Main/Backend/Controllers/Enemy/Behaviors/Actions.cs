@@ -21,9 +21,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
 
         protected override void Process(EnemyAIStateDetails details) {
-            status = StateNodeStatus.RUNNING;
-
-            if (Vector3.Distance(transform.position, destination) < 0.1f) {
+            if ((!nav.isMoving && !destination.IsNegativeInfinity())
+                || Vector3.Distance(transform.position, destination) < 0.1f) {
                 nav.Stop();
                 status = StateNodeStatus.SUCCESS;
             } else if (destElapsed <= 0f) {
