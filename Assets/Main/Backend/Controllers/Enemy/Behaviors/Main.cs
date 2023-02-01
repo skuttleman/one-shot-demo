@@ -31,7 +31,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Main {
         }
 
         public static AStateNode<EnemyAIStateDetails> Curious(Transform transform) =>
-            new BNodeAnd<EnemyAIStateDetails>(
+            new BNodeParallel<EnemyAIStateDetails>(
                 transform,
                 new BNodeSpeak(transform, "..."),
                 new BNodeRepeat<EnemyAIStateDetails>(
@@ -63,6 +63,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Main {
         public static AStateNode<EnemyAIStateDetails> LookAround(Transform transform) =>
             new BNodeAnd<EnemyAIStateDetails>(
                 transform,
+                new BNodeWait<EnemyAIStateDetails>(transform, 0.5f),
                 new BNodeLookAt(transform, _ =>
                     transform.position
                         + transform.TransformDirection(new Vector3(3f, 0, 1f))),

@@ -43,19 +43,19 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.suspicion >= passiveToCurious, curious);
             return_passive
                 .To(state => state.suspicion >= passiveToCurious, curious)
-                .To(state => state.status == StateNodeStatus.SUCCESS
-                        || state.status == StateNodeStatus.FAILURE,
+                .To(state => IsFinished(state.status),
                     passive);
             curious
-                .To(state => state.unSightedElapsed > 2f && state.suspicion < 0.1f, return_passive)
+                .To(state => state.unSightedElapsed > 2f && state.suspicion < 0.1f, passive)
                 .To(state => state.suspicion >= curiousToInvestigating, investigating);
             investigating
-                .To(state => state.suspicion < 0.1f
-                        && (state.status == StateNodeStatus.SUCCESS
-                            || state.status == StateNodeStatus.FAILURE),
-                    return_passive);
+                .To(state => state.suspicion < 0.1f && IsFinished(state.status), return_passive);
 
             return passive;
         }
+
+        private static bool IsFinished(StateNodeStatus status) =>
+            status == StateNodeStatus.SUCCESS
+                || status == StateNodeStatus.FAILURE;
     }
 }

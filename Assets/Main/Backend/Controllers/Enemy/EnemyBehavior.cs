@@ -42,22 +42,24 @@ namespace OSBE.Controllers.Enemy {
         }
 
         public void SetInterruptState(EnemyAwareness awareness) {
+            Debug.Log("SET IN");
             if (nav != null) nav.Stop();
             if (patrol == null) AssignPatrol(EnemyBehaviors.TransformPatrol(transform));
 
             switch (awareness) {
                 case EnemyAwareness.PASSIVE:
-                    AStateNode<EnemyAIStateDetails>.ReInit(patrol);
+                    // TODO - don't need me
+                    //AStateNode<EnemyAIStateDetails>.ReInit(patrol);
                     AssignInterruptBehavior(patrol);
-                    break;
-                case EnemyAwareness.RETURN_PASSIVE:
-                    AssignInterruptBehavior(EnemyBehaviors.ReturnToPassive(transform));
                     break;
                 case EnemyAwareness.CURIOUS:
                     AssignInterruptBehavior(EnemyBehaviors.Curious(transform));
                     break;
                 case EnemyAwareness.INVESTIGATING:
                     AssignInterruptBehavior(EnemyBehaviors.Investigate(transform));
+                    break;
+                case EnemyAwareness.RETURN_PASSIVE:
+                    AssignInterruptBehavior(EnemyBehaviors.ReturnToPassive(transform));
                     break;
             }
         }
