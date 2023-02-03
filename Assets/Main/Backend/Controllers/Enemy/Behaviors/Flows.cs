@@ -66,34 +66,33 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                 LookAround(transform),
                 GiveUp(transform));
 
-        public static ABehaviorNode<EnemyAIStateDetails> LookAround(Transform transform) =>
-            new BNodeAnd<EnemyAIStateDetails>(
+        public static ABehaviorNode<EnemyAIStateDetails> LookAround(Transform transform) {
+            return new BNodeAnd<EnemyAIStateDetails>(
                 transform,
                 new BNodeWait<EnemyAIStateDetails>(transform, 0.5f),
-                new BNodeLookAt(transform, _ => transform.position
-                    + transform.TransformDirection(new Vector3(5f, 0, 1f))),
+                Turn(transform, 80f),
                 new BNodeWait<EnemyAIStateDetails>(transform, 0.75f),
-                new BNodeLookAt(transform, _ => transform.position
-                    + transform.TransformDirection(new Vector3(-5f, 0, 1f))),
-                new BNodeLookAt(transform, _ => transform.position
-                    + transform.TransformDirection(new Vector3(-5f, 0, 1f))),
+                Turn(transform, -160f),
                 new BNodeWait<EnemyAIStateDetails>(transform, 1.5f),
-                new BNodeLookAt(transform, _ => transform.position
-                    + transform.TransformDirection(new Vector3(5f, 0, 1f))),
+                Turn(transform, 80f),
                 new BNodeWait<EnemyAIStateDetails>(transform, 1f));
+        }
 
         public static ABehaviorNode<EnemyAIStateDetails> ScanAround(Transform transform) =>
             new BNodeAnd<EnemyAIStateDetails>(
                 transform,
                 new BNodeWait<EnemyAIStateDetails>(transform, 0.25f),
-                new BNodeLookAt(transform, _ => transform.position
-                    + transform.TransformDirection(new Vector3(5f, 0, 1f))),
+                Turn(transform, -80f),
                 new BNodeWait<EnemyAIStateDetails>(transform, 0.25f),
-                new BNodeLookAt(transform, _ => transform.position
-                    + transform.TransformDirection(new Vector3(-5f, 0, 1f))),
-                new BNodeLookAt(transform, _ => transform.position
-                    + transform.TransformDirection(new Vector3(-5f, 0, 1f))),
+                Turn(transform, 160f),
                 new BNodeWait<EnemyAIStateDetails>(transform, 0.25f));
+
+        public static ABehaviorNode<EnemyAIStateDetails> Turn(Transform transform, float angle) {
+            return new BNodeLookAt(
+                transform,
+                _ => transform.position
+                    + Quaternion.AngleAxis(angle, Vector3.up) * transform.forward);
+        }
 
         /*
          * TEMPORARY

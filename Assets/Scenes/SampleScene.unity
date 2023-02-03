@@ -4073,7 +4073,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cfg: {fileID: 11400000, guid: bc964265b4e6d4bfda94d287d66aec70, type: 2}
-  awareness: 0
+  awareness: 10
 --- !u!114 &467042526
 MonoBehaviour:
   m_ObjectHideFlags: 0
