@@ -14,6 +14,8 @@ namespace OSBE.Controllers.Enemy {
         private BehaviorConfig cfg;
 
         private Vector3 turnPos;
+        private Quaternion faceTarget;
+        private float turnStartTime;
         private Vector3 prevPos;
         private float buffer;
 
@@ -51,8 +53,10 @@ namespace OSBE.Controllers.Enemy {
 
         public void Face(Vector3 location, BehaviorConfig cfg) {
             this.cfg = cfg;
-            isTurning = true;
+            faceTarget = transform.rotation;
+            turnStartTime = Time.time;
             turnPos = location;
+            isTurning = true;
         }
 
         private void UpdateTurn() {
@@ -61,7 +65,7 @@ namespace OSBE.Controllers.Enemy {
             float diff = Maths.AngleDiff(rotation.eulerAngles.y, face.eulerAngles.y);
 
             if (diff >= 1f) {
-                transform.rotation = Quaternion.Lerp(rotation, face, cfg.rotationSpeed * Time.deltaTime);
+                DoTurn(face);
             } else {
                 isTurning = false;
             }
@@ -70,10 +74,7 @@ namespace OSBE.Controllers.Enemy {
         private void UpdateMove() {
             Vector3 movement = transform.position - prevPos;
             if (Vectors.NonZero(movement)) {
-                transform.rotation = Quaternion.Lerp(
-                    transform.rotation,
-                    Quaternion.LookRotation(transform.position - prevPos),
-                    cfg.rotationSpeed * Time.deltaTime);
+                DoTurn(Quaternion.LookRotation(transform.position - prevPos));
             }
 
             if (isMoving && buffer > 0f && (nav.isStopped || nav.remainingDistance < 0.025f)) {
@@ -82,6 +83,14 @@ namespace OSBE.Controllers.Enemy {
                 nav.isStopped = true;
                 nav.ResetPath();
             }
+        }
+
+        private void DoTurn(Quaternion toward) {
+            transform.rotation = Quaternion.Lerp(
+                isTurning ? faceTarget : transform.rotation,
+                toward,
+                cfg.rotationSpeed
+                * (isTurning ? (Time.time - turnStartTime) : Time.deltaTime));
         }
 
         /*

@@ -1,7 +1,6 @@
 ﻿using OSCore.Data.AI;
 using OSCore.System;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace OSCore.ScriptableObjects {
     [CreateAssetMenu(menuName = "cfg/enemy/ai")]
@@ -28,8 +27,10 @@ namespace OSCore.ScriptableObjects {
             awareness switch {
                 EnemyAwareness.AGGRESIVE => aggressiveCfg,
                 EnemyAwareness.SEARCHING => aggressiveCfg,
-                EnemyAwareness.PASSIVE => passiveCfg,
-                _ => alertCfg,
+                EnemyAwareness.ALERT => alertCfg,
+                EnemyAwareness.ALERT_CURIOUS => alertCfg,
+                EnemyAwareness.ALERT_INVESTIGATING => alertCfg,
+                _ => passiveCfg,
             };
 
         private EnemyAINode BuildAsset() {

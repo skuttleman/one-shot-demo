@@ -119,6 +119,12 @@ namespace OSBE.Controllers.Enemy {
                 { EnemyAwareness.INVESTIGATING, EnemyBehaviors.Investigate(transform) },
                 { EnemyAwareness.RETURN_PASSIVE, EnemyBehaviors.ReturnToPassive(transform) },
                 { EnemyAwareness.RETURN_PASSIVE_GIVE_UP, EnemyBehaviors.GiveUp(transform) },
+
+                { EnemyAwareness.ALERT, EnemyBehaviors.TransformPatrol(transform) },
+                { EnemyAwareness.ALERT_CURIOUS, EnemyBehaviors.Curious(transform) },
+                { EnemyAwareness.ALERT_INVESTIGATING, EnemyBehaviors.Investigate(transform) },
+                { EnemyAwareness.RETURN_ALERT, EnemyBehaviors.ReturnToAlert(transform) },
+
                 { EnemyAwareness.AGGRESIVE, EnemyBehaviors.Harrass(transform) },
                 { EnemyAwareness.SEARCHING, EnemyBehaviors.SearchHalfHeartedly(transform) }
             };

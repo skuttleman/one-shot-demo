@@ -66,14 +66,21 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                 LookAround(transform),
                 GiveUp(transform));
 
+        public static ABehaviorNode<EnemyAIStateDetails> ReturnToAlert(Transform transform) =>
+            new BNodeAnd<EnemyAIStateDetails>(
+                transform,
+                LookAround(transform),
+                LookAround(transform),
+                new BNodeSpeak(transform, "---"));
+
         public static ABehaviorNode<EnemyAIStateDetails> LookAround(Transform transform) {
             return new BNodeAnd<EnemyAIStateDetails>(
                 transform,
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.5f),
+                new BNodeWait<EnemyAIStateDetails>(transform, 1f),
                 Turn(transform, 80f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f),
+                new BNodeWait<EnemyAIStateDetails>(transform, 1.25f),
                 Turn(transform, -160f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 1.5f),
+                new BNodeWait<EnemyAIStateDetails>(transform, 2f),
                 Turn(transform, 80f),
                 new BNodeWait<EnemyAIStateDetails>(transform, 1f));
         }
@@ -81,11 +88,11 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         public static ABehaviorNode<EnemyAIStateDetails> ScanAround(Transform transform) =>
             new BNodeAnd<EnemyAIStateDetails>(
                 transform,
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.25f),
+                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f),
                 Turn(transform, -80f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.25f),
+                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f),
                 Turn(transform, 160f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.25f));
+                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f));
 
         public static ABehaviorNode<EnemyAIStateDetails> Turn(Transform transform, float angle) {
             return new BNodeLookAt(
