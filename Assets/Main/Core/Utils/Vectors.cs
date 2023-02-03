@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 namespace OSCore.Utils {
     public static class Vectors {
@@ -99,6 +100,19 @@ namespace OSCore.Utils {
         public static Vector2 Directionify(this Vector2 vector) {
             bool horizontal = Mathf.Abs(vector.x) > Mathf.Abs(vector.y);
             return new(horizontal ? vector.x : 0f, horizontal ? 0f : vector.y);
+        }
+
+        public static Vector3 RandomPointWithinDistance(Vector3 origin, Vector3 dist, int layermask) {
+            Vector3 point = origin + new Vector3(
+                dist.x * Random.insideUnitSphere.x,
+                dist.y * Random.insideUnitSphere.y,
+                dist.z * Random.insideUnitSphere.z);
+
+            if (NavMesh.SamplePosition(point, out NavMeshHit navHit, 0.75f, layermask)) {
+                return navHit.position;
+            }
+
+            return Vector3.negativeInfinity;
         }
     }
 }

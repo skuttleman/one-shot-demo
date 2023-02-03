@@ -156,6 +156,7 @@ namespace OSCore.Data {
             CURIOUS,
             INVESTIGATING,
             RETURN_PASSIVE,
+            RETURN_PASSIVE_GIVE_UP,
 
             ALERT,
             ALERT_CURIOUS,

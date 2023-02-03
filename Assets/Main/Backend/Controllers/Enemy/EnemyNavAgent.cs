@@ -19,8 +19,9 @@ namespace OSBE.Controllers.Enemy {
         public bool Goto(Vector3 location, BehaviorConfig cfg) {
             NavMeshPath path = new();
 
-            if (nav.CalculatePath(location, path)
-                && Vector3.Distance(location, nav.pathEndPosition) > 0.025f
+            if (!location.IsNegativeInfinity()
+                    && nav.CalculatePath(location, path)
+                    && Vector3.Distance(location, nav.pathEndPosition) > 0.025f
             ) {
                 anim.Transition(state => state with { isMoving = true });
                 anim.SetSpeed(cfg.moveSpeed / 2.5f);

@@ -36,17 +36,18 @@ namespace OSBE.Controllers.Enemy {
         }
 
         public void OnStateInit(EnemyAwareness curr) {
-            behavior.SetInterruptState(curr);
+            behavior.SetInterruptState(curr, curr);
         }
 
         public void OnStateTransition(EnemyAwareness prev, EnemyAwareness curr) {
-            behavior.SetInterruptState(curr);
+            behavior.SetInterruptState(prev, curr);
         }
 
         private EnemyAIStateDetails HandleDamage(EnemyAIStateDetails details) =>
             details with {
                 unSightedElapsed = 0f,
                 unMovedElapsed = 0f,
+                suspicion = cfg.maxSuspicion,
                 lastKnownPosition = player.transform.position,
             };
 
@@ -107,16 +108,16 @@ namespace OSBE.Controllers.Enemy {
 
 state                     = {GetComponent<EnemyAI>().state}
 
-playerStance              = {behavior.details.playerStance}
 playerSpeed               = {behavior.details.playerSpeed}
 playerVisibility          = {behavior.details.playerVisibility}
 playerDistance            = {behavior.details.playerDistance}
 playerAngle               = {behavior.details.playerAngle}
 
-unSightedElapsed          = {behavior.details.unSightedElapsed}
-
 suspicion                 = {behavior.details.suspicion}
 lastKnownPosition         = {behavior.details.lastKnownPosition}
+distance                  = {Vector3.Distance(
+                                 behavior.details.lastKnownPosition,
+                                 transform.position)}
 
             ".Trim();
         }

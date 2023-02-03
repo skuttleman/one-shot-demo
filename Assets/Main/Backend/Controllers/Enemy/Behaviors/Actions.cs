@@ -42,6 +42,39 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
     }
 
+    public class BNodeGotoStatic : AStateNode<EnemyAIStateDetails> {
+        private readonly EnemyNavAgent nav;
+        private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
+        bool isStarted;
+
+        public BNodeGotoStatic(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
+            nav = transform.GetComponent<EnemyNavAgent>();
+            this.toLocation = toLocation;
+        }
+
+        protected override void Init() {
+            isStarted = false;
+            nav.Stop();
+        }
+
+        protected override void Process(EnemyAIStateDetails details) {
+            Vector3 destination = toLocation(details);
+            float distance = Vector3.Distance(transform.position, destination);
+
+            if (!isStarted) {
+                isStarted = true;
+
+                if (!nav.Goto(destination, details.cfg)) {
+                    status = StateNodeStatus.FAILURE;
+                }
+            } else if (!nav.isMoving || distance < 0.1f) {
+                nav.Stop();
+                status = StateNodeStatus.SUCCESS;
+
+            }
+        }
+    }
+
     public class BNodeGotoLocation : BNodeGoto {
         public BNodeGotoLocation(Transform transform, Vector3 location)
             : base(transform, _ => location) { }
@@ -52,7 +85,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
         private bool isStarted;
 
-        public BNodeLookAt(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
+        public BNodeLookAt(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation)
+            : base(transform) {
             nav = transform.GetComponent<EnemyNavAgent>();
             this.toLocation = toLocation;
         }

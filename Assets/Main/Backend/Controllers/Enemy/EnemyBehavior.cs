@@ -1,6 +1,4 @@
-﻿using OSBE.Controllers.Enemy.Behaviors.Actions;
-using OSBE.Controllers.Enemy.Behaviors.Composites;
-using OSBE.Controllers.Enemy.Behaviors.Main;
+﻿using OSBE.Controllers.Enemy.Behaviors.Flows;
 using OSCore.Data.AI;
 using OSCore.Data.Animations;
 using OSCore.Data.Enums;
@@ -8,6 +6,7 @@ using OSCore.ScriptableObjects;
 using OSCore.System;
 using OSCore.System.Interfaces;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
@@ -20,12 +19,12 @@ namespace OSBE.Controllers.Enemy {
         public EnemyAwareness state => ai.state;
         public EnemyAIStateDetails details => ai.details;
 
-        private EnemyAI ai;
-        private EnemyNavAgent nav;
-        private GameObject player;
+        [SerializeField] private EnemyAwareness awareness;
+        private EnemyAwareness prevAwareness = EnemyAwareness.PASSIVE;
 
-        private AStateNode<EnemyAIStateDetails> patrol;
-        private AStateNode<EnemyAIStateDetails> behavior;
+        private EnemyAI ai;
+        private GameObject player;
+        private IDictionary<EnemyAwareness, AStateNode<EnemyAIStateDetails>> behaviors;
 
         public EnemyAIStateDetails UpdateState(Func<EnemyAIStateDetails, EnemyAIStateDetails> updateFn) {
             ai.Transition(updateFn);
@@ -33,35 +32,8 @@ namespace OSBE.Controllers.Enemy {
             return ai.details;
         }
 
-        public void AssignPatrol(AStateNode<EnemyAIStateDetails> patrol) {
-            this.patrol = patrol;
-        }
-
-        public void AssignInterruptBehavior(AStateNode<EnemyAIStateDetails> behavior) {
-            this.behavior = behavior;
-        }
-
-        public void SetInterruptState(EnemyAwareness awareness) {
-            Debug.Log("SET IN");
-            if (nav != null) nav.Stop();
-            if (patrol == null) AssignPatrol(EnemyBehaviors.TransformPatrol(transform));
-
-            switch (awareness) {
-                case EnemyAwareness.PASSIVE:
-                    // TODO - don't need me
-                    //AStateNode<EnemyAIStateDetails>.ReInit(patrol);
-                    AssignInterruptBehavior(patrol);
-                    break;
-                case EnemyAwareness.CURIOUS:
-                    AssignInterruptBehavior(EnemyBehaviors.Curious(transform));
-                    break;
-                case EnemyAwareness.INVESTIGATING:
-                    AssignInterruptBehavior(EnemyBehaviors.Investigate(transform));
-                    break;
-                case EnemyAwareness.RETURN_PASSIVE:
-                    AssignInterruptBehavior(EnemyBehaviors.ReturnToPassive(transform));
-                    break;
-            }
+        public void SetInterruptState(EnemyAwareness prev, EnemyAwareness curr) {
+            Debug.Log($"AI transtition from {prev} to {curr}");
         }
 
         protected override void OnEvent(MovementChanged e) {
@@ -79,7 +51,7 @@ namespace OSBE.Controllers.Enemy {
 
         private float CalculateSuspicion(EnemyAIStateDetails details, bool isVisible) {
             BehaviorConfig config = cfg.ActiveCfg(ai.state);
-            float increase = -1f;
+            float increase = -10f;
 
             if (isVisible) {
                 increase = config.baseSuspicion;
@@ -139,23 +111,39 @@ namespace OSBE.Controllers.Enemy {
 
         private void Start() {
             ai = GetComponent<EnemyAI>();
-            nav = GetComponent<EnemyNavAgent>();
-
             player = system.Player();
+
+            behaviors = new Dictionary<EnemyAwareness, AStateNode<EnemyAIStateDetails>>() {
+                { EnemyAwareness.PASSIVE, EnemyBehaviors.TransformPatrol(transform) },
+                { EnemyAwareness.CURIOUS, EnemyBehaviors.Curious(transform) },
+                { EnemyAwareness.INVESTIGATING, EnemyBehaviors.Investigate(transform) },
+                { EnemyAwareness.RETURN_PASSIVE, EnemyBehaviors.ReturnToPassive(transform) },
+                { EnemyAwareness.RETURN_PASSIVE_GIVE_UP, EnemyBehaviors.GiveUp(transform) },
+                { EnemyAwareness.AGGRESIVE, EnemyBehaviors.Harrass(transform) },
+                { EnemyAwareness.SEARCHING, EnemyBehaviors.SearchHalfHeartedly(transform) }
+            };
         }
 
         private void Update() {
+            AStateNode<EnemyAIStateDetails> behavior = behaviors[awareness];
+            if (awareness != prevAwareness) {
+                prevAwareness = awareness;
+                if (behavior != null) AStateNode<EnemyAIStateDetails>.ReInit(behavior);
+            }
+
             UpdateState(state => ProcessUpdate(state) with {
                 unMovedElapsed = state.unMovedElapsed + Time.deltaTime,
                 unSightedElapsed = state.unSightedElapsed + Time.deltaTime,
                 status = behavior?.status ?? StateNodeStatus.INIT,
             });
 
-            AStateNode<EnemyAIStateDetails>.Process(
-                behavior,
-                ai.details with {
-                    cfg = cfg.ActiveCfg(ai.state),
-                });
+            if (behavior != null) {
+                AStateNode<EnemyAIStateDetails>.Process(
+                    behavior,
+                    ai.details with {
+                        cfg = cfg.ActiveCfg(awareness),
+                    });
+            }
         }
     }
 }

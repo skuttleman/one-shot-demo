@@ -4,14 +4,19 @@ using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Composites {
     public class BNodeAnd<T> : AStateNode<T> {
-        private readonly AStateNode<T>[] nodes;
-        private int curr;
+        protected readonly AStateNode<T>[] nodes;
+        protected int curr;
 
         public BNodeAnd(Transform transform, params AStateNode<T>[] nodes) : base(transform) {
             this.nodes = nodes;
         }
 
         protected override void Process(T details) {
+            if (curr >= nodes.Length) {
+                status = StateNodeStatus.SUCCESS;
+                return;
+            }
+
             AStateNode<T> node = nodes[curr];
             Process(node, details);
             status = StateNodeStatus.RUNNING;
@@ -24,8 +29,6 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
                     curr++;
                     break;
             }
-
-            if (curr >= nodes.Length) status = StateNodeStatus.SUCCESS;
         }
 
         protected override void Init() {
@@ -68,6 +71,26 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
 
         protected override void ReInit() {
             foreach (AStateNode<T> node in nodes) ReInit(node);
+        }
+    }
+
+    public class BNodeOptional<T> : AStateNode<T> {
+        private readonly AStateNode<T> child;
+
+        public BNodeOptional(Transform transform, AStateNode<T> child)
+            : base(transform) {
+            this.child = child;
+        }
+
+        protected override void Process(T details) {
+            Process(child, details);
+            status = child.status == StateNodeStatus.FAILURE
+                ? StateNodeStatus.SUCCESS
+                : child.status;
+        }
+
+        protected override void ReInit() {
+            ReInit(child);
         }
     }
 
@@ -128,14 +151,14 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         private readonly AStateNode<T> child;
         private readonly Predicate<T> pred;
 
-        public BNodeDoWhile(Transform transform, AStateNode<T> child, Predicate<T> pred)
+        public BNodeDoWhile(Transform transform, Predicate<T> pred, AStateNode<T> child)
             : base(transform) {
-            this.child = child;
             this.pred = pred;
+            this.child = child;
         }
 
         protected override void Process(T details) {
-            if (pred(details)) {
+            if (!pred(details)) {
                 status = StateNodeStatus.SUCCESS;
                 return;
             }
@@ -175,10 +198,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
         }
     }
 
-    public class BNodeParallel<T> : AStateNode<T> {
+    public class BNodeParallelAll<T> : AStateNode<T> {
         private readonly AStateNode<T>[] children;
 
-        public BNodeParallel(Transform transform, params AStateNode<T>[] children) : base(transform) {
+        public BNodeParallelAll(Transform transform, params AStateNode<T>[] children) : base(transform) {
             this.children = children;
         }
 
@@ -209,7 +232,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
     public class BNodeParallelAny<T> : AStateNode<T> {
         private readonly AStateNode<T>[] children;
 
-        public BNodeParallelAny(Transform transform, params AStateNode<T>[] children) : base(transform) {
+        public BNodeParallelAny(Transform transform, params AStateNode<T>[] children)
+            : base(transform) {
             this.children = children;
         }
 
@@ -218,16 +242,46 @@ namespace OSBE.Controllers.Enemy.Behaviors.Composites {
                 Process(child, details);
                 status = child.status;
 
-                if (child.status == StateNodeStatus.SUCCESS
-                    || child.status == StateNodeStatus.FAILURE
-                ) {
-                    return;
-                }
+                if (status != StateNodeStatus.RUNNING) return;
             }
         }
 
         protected override void ReInit() {
             foreach (AStateNode<T> child in children) ReInit(child);
+        }
+    }
+
+    namespace Experimental {
+        public class BNodeStepLockedAnd<T> : BNodeAnd<T> {
+            public BNodeStepLockedAnd(Transform transform, params AStateNode<T>[] nodes)
+                : base(transform, nodes) {
+                curr = -1;
+            }
+
+            protected override void Init() {
+                curr++;
+                if (curr >= nodes.Length) curr = 0;
+            }
+        }
+
+        public class BNodeAsync<T> : AStateNode<T> {
+            private readonly AStateNode<T> child;
+
+            public BNodeAsync(Transform transform, AStateNode<T> node)
+                : base(transform) {
+                child = node;
+            }
+
+            protected override void Process(T details) {
+                Process(child, details);
+                status = child.status == StateNodeStatus.FAILURE
+                    ? StateNodeStatus.FAILURE
+                    : StateNodeStatus.SUCCESS;
+            }
+
+            protected override void ReInit() {
+                ReInit(child);
+            }
         }
     }
 }
