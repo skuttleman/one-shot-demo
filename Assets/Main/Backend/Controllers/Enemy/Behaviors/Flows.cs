@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Flows {
     public static class EnemyBehaviors {
-        public static AStateNode<EnemyAIStateDetails> TransformPatrol(Transform transform) {
-            List<AStateNode<EnemyAIStateDetails>> nodes = new();
+        public static ABehaviorNode<EnemyAIStateDetails> TransformPatrol(Transform transform) {
+            List<ABehaviorNode<EnemyAIStateDetails>> nodes = new();
 
             Transforms
                 .FindInChildren(transform.parent, node => node.name.Contains("position"))
@@ -31,7 +31,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                 new BNodeStepLockedAnd<EnemyAIStateDetails>(transform, nodes.ToArray()));
         }
 
-        public static AStateNode<EnemyAIStateDetails> Curious(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> Curious(Transform transform) =>
             new BNodeParallelAll<EnemyAIStateDetails>(
                 transform,
                 new BNodeSpeak(transform, "..."),
@@ -39,7 +39,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                     transform,
                     new BNodeLookAtLKP(transform)));
 
-        public static AStateNode<EnemyAIStateDetails> FollowLKP(
+        public static ABehaviorNode<EnemyAIStateDetails> FollowLKP(
             Transform transform, float minDist) =>
             new BNodeDoWhile<EnemyAIStateDetails>(
                     transform,
@@ -49,7 +49,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                         details => details.lastKnownPosition));
 
 
-        public static AStateNode<EnemyAIStateDetails> Investigate(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> Investigate(Transform transform) =>
             new BNodeAnd<EnemyAIStateDetails>(
                 transform,
                 new BNodeParallelAny<EnemyAIStateDetails>(
@@ -60,13 +60,13 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                         new BNodeLookAtLKP(transform))),
                 FollowLKP(transform, 0.5f));
 
-        public static AStateNode<EnemyAIStateDetails> ReturnToPassive(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> ReturnToPassive(Transform transform) =>
             new BNodeAnd<EnemyAIStateDetails>(
                 transform,
                 LookAround(transform),
                 GiveUp(transform));
 
-        public static AStateNode<EnemyAIStateDetails> LookAround(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> LookAround(Transform transform) =>
             new BNodeAnd<EnemyAIStateDetails>(
                 transform,
                 new BNodeWait<EnemyAIStateDetails>(transform, 0.5f),
@@ -82,7 +82,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                     + transform.TransformDirection(new Vector3(5f, 0, 1f))),
                 new BNodeWait<EnemyAIStateDetails>(transform, 1f));
 
-        public static AStateNode<EnemyAIStateDetails> ScanAround(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> ScanAround(Transform transform) =>
             new BNodeAnd<EnemyAIStateDetails>(
                 transform,
                 new BNodeWait<EnemyAIStateDetails>(transform, 0.25f),
@@ -99,7 +99,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
          * TEMPORARY
          */
 
-        public static AStateNode<EnemyAIStateDetails> Harrass(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> Harrass(Transform transform) =>
             new BNodeParallelAll<EnemyAIStateDetails>(
                 transform,
                 new BNodeRepeat<EnemyAIStateDetails>(
@@ -121,10 +121,10 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                             details => Vector3.Distance(details.lastKnownPosition, transform.position) < 2f,
                             new BNodeLookAtLKP(transform)))));
 
-        public static AStateNode<EnemyAIStateDetails> GiveUp(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> GiveUp(Transform transform) =>
                 new BNodeSpeak(transform, "¯\\_(  )_/¯");
 
-        public static AStateNode<EnemyAIStateDetails> SearchHalfHeartedly(Transform transform) =>
+        public static ABehaviorNode<EnemyAIStateDetails> SearchHalfHeartedly(Transform transform) =>
             new BNodeParallelAll<EnemyAIStateDetails>(
                 transform,
                 new BNodeRepeat<EnemyAIStateDetails>(

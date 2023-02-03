@@ -5,35 +5,31 @@ namespace OSCore.System {
         INIT, RUNNING, SUCCESS, FAILURE
     }
 
-    public abstract class AStateNode<T> {
+    public abstract class ABehaviorNode<T> {
         public readonly Transform transform;
         public StateNodeStatus status { get; protected set; } = StateNodeStatus.INIT;
+        public bool isFinished =>
+            status == StateNodeStatus.SUCCESS
+                || status == StateNodeStatus.FAILURE;
 
-        public AStateNode(Transform transform) {
+        public ABehaviorNode(Transform transform) {
             this.transform = transform;
         }
 
-        protected virtual void Init() { }
-
-        protected virtual void ReInit() { }
-
-        protected abstract void Process(T details);
-
-        public static void ReInit(AStateNode<T> node) {
-            node.Init();
-            node.status = StateNodeStatus.RUNNING;
-            node.ReInit();
+        protected virtual void Start(T details) {
+            Continue(details);
         }
 
-        public static void Process(AStateNode<T> node, T details) {
-            if (node.status == StateNodeStatus.INIT) {
-                node.Init();
-                node.status = StateNodeStatus.RUNNING;
-                return;
-            }
-            if (node.status != StateNodeStatus.RUNNING) return;
+        protected abstract void Continue(T details);
 
-            node.Process(details);
+        protected virtual void Stop() { }
+
+        public static void Process(ABehaviorNode<T> node, T details) {
+            if (node.status == StateNodeStatus.INIT) node.Start(details);
+            else if (!node.isFinished) node.Continue(details);
+
+            if (node.status == StateNodeStatus.INIT) node.status = StateNodeStatus.RUNNING;
+
             switch (node.status) {
                 //case StateNodeStatus.RUNNING:
                 //    Debug.Log(node.GetType().ToString() + " -> " + node.status);
@@ -47,6 +43,11 @@ namespace OSCore.System {
                 default:
                     break;
             }
+        }
+
+        public static void ReInit(ABehaviorNode<T> node) {
+            node.Stop();
+            node.status = StateNodeStatus.INIT;
         }
     }
 }

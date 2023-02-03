@@ -24,7 +24,7 @@ namespace OSBE.Controllers.Enemy {
 
         private EnemyAI ai;
         private GameObject player;
-        private IDictionary<EnemyAwareness, AStateNode<EnemyAIStateDetails>> behaviors;
+        private IDictionary<EnemyAwareness, ABehaviorNode<EnemyAIStateDetails>> behaviors;
 
         public EnemyAIStateDetails UpdateState(Func<EnemyAIStateDetails, EnemyAIStateDetails> updateFn) {
             ai.Transition(updateFn);
@@ -113,7 +113,7 @@ namespace OSBE.Controllers.Enemy {
             ai = GetComponent<EnemyAI>();
             player = system.Player();
 
-            behaviors = new Dictionary<EnemyAwareness, AStateNode<EnemyAIStateDetails>>() {
+            behaviors = new Dictionary<EnemyAwareness, ABehaviorNode<EnemyAIStateDetails>>() {
                 { EnemyAwareness.PASSIVE, EnemyBehaviors.TransformPatrol(transform) },
                 { EnemyAwareness.CURIOUS, EnemyBehaviors.Curious(transform) },
                 { EnemyAwareness.INVESTIGATING, EnemyBehaviors.Investigate(transform) },
@@ -125,10 +125,10 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private void Update() {
-            AStateNode<EnemyAIStateDetails> behavior = behaviors[awareness];
+            ABehaviorNode<EnemyAIStateDetails> behavior = behaviors[awareness];
             if (awareness != prevAwareness) {
                 prevAwareness = awareness;
-                if (behavior != null) AStateNode<EnemyAIStateDetails>.ReInit(behavior);
+                if (behavior != null) ABehaviorNode<EnemyAIStateDetails>.ReInit(behavior);
             }
 
             UpdateState(state => ProcessUpdate(state) with {
@@ -138,7 +138,7 @@ namespace OSBE.Controllers.Enemy {
             });
 
             if (behavior != null) {
-                AStateNode<EnemyAIStateDetails>.Process(
+                ABehaviorNode<EnemyAIStateDetails>.Process(
                     behavior,
                     ai.details with {
                         cfg = cfg.ActiveCfg(awareness),

@@ -7,6 +7,7 @@ namespace OSBE.Controllers.Enemy {
     public class EnemyNavAgent : MonoBehaviour {
         public bool isMoving { get; private set; }
         public bool isTurning { get; private set; }
+        public float remainingDistance => nav == null ? -1f : nav.remainingDistance;
 
         private EnemyAnimator anim;
         private NavMeshAgent nav;

@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Actions {
-    public class BNodeGoto : AStateNode<EnemyAIStateDetails> {
+    public class BNodeGoto : ABehaviorNode<EnemyAIStateDetails> {
         private readonly EnemyNavAgent nav;
         private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
         private float destElapsed = 0f;
@@ -15,14 +15,12 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.toLocation = toLocation;
         }
 
-        protected override void Init() {
-            destination = Vector3.negativeInfinity;
-            nav.Stop();
+        protected override void Start(EnemyAIStateDetails details) {
+            StartWalk(details, toLocation(details));
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
-            if ((!nav.isMoving && !destination.IsNegativeInfinity())
-                || Vector3.Distance(transform.position, destination) < 0.1f) {
+        protected override void Continue(EnemyAIStateDetails details) {
+            if (!nav.isMoving || Vector3.Distance(transform.position, destination) < 0.1f) {
                 nav.Stop();
                 status = StateNodeStatus.SUCCESS;
             } else if (destElapsed <= 0f) {
@@ -30,48 +28,56 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
                 destElapsed = 0.5f;
 
                 if (Vectors.NonZero(loc - destination) || !nav.isMoving) {
-                    destination = loc;
-
-                    if (!nav.Goto(destination, details.cfg)) {
-                        status = StateNodeStatus.FAILURE;
-                    }
+                    StartWalk(details, loc);
                 }
             }
 
             destElapsed -= Time.deltaTime;
         }
+
+        protected override void Stop() {
+            destination = Vector3.negativeInfinity;
+            nav.Stop();
+        }
+
+        private void StartWalk(EnemyAIStateDetails details, Vector3 location) {
+            destination = location;
+
+            if (!nav.Goto(destination, details.cfg)) {
+                status = StateNodeStatus.FAILURE;
+            }
+        }
     }
 
-    public class BNodeGotoStatic : AStateNode<EnemyAIStateDetails> {
+    public class BNodeGotoStatic : ABehaviorNode<EnemyAIStateDetails> {
         private readonly EnemyNavAgent nav;
         private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
-        bool isStarted;
+        private Vector3 destination;
 
         public BNodeGotoStatic(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
             nav = transform.GetComponent<EnemyNavAgent>();
             this.toLocation = toLocation;
         }
 
-        protected override void Init() {
-            isStarted = false;
-            nav.Stop();
+        protected override void Start(EnemyAIStateDetails details) {
+            destination = toLocation(details);
+
+            if (!nav.Goto(destination, details.cfg)) {
+                status = StateNodeStatus.FAILURE;
+            }
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
-            Vector3 destination = toLocation(details);
+        protected override void Continue(EnemyAIStateDetails details) {
             float distance = Vector3.Distance(transform.position, destination);
 
-            if (!isStarted) {
-                isStarted = true;
-
-                if (!nav.Goto(destination, details.cfg)) {
-                    status = StateNodeStatus.FAILURE;
-                }
-            } else if (!nav.isMoving || distance < 0.1f) {
-                nav.Stop();
+            if (!nav.isMoving || distance < 0.1f) {
+                Stop();
                 status = StateNodeStatus.SUCCESS;
-
             }
+        }
+
+        protected override void Stop() {
+            nav.Stop();
         }
     }
 
@@ -80,7 +86,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             : base(transform, _ => location) { }
     }
 
-    public class BNodeLookAt : AStateNode<EnemyAIStateDetails> {
+    public class BNodeLookAt : ABehaviorNode<EnemyAIStateDetails> {
         private readonly EnemyNavAgent nav;
         private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
         private bool isStarted;
@@ -91,18 +97,17 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.toLocation = toLocation;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
-            status = StateNodeStatus.RUNNING;
-            if (!isStarted) {
-                isStarted = true;
-                nav.Face(toLocation(details), details.cfg);
-            } else if (!nav.isTurning) {
+        protected override void Start(EnemyAIStateDetails details) {
+            nav.Face(toLocation(details), details.cfg);
+        }
+
+        protected override void Continue(EnemyAIStateDetails details) {
+            if (!nav.isTurning) {
                 status = StateNodeStatus.SUCCESS;
             }
         }
 
-        protected override void Init() {
-            isStarted = false;
+        protected override void Stop() {
             nav.Stop();
         }
     }
@@ -127,29 +132,27 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             : base(transform, details => details.lastKnownPosition) { }
     }
 
-    public class BNodeSpeak : AStateNode<EnemyAIStateDetails> {
+    public class BNodeSpeak : ABehaviorNode<EnemyAIStateDetails> {
         private readonly EnemySpeechAgent speech;
         private readonly string message;
-        private bool isStarted;
 
         public BNodeSpeak(Transform transform, string message) : base(transform) {
             speech = transform.GetComponent<EnemySpeechAgent>();
             this.message = message;
         }
 
-        protected override void Process(EnemyAIStateDetails details) {
-            status = StateNodeStatus.RUNNING;
+        protected override void Start(EnemyAIStateDetails details) {
+            speech.Say(message);
+        }
 
-            if (!isStarted) {
-                speech.Say(message);
-                isStarted = true;
-            } else if (!speech.isSpeaking) {
+        protected override void Continue(EnemyAIStateDetails details) {
+            if (!speech.isSpeaking) {
+                Stop();
                 status = StateNodeStatus.SUCCESS;
             }
         }
 
-        protected override void Init() {
-            isStarted = false;
+        protected override void Stop() {
             speech.Stop();
         }
     }
