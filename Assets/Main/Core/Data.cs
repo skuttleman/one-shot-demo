@@ -156,7 +156,6 @@ namespace OSCore.Data {
             CURIOUS,
             INVESTIGATING,
             RETURN_PASSIVE,
-            RETURN_PASSIVE_GIVE_UP,
 
             ALERT,
             ALERT_CURIOUS,
@@ -193,7 +192,7 @@ namespace OSCore.Data {
             [field: SerializeField] public float angle_PERIPHERY { get; private set; }
 
 
-            [field: Header("FOV")]
+            [field: Header("Sensor Config")]
             [field: SerializeField] public SensorConfig visibility { get; private set; }
             [field: SerializeField] public SensorConfig distance { get; private set; }
             [field: SerializeField] public SensorConfig angle { get; private set; }

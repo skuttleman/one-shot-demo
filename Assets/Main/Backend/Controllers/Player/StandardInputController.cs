@@ -159,8 +159,10 @@ namespace OSBE.Controllers.Player {
 
         private MovementChanged MoveChangedEvent(float movementSpeed) {
             PlayerSpeed playerSpeed = PlayerSpeed.FAST;
+
             if (!controller.state.isMoving || movementSpeed < 0.1f) playerSpeed = PlayerSpeed.STOPPED;
-            else if (movementSpeed < 0.725f) playerSpeed = PlayerSpeed.SLOW;
+            else if (movementSpeed < 0.5f) playerSpeed = PlayerSpeed.SLOW;
+
             return new(playerSpeed);
         }
 

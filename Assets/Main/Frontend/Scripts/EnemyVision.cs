@@ -41,8 +41,7 @@ namespace OSFE.Scripts {
                 .position;
             controller.Handle(BuildLOS(eyes, playerEyes));
 
-            float enemyVisibility = Transforms.VisibilityFrom(playerEyes, coll);
-            if (enemyVisibility > 0f) timeSinceSeeable = 0f;
+            if (Transforms.VisibilityFrom(playerEyes, coll) > 0f) timeSinceSeeable = 0f;
             else timeSinceSeeable += Time.fixedDeltaTime;
         }
 
@@ -51,10 +50,9 @@ namespace OSFE.Scripts {
             float distance = Vector3.Distance(eyes, playerEyes);
 
             CapsuleCollider playerColl = player.GetComponentInChildren<CapsuleCollider>();
-            float visibility = Transforms.VisibilityFrom(eyes, playerColl);
 
             return new PlayerLOS(
-                visibility,
+                Transforms.VisibilityFrom(eyes, playerColl),
                 distance,
                 angle2Player,
                 player.position);

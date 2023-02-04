@@ -41,19 +41,27 @@ namespace OSCore.Utils {
             Vector3 feet = center - offset;
 
             float result = 0f;
-            if (!IsHit(position, center)) result += 0.65f;
-            if (!IsHit(position, head)) result += 0.25f;
-            if (!IsHit(position, feet)) result += 0.1f;
+
+            if (!IsBlocked(position, center)) result += 0.5f;
+            if (!IsBlocked(position, head)) result += 0.25f;
+            if (!IsBlocked(position, feet)) result += 0.25f;
 
             return result;
         }
 
-        private static bool IsHit(Vector3 origin, Vector3 position) =>
-            Physics.Raycast(
+        private static bool IsBlocked(Vector3 origin, Vector3 position) {
+            bool hit = Physics.Raycast(
                 origin,
                 position - origin,
                 Vector3.Distance(origin, position),
                 LayerMask.GetMask("Opaque", "InsideOpaque"));
+
+            if (!hit) {
+                Debug.DrawLine(origin, position, Color.red, 0f, false);
+            }
+
+            return hit;
+        }
     }
 
     public static class Monos {

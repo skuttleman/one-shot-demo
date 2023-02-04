@@ -50,7 +50,7 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private float CalculateSuspicion(EnemyAIStateDetails details, bool isVisible) {
-            BehaviorConfig config = cfg.ActiveCfg(awareness);
+            BehaviorConfig config = cfg.ActiveCfg(ai.state);
             float increase = -10f;
 
             if (isVisible) {
@@ -98,10 +98,10 @@ namespace OSBE.Controllers.Enemy {
                 && details.playerAngle != ViewAngle.OOV;
 
             return details with {
-                //lastKnownPosition = isVisible
-                //    ? player.transform.position
-                //    : details.lastKnownPosition,
-                lastKnownPosition = player.transform.position,
+                lastKnownPosition = isVisible
+                    ? player.transform.position
+                    : details.lastKnownPosition,
+                //lastKnownPosition = player.transform.position,
                 suspicion = CalculateSuspicion(details, isVisible),
             };
         }
@@ -119,7 +119,6 @@ namespace OSBE.Controllers.Enemy {
                 { EnemyAwareness.CURIOUS, EnemyBehaviors.Curious().Create(transform) },
                 { EnemyAwareness.INVESTIGATING, EnemyBehaviors.Investigate().Create(transform) },
                 { EnemyAwareness.RETURN_PASSIVE, EnemyBehaviors.ReturnToPassive().Create(transform) },
-                { EnemyAwareness.RETURN_PASSIVE_GIVE_UP, EnemyBehaviors.GiveUp().Create(transform) },
 
                 { EnemyAwareness.ALERT, EnemyBehaviors.TransformPatrol(transform).Create(transform) },
                 { EnemyAwareness.ALERT_CURIOUS, EnemyBehaviors.Curious().Create(transform) },
@@ -149,7 +148,9 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private void Update() {
+            EnemyAwareness awareness = ai.state;
             ABehaviorNode<EnemyAIStateDetails> behavior = behaviors[awareness];
+
             if (awareness != prevAwareness) {
                 prevAwareness = awareness;
                 if (behavior != null) behavior.ReInit();

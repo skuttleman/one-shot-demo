@@ -106,13 +106,15 @@ namespace OSBE.Controllers.Enemy {
         private void Update() {
             debug.text = $@"
 
-state                     = {GetComponent<EnemyAI>().state}
-
 playerSpeed               = {behavior.details.playerSpeed}
 playerVisibility          = {behavior.details.playerVisibility}
 playerDistance            = {behavior.details.playerDistance}
 playerAngle               = {behavior.details.playerAngle}
 
+
+
+
+state                     = {GetComponent<EnemyAI>().state}
 suspicion                 = {behavior.details.suspicion}
 lastKnownPosition         = {behavior.details.lastKnownPosition}
 distance                  = {Vector3.Distance(

@@ -18,12 +18,15 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                     float rotation = xform.rotation.eulerAngles.y;
                     Vector3 direction = Vectors.ToVector3(xform.rotation.eulerAngles.y);
 
-                    children.Add(BNodeGotoLocation.Of(xform.position));
+                    List<IBehaviorNodeFactory<EnemyAIStateDetails>> group = new();
+
+                    group.Add(BNodeGotoLocation.Of(xform.position));
 
                     if (waitTime > 0) {
-                        children.Add(BNodeLookAt.Of((transform, _) => transform.position + direction));
-                        children.Add(BNodeWait<EnemyAIStateDetails>.Of(waitTime));
+                        group.Add(BNodeLookAt.Of((transform, _) => transform.position + direction));
+                        group.Add(BNodeWait<EnemyAIStateDetails>.Of(waitTime));
                     }
+                    children.Add(BNodeAnd<EnemyAIStateDetails>.Of(group.ToArray()));
                 });
 
             return BNodeRepeat<EnemyAIStateDetails>.Of(

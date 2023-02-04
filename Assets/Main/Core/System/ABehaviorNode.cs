@@ -25,7 +25,6 @@ namespace OSCore.System {
         }
 
         public void Process(T details) {
-            if (transform is null) throw new Exception($"`Process` cannot be called before `Init`: {GetType()}");
             if (status == StateNodeStatus.INIT) Start(details);
             else if (!isFinished) Continue(details);
 

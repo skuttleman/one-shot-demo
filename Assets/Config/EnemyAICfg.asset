@@ -15,35 +15,35 @@ MonoBehaviour:
   <passiveCfg>k__BackingField:
     <moveSpeed>k__BackingField: 0.8
     <rotationSpeed>k__BackingField: 2.9
-    <baseSuspicion>k__BackingField: 8
+    <baseSuspicion>k__BackingField: 5
     <speed_FAST>k__BackingField: 2
     <speed_STOPPED>k__BackingField: 0.2
     <stance_STANDING>k__BackingField: 5
     <stance_CROUCHING>k__BackingField: 1.5
     <vis_LOW>k__BackingField: 0.33
     <vis_MED>k__BackingField: 0.66
-    <dist_NEAR>k__BackingField: 0.8
-    <dist_MED>k__BackingField: 0.5
-    <dist_FAR>k__BackingField: 0.2
+    <dist_NEAR>k__BackingField: 2
+    <dist_MED>k__BackingField: 1
+    <dist_FAR>k__BackingField: 0.1
     <angle_MAIN>k__BackingField: 1
-    <angle_BROAD>k__BackingField: 0.5
-    <angle_PERIPHERY>k__BackingField: 0.25
+    <angle_BROAD>k__BackingField: 0.9
+    <angle_PERIPHERY>k__BackingField: 0.5
     <visibility>k__BackingField:
       <limit>k__BackingField: 0.25
       <lowThresh>k__BackingField: 0.5
       <highThresh>k__BackingField: 0.75
     <distance>k__BackingField:
-      <limit>k__BackingField: 4
-      <lowThresh>k__BackingField: 3
-      <highThresh>k__BackingField: 3.4
+      <limit>k__BackingField: 3.75
+      <lowThresh>k__BackingField: 1.5
+      <highThresh>k__BackingField: 3
     <angle>k__BackingField:
-      <limit>k__BackingField: 60
-      <lowThresh>k__BackingField: 40
+      <limit>k__BackingField: 80
+      <lowThresh>k__BackingField: 20
       <highThresh>k__BackingField: 50
   <alertCfg>k__BackingField:
-    <moveSpeed>k__BackingField: 1.2
+    <moveSpeed>k__BackingField: 1.35
     <rotationSpeed>k__BackingField: 3.2
-    <baseSuspicion>k__BackingField: 12
+    <baseSuspicion>k__BackingField: 8
     <speed_FAST>k__BackingField: 2
     <speed_STOPPED>k__BackingField: 0.9
     <stance_STANDING>k__BackingField: 6
@@ -61,17 +61,17 @@ MonoBehaviour:
       <lowThresh>k__BackingField: 0.5
       <highThresh>k__BackingField: 0.75
     <distance>k__BackingField:
-      <limit>k__BackingField: 5.5
-      <lowThresh>k__BackingField: 3
-      <highThresh>k__BackingField: 4
+      <limit>k__BackingField: 4.5
+      <lowThresh>k__BackingField: 1.75
+      <highThresh>k__BackingField: 3.25
     <angle>k__BackingField:
-      <limit>k__BackingField: 75
+      <limit>k__BackingField: 87.5
       <lowThresh>k__BackingField: 30
       <highThresh>k__BackingField: 45
   <aggressiveCfg>k__BackingField:
-    <moveSpeed>k__BackingField: 1.5
+    <moveSpeed>k__BackingField: 2.25
     <rotationSpeed>k__BackingField: 3.5
-    <baseSuspicion>k__BackingField: 25
+    <baseSuspicion>k__BackingField: 10
     <speed_FAST>k__BackingField: 2
     <speed_STOPPED>k__BackingField: 1
     <stance_STANDING>k__BackingField: 7.5
@@ -85,20 +85,20 @@ MonoBehaviour:
     <angle_BROAD>k__BackingField: 1
     <angle_PERIPHERY>k__BackingField: 1
     <visibility>k__BackingField:
-      <limit>k__BackingField: 0.33
+      <limit>k__BackingField: 0.25
       <lowThresh>k__BackingField: 0
       <highThresh>k__BackingField: 0
     <distance>k__BackingField:
-      <limit>k__BackingField: 7
-      <lowThresh>k__BackingField: 0
-      <highThresh>k__BackingField: 0
+      <limit>k__BackingField: 6
+      <lowThresh>k__BackingField: 6
+      <highThresh>k__BackingField: 6
     <angle>k__BackingField:
-      <limit>k__BackingField: 85
+      <limit>k__BackingField: 90
       <lowThresh>k__BackingField: 20
       <highThresh>k__BackingField: 60
   <speechSpeed>k__BackingField: 0.2
-  <maxSuspicion>k__BackingField: 80
-  <passiveToCurious>k__BackingField: 0.25
-  <curiousToInvestigating>k__BackingField: 5
+  <maxSuspicion>k__BackingField: 8
+  <passiveToCurious>k__BackingField: 0.15
+  <curiousToInvestigating>k__BackingField: 2.75
   <aggressiveSeconds>k__BackingField: 5
   <searchingSeconds>k__BackingField: 20

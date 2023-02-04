@@ -39,10 +39,10 @@ namespace OSCore.ScriptableObjects {
             EnemyAINode investigating = new(EnemyAwareness.INVESTIGATING);
             EnemyAINode return_passive = new(EnemyAwareness.RETURN_PASSIVE);
 
-            //EnemyAINode alert = new(EnemyAwareness.ALERT);
-            //EnemyAINode alert_curious = new(EnemyAwareness.ALERT_CURIOUS);
-            //EnemyAINode alert_investigating = new(EnemyAwareness.ALERT_INVESTIGATING);
-            //EnemyAINode return_alert = new(EnemyAwareness.RETURN_ALERT);
+            EnemyAINode alert = new(EnemyAwareness.ALERT);
+            EnemyAINode alert_curious = new(EnemyAwareness.ALERT_CURIOUS);
+            EnemyAINode alert_investigating = new(EnemyAwareness.ALERT_INVESTIGATING);
+            EnemyAINode return_alert = new(EnemyAwareness.RETURN_ALERT);
 
             EnemyAINode aggressive = new(EnemyAwareness.AGGRESIVE);
             EnemyAINode searching = new(EnemyAwareness.SEARCHING);
@@ -60,14 +60,32 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.suspicion >= passiveToCurious, curious)
                 .To(state => IsFinished(state.status), passive);
 
+            alert
+                .To(state => state.suspicion >= passiveToCurious, alert_curious);
+            alert_curious
+                .To(state => state.suspicion >= maxSuspicion, aggressive)
+                .To(state => state.unSightedElapsed > 2f && state.suspicion < 0.1f, alert)
+                .To(state => state.suspicion >= curiousToInvestigating, alert_investigating);
+            alert_investigating
+                .To(state => state.suspicion >= maxSuspicion, aggressive)
+                .To(state => state.suspicion < 0.1f && IsFinished(state.status), return_alert);
+            return_alert
+                .To(state => state.suspicion >= passiveToCurious, alert_curious)
+                .To(state => IsFinished(state.status), alert);
+
             aggressive
                 .To(state => state.suspicion <= 0.1f
                         && state.timeInState >= aggressiveSeconds,
                     searching);
             searching
+                .To(state => state.suspicion >= curiousToInvestigating
+                        && state.playerVisibility != Visibility.NONE
+                        && state.playerAngle != ViewAngle.OOV
+                        && state.playerDistance != ViewDistance.OOV,
+                    aggressive)
                 .To(state => state.suspicion <= 0.1f
                         && state.timeInState >= searchingSeconds,
-                    return_passive);
+                    return_alert);
 
             return passive;
         }
