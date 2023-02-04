@@ -50,7 +50,7 @@ namespace OSBE.Controllers.Enemy {
         }
 
         private float CalculateSuspicion(EnemyAIStateDetails details, bool isVisible) {
-            BehaviorConfig config = cfg.ActiveCfg(ai.state);
+            BehaviorConfig config = cfg.ActiveCfg(awareness);
             float increase = -10f;
 
             if (isVisible) {
@@ -98,9 +98,10 @@ namespace OSBE.Controllers.Enemy {
                 && details.playerAngle != ViewAngle.OOV;
 
             return details with {
-                lastKnownPosition = isVisible
-                    ? player.transform.position
-                    : details.lastKnownPosition,
+                //lastKnownPosition = isVisible
+                //    ? player.transform.position
+                //    : details.lastKnownPosition,
+                lastKnownPosition = player.transform.position,
                 suspicion = CalculateSuspicion(details, isVisible),
             };
         }
@@ -114,19 +115,36 @@ namespace OSBE.Controllers.Enemy {
             player = system.Player();
 
             behaviors = new Dictionary<EnemyAwareness, ABehaviorNode<EnemyAIStateDetails>>() {
-                { EnemyAwareness.PASSIVE, EnemyBehaviors.TransformPatrol(transform) },
-                { EnemyAwareness.CURIOUS, EnemyBehaviors.Curious(transform) },
-                { EnemyAwareness.INVESTIGATING, EnemyBehaviors.Investigate(transform) },
-                { EnemyAwareness.RETURN_PASSIVE, EnemyBehaviors.ReturnToPassive(transform) },
-                { EnemyAwareness.RETURN_PASSIVE_GIVE_UP, EnemyBehaviors.GiveUp(transform) },
+                { EnemyAwareness.PASSIVE, EnemyBehaviors.TransformPatrol(transform).Create(transform) },
+                { EnemyAwareness.CURIOUS, EnemyBehaviors.Curious().Create(transform) },
+                { EnemyAwareness.INVESTIGATING, EnemyBehaviors.Investigate().Create(transform) },
+                { EnemyAwareness.RETURN_PASSIVE, EnemyBehaviors.ReturnToPassive().Create(transform) },
+                { EnemyAwareness.RETURN_PASSIVE_GIVE_UP, EnemyBehaviors.GiveUp().Create(transform) },
 
-                { EnemyAwareness.ALERT, EnemyBehaviors.TransformPatrol(transform) },
-                { EnemyAwareness.ALERT_CURIOUS, EnemyBehaviors.Curious(transform) },
-                { EnemyAwareness.ALERT_INVESTIGATING, EnemyBehaviors.Investigate(transform) },
-                { EnemyAwareness.RETURN_ALERT, EnemyBehaviors.ReturnToAlert(transform) },
+                { EnemyAwareness.ALERT, EnemyBehaviors.TransformPatrol(transform).Create(transform) },
+                { EnemyAwareness.ALERT_CURIOUS, EnemyBehaviors.Curious().Create(transform) },
+                { EnemyAwareness.ALERT_INVESTIGATING, EnemyBehaviors.Investigate().Create(transform) },
+                { EnemyAwareness.RETURN_ALERT, EnemyBehaviors.ReturnToAlert().Create(transform) },
 
-                { EnemyAwareness.AGGRESIVE, EnemyBehaviors.Harrass(transform) },
-                { EnemyAwareness.SEARCHING, EnemyBehaviors.SearchHalfHeartedly(transform) }
+                { EnemyAwareness.AGGRESIVE, EnemyBehaviors.Harrass().Create(transform) },
+                { EnemyAwareness.SEARCHING, EnemyBehaviors.SearchHalfHeartedly().Create(transform) }
+
+
+
+
+                //{ EnemyAwareness.PASSIVE, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.CURIOUS, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.INVESTIGATING, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.RETURN_PASSIVE, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.RETURN_PASSIVE_GIVE_UP, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+
+                //{ EnemyAwareness.ALERT, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.ALERT_CURIOUS, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.ALERT_INVESTIGATING, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.RETURN_ALERT, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+
+                //{ EnemyAwareness.AGGRESIVE, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
+                //{ EnemyAwareness.SEARCHING, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop }
             };
         }
 
@@ -134,7 +152,7 @@ namespace OSBE.Controllers.Enemy {
             ABehaviorNode<EnemyAIStateDetails> behavior = behaviors[awareness];
             if (awareness != prevAwareness) {
                 prevAwareness = awareness;
-                if (behavior != null) ABehaviorNode<EnemyAIStateDetails>.ReInit(behavior);
+                if (behavior != null) behavior.ReInit();
             }
 
             UpdateState(state => ProcessUpdate(state) with {
@@ -144,11 +162,9 @@ namespace OSBE.Controllers.Enemy {
             });
 
             if (behavior != null) {
-                ABehaviorNode<EnemyAIStateDetails>.Process(
-                    behavior,
-                    ai.details with {
-                        cfg = cfg.ActiveCfg(awareness),
-                    });
+                behavior.Process(ai.details with {
+                    cfg = cfg.ActiveCfg(awareness),
+                });
             }
         }
     }

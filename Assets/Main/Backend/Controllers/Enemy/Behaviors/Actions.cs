@@ -4,19 +4,20 @@ using System;
 using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Actions {
-    public class BNodeGoto : ABehaviorNode<EnemyAIStateDetails> {
-        private readonly EnemyNavAgent nav;
-        private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
-        private float destElapsed = 0f;
+    public abstract class ABNodeGoto : ABehaviorNode<EnemyAIStateDetails> {
+        private EnemyNavAgent nav;
         private Vector3 destination;
+        private float destElapsed;
 
-        public BNodeGoto(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
+        protected ABNodeGoto(Transform transform) : base(transform) {
             nav = transform.GetComponent<EnemyNavAgent>();
-            this.toLocation = toLocation;
         }
 
+        protected abstract Vector3 ToLocation(EnemyAIStateDetails details);
+
         protected override void Start(EnemyAIStateDetails details) {
-            StartWalk(details, toLocation(details));
+            destElapsed = 0f;
+            StartWalk(details, ToLocation(details));
         }
 
         protected override void Continue(EnemyAIStateDetails details) {
@@ -24,7 +25,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
                 nav.Stop();
                 status = StateNodeStatus.SUCCESS;
             } else if (destElapsed <= 0f) {
-                Vector3 loc = toLocation(details);
+                Vector3 loc = ToLocation(details);
                 destElapsed = 0.5f;
 
                 if (Vectors.NonZero(loc - destination) || !nav.isMoving) {
@@ -36,8 +37,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
 
         protected override void Stop() {
-            destination = Vector3.negativeInfinity;
-            nav.Stop();
+            transform.GetComponent<EnemyNavAgent>().Stop();
         }
 
         private void StartWalk(EnemyAIStateDetails details, Vector3 location) {
@@ -49,56 +49,67 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
     }
 
-    public class BNodeGotoStatic : ABehaviorNode<EnemyAIStateDetails> {
-        private readonly EnemyNavAgent nav;
-        private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
-        private Vector3 destination;
+    public class BNodeGoto : ABNodeGoto {
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Of(
+            Func<Transform, EnemyAIStateDetails, Vector3> toLocation) =>
+                new BehaviorNodeFactory<EnemyAIStateDetails>(
+                    transform => new BNodeGoto(transform, toLocation));
 
-        public BNodeGotoStatic(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation) : base(transform) {
-            nav = transform.GetComponent<EnemyNavAgent>();
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Of(Vector3 location) =>
+            new BehaviorNodeFactory<EnemyAIStateDetails>(
+                transform => new BNodeGoto(transform, (_, _) => location));
+
+        private readonly Func<Transform, EnemyAIStateDetails, Vector3> toLocation;
+
+        protected BNodeGoto(Transform transform, Func<Transform, EnemyAIStateDetails, Vector3> toLocation)
+            : base(transform) {
             this.toLocation = toLocation;
         }
 
-        protected override void Start(EnemyAIStateDetails details) {
-            destination = toLocation(details);
+        protected override Vector3 ToLocation(EnemyAIStateDetails details) =>
+            toLocation(transform, details);
 
-            if (!nav.Goto(destination, details.cfg)) {
-                status = StateNodeStatus.FAILURE;
-            }
+    }
+
+    public class BNodeGotoStatic : ABNodeGoto {
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Of(
+            Func<Transform, EnemyAIStateDetails, Vector3> toLocation) =>
+                new BehaviorNodeFactory<EnemyAIStateDetails>(
+                    transform => new BNodeGotoStatic(transform, toLocation));
+
+        private readonly Func<Transform, EnemyAIStateDetails, Vector3> toLocation;
+        private Vector3 destination;
+
+        protected BNodeGotoStatic(Transform transform, Func<Transform, EnemyAIStateDetails, Vector3> toLocation)
+            : base (transform) {
+            destination = Vector3.negativeInfinity;
+            this.toLocation = toLocation;
         }
 
-        protected override void Continue(EnemyAIStateDetails details) {
-            float distance = Vector3.Distance(transform.position, destination);
-
-            if (!nav.isMoving || distance < 0.1f) {
-                Stop();
-                status = StateNodeStatus.SUCCESS;
-            }
-        }
-
-        protected override void Stop() {
-            nav.Stop();
-        }
+        protected override Vector3 ToLocation(EnemyAIStateDetails details) =>
+            destination.IsNegativeInfinity()
+                ? destination = toLocation(transform, details)
+                : destination;
     }
 
     public class BNodeGotoLocation : BNodeGoto {
-        public BNodeGotoLocation(Transform transform, Vector3 location)
-            : base(transform, _ => location) { }
+        public static new IBehaviorNodeFactory<EnemyAIStateDetails> Of(Vector3 location) =>
+            new BehaviorNodeFactory<EnemyAIStateDetails>(
+                transform => new BNodeGotoLocation(transform, location));
+
+        protected BNodeGotoLocation(Transform transform, Vector3 location) : base(transform, (_, _) => location) { }
     }
 
-    public class BNodeLookAt : ABehaviorNode<EnemyAIStateDetails> {
-        private readonly EnemyNavAgent nav;
-        private readonly Func<EnemyAIStateDetails, Vector3> toLocation;
-        private bool isStarted;
+    public abstract class ABNodeLookAt : ABehaviorNode<EnemyAIStateDetails> {
+        private EnemyNavAgent nav;
 
-        public BNodeLookAt(Transform transform, Func<EnemyAIStateDetails, Vector3> toLocation)
-            : base(transform) {
-            nav = transform.GetComponent<EnemyNavAgent>();
-            this.toLocation = toLocation;
-        }
+        protected ABNodeLookAt(Transform transform) : base(transform) { }
+
+        protected abstract Vector3 ToLocation(EnemyAIStateDetails details);
 
         protected override void Start(EnemyAIStateDetails details) {
-            nav.Face(toLocation(details), details.cfg);
+            nav = transform.GetComponent<EnemyNavAgent>();
+            nav.Face(ToLocation(details), details.cfg);
         }
 
         protected override void Continue(EnemyAIStateDetails details) {
@@ -108,40 +119,45 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
 
         protected override void Stop() {
-            nav.Stop();
+            if (nav is not null) nav.Stop();
         }
     }
 
-    public class BNodeLookAtTransform : BNodeLookAt {
-        public BNodeLookAtTransform(Transform transform, Transform target)
-            : base(transform, _ => target.position) { }
-    }
+    public class BNodeLookAt : ABNodeLookAt {
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Of(
+            Func<Transform, EnemyAIStateDetails, Vector3> toLocation) =>
+                new BehaviorNodeFactory<EnemyAIStateDetails>(
+                    transform => new BNodeLookAt(transform, toLocation));
 
-    public class BNodeLookAtLocation : BNodeLookAt {
-        public BNodeLookAtLocation(Transform transform, Vector3 location)
-            : base(transform, _ => location) { }
-    }
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> LKP() =>
+            new BehaviorNodeFactory<EnemyAIStateDetails>(transform =>
+                new BNodeLookAt(transform, (transform, details) => details.lastKnownPosition));
 
-    public class BNodeLookAtDirection : BNodeLookAt {
-        public BNodeLookAtDirection(Transform transform, Vector3 direction)
-            : base(transform, _ => transform.position + direction.normalized) { }
-    }
+        private readonly Func<Transform, EnemyAIStateDetails, Vector3> toLocation;
 
-    public class BNodeLookAtLKP : BNodeLookAt {
-        public BNodeLookAtLKP(Transform transform)
-            : base(transform, details => details.lastKnownPosition) { }
+        protected BNodeLookAt(Transform transform, Func<Transform, EnemyAIStateDetails, Vector3> toLocation)
+            : base(transform) {
+            this.toLocation = toLocation;
+        }
+
+        protected override Vector3 ToLocation(EnemyAIStateDetails details) =>
+            toLocation(transform, details);
     }
 
     public class BNodeSpeak : ABehaviorNode<EnemyAIStateDetails> {
-        private readonly EnemySpeechAgent speech;
-        private readonly string message;
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Of(string message) =>
+            new BehaviorNodeFactory<EnemyAIStateDetails>(
+                transform => new BNodeSpeak(transform, message));
 
-        public BNodeSpeak(Transform transform, string message) : base(transform) {
-            speech = transform.GetComponent<EnemySpeechAgent>();
+        private readonly string message;
+        private EnemySpeechAgent speech;
+
+        protected BNodeSpeak(Transform transform, string message) : base(transform) {
             this.message = message;
         }
 
         protected override void Start(EnemyAIStateDetails details) {
+            speech = transform.GetComponent<EnemySpeechAgent>();
             speech.Say(message);
         }
 
@@ -153,7 +169,35 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
         }
 
         protected override void Stop() {
-            speech.Stop();
+            if (speech is not null) speech.Stop();
+        }
+    }
+
+    public class BNodeWait<T> : ABehaviorNode<T> {
+        public static IBehaviorNodeFactory<T> Of(float time) =>
+            new BehaviorNodeFactory<T>(
+                transform => new BNodeWait<T>(transform, time));
+
+        private readonly float time;
+        private float elapsed;
+
+        protected BNodeWait(Transform transform, float time) : base(transform) {
+            this.time = time;
+            elapsed = 0f;
+        }
+
+        protected override void Continue(T details) {
+            status = StateNodeStatus.RUNNING;
+
+            if (elapsed >= time) {
+                status = StateNodeStatus.SUCCESS;
+            }
+
+            elapsed += Time.deltaTime;
+        }
+
+        protected override void Stop() {
+            elapsed = 0f;
         }
     }
 }

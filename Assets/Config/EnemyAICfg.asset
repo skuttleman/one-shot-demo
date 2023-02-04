@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <passiveCfg>k__BackingField:
     <moveSpeed>k__BackingField: 0.8
-    <rotationSpeed>k__BackingField: 4
+    <rotationSpeed>k__BackingField: 2.9
     <baseSuspicion>k__BackingField: 8
     <speed_FAST>k__BackingField: 2
     <speed_STOPPED>k__BackingField: 0.2
@@ -42,7 +42,7 @@ MonoBehaviour:
       <highThresh>k__BackingField: 50
   <alertCfg>k__BackingField:
     <moveSpeed>k__BackingField: 1.2
-    <rotationSpeed>k__BackingField: 6
+    <rotationSpeed>k__BackingField: 3.2
     <baseSuspicion>k__BackingField: 12
     <speed_FAST>k__BackingField: 2
     <speed_STOPPED>k__BackingField: 0.9
@@ -70,7 +70,7 @@ MonoBehaviour:
       <highThresh>k__BackingField: 45
   <aggressiveCfg>k__BackingField:
     <moveSpeed>k__BackingField: 1.5
-    <rotationSpeed>k__BackingField: 8
+    <rotationSpeed>k__BackingField: 3.5
     <baseSuspicion>k__BackingField: 25
     <speed_FAST>k__BackingField: 2
     <speed_STOPPED>k__BackingField: 1

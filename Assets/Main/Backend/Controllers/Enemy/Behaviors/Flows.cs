@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Flows {
     public static class EnemyBehaviors {
-        public static ABehaviorNode<EnemyAIStateDetails> TransformPatrol(Transform transform) {
-            List<ABehaviorNode<EnemyAIStateDetails>> nodes = new();
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> TransformPatrol(Transform transform) {
+            List<IBehaviorNodeFactory<EnemyAIStateDetails>> children = new();
 
             Transforms
                 .FindInChildren(transform.parent, node => node.name.Contains("position"))
@@ -18,139 +18,128 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                     float rotation = xform.rotation.eulerAngles.y;
                     Vector3 direction = Vectors.ToVector3(xform.rotation.eulerAngles.y);
 
-                    nodes.Add(new BNodeGotoLocation(transform, xform.position));
+                    children.Add(BNodeGotoLocation.Of(xform.position));
 
                     if (waitTime > 0) {
-                        nodes.Add(new BNodeLookAtDirection(transform, direction));
-                        nodes.Add(new BNodeWait<EnemyAIStateDetails>(transform, waitTime));
+                        children.Add(BNodeLookAt.Of((transform, _) => transform.position + direction));
+                        children.Add(BNodeWait<EnemyAIStateDetails>.Of(waitTime));
                     }
                 });
 
-            return new BNodeRepeat<EnemyAIStateDetails>(
-                transform,
-                new BNodeStepLockedAnd<EnemyAIStateDetails>(transform, nodes.ToArray()));
+            return BNodeRepeat<EnemyAIStateDetails>.Of(
+                BNodeStepLockedAnd<EnemyAIStateDetails>.Of(children.ToArray()));
         }
 
-        public static ABehaviorNode<EnemyAIStateDetails> Curious(Transform transform) =>
-            new BNodeParallelAll<EnemyAIStateDetails>(
-                transform,
-                new BNodeSpeak(transform, "..."),
-                new BNodeRepeat<EnemyAIStateDetails>(
-                    transform,
-                    new BNodeLookAtLKP(transform)));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Curious() =>
+            BNodeParallelAll<EnemyAIStateDetails>.Of(
+                BNodeSpeak.Of("..."),
+                BNodeRepeat<EnemyAIStateDetails>.Of(
+                    BNodeLookAt.LKP()));
 
-        public static ABehaviorNode<EnemyAIStateDetails> FollowLKP(
-            Transform transform, float minDist) =>
-            new BNodeDoWhile<EnemyAIStateDetails>(
-                    transform,
-                    details => Vector3.Distance(details.lastKnownPosition, transform.position) > minDist,
-                    new BNodeGoto(
-                        transform,
-                        details => details.lastKnownPosition));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> FollowLKP(float minDist) =>
+            BNodeDoWhile<EnemyAIStateDetails>.Of(
+                (transform, details) =>
+                    Vector3.Distance(details.lastKnownPosition, transform.position) > minDist,
+                BNodeGoto.Of((_, details) => details.lastKnownPosition));
 
 
-        public static ABehaviorNode<EnemyAIStateDetails> Investigate(Transform transform) =>
-            new BNodeAnd<EnemyAIStateDetails>(
-                transform,
-                new BNodeParallelAny<EnemyAIStateDetails>(
-                    transform,
-                    new BNodeSpeak(transform, "???"),
-                    new BNodeRepeat<EnemyAIStateDetails>(
-                        transform,
-                        new BNodeLookAtLKP(transform))),
-                FollowLKP(transform, 0.5f));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Investigate() =>
+            BNodeAnd<EnemyAIStateDetails>.Of(
+                BNodeParallelAny<EnemyAIStateDetails>.Of(
+                    BNodeSpeak.Of("???"),
+                    BNodeRepeat<EnemyAIStateDetails>.Of(
+                        BNodeLookAt.LKP())),
+                FollowLKP(0.5f));
 
-        public static ABehaviorNode<EnemyAIStateDetails> ReturnToPassive(Transform transform) =>
-            new BNodeAnd<EnemyAIStateDetails>(
-                transform,
-                LookAround(transform),
-                GiveUp(transform));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> ReturnToPassive() =>
+            BNodeAnd<EnemyAIStateDetails>.Of(
+                LookAround(),
+                GiveUp());
 
-        public static ABehaviorNode<EnemyAIStateDetails> ReturnToAlert(Transform transform) =>
-            new BNodeAnd<EnemyAIStateDetails>(
-                transform,
-                LookAround(transform),
-                LookAround(transform),
-                new BNodeSpeak(transform, "---"));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> ReturnToAlert() =>
+            BNodeAnd<EnemyAIStateDetails>.Of(
+                LookAround(),
+                LookAround(),
+                BNodeSpeak.Of("---"));
 
-        public static ABehaviorNode<EnemyAIStateDetails> LookAround(Transform transform) {
-            return new BNodeAnd<EnemyAIStateDetails>(
-                transform,
-                new BNodeWait<EnemyAIStateDetails>(transform, 1f),
-                Turn(transform, 80f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 1.25f),
-                Turn(transform, -160f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 2f),
-                Turn(transform, 80f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 1f));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> LookAround() {
+            return BNodeAnd<EnemyAIStateDetails>.Of(
+                BNodeWait<EnemyAIStateDetails>.Of(1f),
+                Turn(80f),
+                BNodeWait<EnemyAIStateDetails>.Of(1.25f),
+                Turn(-160f),
+                BNodeWait<EnemyAIStateDetails>.Of(2f),
+                Turn(80f),
+                BNodeWait<EnemyAIStateDetails>.Of(1f));
         }
 
-        public static ABehaviorNode<EnemyAIStateDetails> ScanAround(Transform transform) =>
-            new BNodeAnd<EnemyAIStateDetails>(
-                transform,
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f),
-                Turn(transform, -80f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f),
-                Turn(transform, 160f),
-                new BNodeWait<EnemyAIStateDetails>(transform, 0.75f));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> ScanAround() =>
+            BNodeAnd<EnemyAIStateDetails>.Of(
+                BNodeWait<EnemyAIStateDetails>.Of(0.75f),
+                Turn(-80f),
+                BNodeWait<EnemyAIStateDetails>.Of(0.75f),
+                Turn(160f),
+                BNodeWait<EnemyAIStateDetails>.Of(0.75f));
 
-        public static ABehaviorNode<EnemyAIStateDetails> Turn(Transform transform, float angle) {
-            return new BNodeLookAt(
-                transform,
-                _ => transform.position
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Turn(float angle) =>
+            BNodeLookAt.Of(
+                (transform, _) => transform.position
                     + Quaternion.AngleAxis(angle, Vector3.up) * transform.forward);
-        }
 
         /*
          * TEMPORARY
          */
 
-        public static ABehaviorNode<EnemyAIStateDetails> Harrass(Transform transform) =>
-            new BNodeParallelAll<EnemyAIStateDetails>(
-                transform,
-                new BNodeRepeat<EnemyAIStateDetails>(
-                    transform,
-                    new BNodeAnd<EnemyAIStateDetails>(
-                        transform,
-                        new BNodeSpeak(transform, "!!!"),
-                        new BNodeWait<EnemyAIStateDetails>(transform, 2f))),
-                new BNodeRepeat<EnemyAIStateDetails>(
-                    transform,
-                    new BNodeAnd<EnemyAIStateDetails>(
-                        transform,
-                        new BNodeDoWhile<EnemyAIStateDetails>(
-                            transform,
-                            details => Vector3.Distance(details.lastKnownPosition, transform.position) >= 2f,
-                            FollowLKP(transform, 1.5f)),
-                        new BNodeDoWhile<EnemyAIStateDetails>(
-                            transform,
-                            details => Vector3.Distance(details.lastKnownPosition, transform.position) < 2f,
-                            new BNodeLookAtLKP(transform)))));
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> Harrass() =>
+            BNodeParallelAll<EnemyAIStateDetails>.Of(
+                BNodeRepeat<EnemyAIStateDetails>.Of(
+                    BNodeAnd<EnemyAIStateDetails>.Of(
+                        BNodeSpeak.Of("!!!"),
+                        BNodeWait<EnemyAIStateDetails>.Of(2f))),
+                BNodeRepeat<EnemyAIStateDetails>.Of(
+                    BNodeAnd<EnemyAIStateDetails>.Of(
+                        BNodeDoWhile<EnemyAIStateDetails>.Of(
+                            (transform, details) =>
+                                Vector3.Distance(
+                                    details.lastKnownPosition,
+                                    transform.position
+                                ) >= 2f,
+                            BNodeOptional<EnemyAIStateDetails>.Of(FollowLKP(1.5f))),
+                        BNodeDoWhile<EnemyAIStateDetails>.Of(
+                            (transform, details) =>
+                                Vector3.Distance(
+                                    details.lastKnownPosition,
+                                    transform.position
+                                ) < 2f,
+                            BNodeLookAt.LKP()))));
 
-        public static ABehaviorNode<EnemyAIStateDetails> GiveUp(Transform transform) =>
-                new BNodeSpeak(transform, "¯\\_(  )_/¯");
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> GiveUp() =>
+                BNodeSpeak.Of("¯\\_(  )_/¯");
 
-        public static ABehaviorNode<EnemyAIStateDetails> SearchHalfHeartedly(Transform transform) =>
-            new BNodeParallelAll<EnemyAIStateDetails>(
-                transform,
-                new BNodeRepeat<EnemyAIStateDetails>(
-                    transform,
-                    new BNodeAnd<EnemyAIStateDetails>(
-                        transform,
-                        new BNodeSpeak(transform, "***"),
-                        new BNodeWait<EnemyAIStateDetails>(transform, 7.5f))),
-                new BNodeRepeat<EnemyAIStateDetails>(
-                    transform,
-                    new BNodeOptional<EnemyAIStateDetails>(
-                        transform,
-                        new BNodeAnd<EnemyAIStateDetails>(
-                            transform,
-                            new BNodeGotoStatic(
-                                transform,
-                                details => Vectors.RandomPointWithinDistance(
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> SearchHalfHeartedly() =>
+            BNodeParallelAll<EnemyAIStateDetails>.Of(
+                BNodeRepeat<EnemyAIStateDetails>.Of(
+                    BNodeAnd<EnemyAIStateDetails>.Of(
+                        BNodeSpeak.Of("***"),
+                        BNodeWait<EnemyAIStateDetails>.Of(7.5f))),
+                BNodeRepeat<EnemyAIStateDetails>.Of(
+                    BNodeOptional<EnemyAIStateDetails>.Of(
+                        BNodeAnd<EnemyAIStateDetails>.Of(
+                            BNodeGoto.Of(
+                                (_, details) => Vectors.RandomPointWithinDistance(
                                     details.lastKnownPosition,
                                     new(2f, 0f, 2f),
                                     -1)),
-                            ScanAround(transform)))));
+                            ScanAround()))));
+
+        public class Noop<T> : ABehaviorNode<T> {
+            public static readonly Noop<T> noop = new();
+
+            private Noop() : base(default) { }
+
+            protected override void Continue(T details) {
+                status = StateNodeStatus.SUCCESS;
+            }
+        }
     }
 }
