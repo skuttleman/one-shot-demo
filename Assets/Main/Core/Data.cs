@@ -80,8 +80,13 @@ namespace OSCore.Data {
             public record LookInput(Vector2 direction) : EnemyControllerInput();
             public record AimInput(bool isAiming) : EnemyControllerInput();
             public record DamageInput(float damage) : EnemyControllerInput();
-            public record PlayerLOS(float visibility, float distance, float angle, Vector3 location)
-                : EnemyControllerInput();
+            public record PlayerLOS(
+                PlayerStance stance,
+                PlayerSpeed speed,
+                float visibility,
+                float distance,
+                float angle,
+                Vector3 location) : EnemyControllerInput();
 
             private EnemyControllerInput() { }
         }

@@ -28,7 +28,8 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
                 Vector3 loc = ToLocation(details);
                 destElapsed = 0.5f;
 
-                if (Vectors.NonZero(loc - destination) || !nav.isMoving) {
+                if (!loc.IsNegativeInfinity()
+                        && (Vectors.NonZero(loc - destination) || !nav.isMoving)) {
                     StartWalk(details, loc);
                 }
             }

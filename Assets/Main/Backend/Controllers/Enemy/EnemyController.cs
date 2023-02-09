@@ -1,8 +1,11 @@
 using OSCore.Data.AI;
 using OSCore.Data.Controllers;
+using OSCore.Data.Enums;
 using OSCore.ScriptableObjects;
 using OSCore.System.Interfaces.Controllers;
+using OSCore.System.Interfaces.Pooling;
 using OSCore.System.Interfaces;
+using OSCore.System.Pooling;
 using OSCore.System;
 using OSCore.Utils;
 using TMPro;
@@ -20,6 +23,7 @@ namespace OSBE.Controllers.Enemy {
         private GameObject player;
         private EnemyBehavior behavior;
         private TMP_Text debug;
+        private IPool footstepPool;
 
         public void Handle(EnemyControllerInput e) {
             behavior.UpdateState(e switch {
@@ -31,7 +35,7 @@ namespace OSBE.Controllers.Enemy {
 
         public void OnStep() {
             if (behavior.details.unMovedElapsed > 0.5f) {
-                Instantiate(footstep, transform.position, Quaternion.Euler(90f, 0f, 0f));
+                footstepPool.Instantiate(transform.position, Quaternion.Euler(90f, 0f, 0f));
             }
         }
 
@@ -60,6 +64,11 @@ namespace OSBE.Controllers.Enemy {
                 playerVisibility = CalculatePlayerVisibility(config, e.visibility),
                 playerDistance = CalculateViewDistance(config, e.distance),
                 playerAngle = CalculateViewAngle(config, e.angle),
+                playerStance = e.stance,
+                playerSpeed =  e.speed,
+                unMovedElapsed = e.speed != PlayerSpeed.STOPPED
+                    ? 0f
+                    : details.unMovedElapsed,
             };
         }
 
@@ -99,12 +108,15 @@ namespace OSBE.Controllers.Enemy {
             player = system.Player();
             behavior = GetComponent<EnemyBehavior>();
 
+            footstepPool = new SlidingPool(footstep);
+
             debug = FindObjectOfType<TMP_Text>();
             debug.text = "";
         }
 
         private void Update() {
             debug.text = $@"
+
 
 playerSpeed               = {behavior.details.playerSpeed}
 playerVisibility          = {behavior.details.playerVisibility}

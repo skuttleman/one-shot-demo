@@ -5,6 +5,7 @@ using OSCore.System;
 using OSCore.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace OSBE.Controllers.Enemy.Behaviors.Flows {
     public static class EnemyBehaviors {
@@ -62,7 +63,7 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         public static IBehaviorNodeFactory<EnemyAIStateDetails> ReturnToAlert() =>
             BNodeAnd<EnemyAIStateDetails>.Of(
                 LookAround(),
-                LookAround(),
+                Turn(80f),
                 BNodeSpeak.Of("---"));
 
         public static IBehaviorNodeFactory<EnemyAIStateDetails> LookAround() {
@@ -126,14 +127,14 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                         BNodeSpeak.Of("***"),
                         BNodeWait<EnemyAIStateDetails>.Of(7.5f))),
                 BNodeRepeat<EnemyAIStateDetails>.Of(
-                    BNodeOptional<EnemyAIStateDetails>.Of(
-                        BNodeAnd<EnemyAIStateDetails>.Of(
+                    BNodeAnd<EnemyAIStateDetails>.Of(
+                        BNodeOptional<EnemyAIStateDetails>.Of(
                             BNodeGoto.Of(
                                 (_, details) => Vectors.RandomPointWithinDistance(
                                     details.lastKnownPosition,
                                     new(2f, 0f, 2f),
-                                    -1)),
-                            ScanAround()))));
+                                    -1))),
+                        ScanAround())));
 
         public class Noop<T> : ABehaviorNode<T> {
             public static readonly Noop<T> noop = new();
@@ -141,6 +142,22 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
             private Noop() : base(default) { }
 
             protected override void Continue(T details) {
+                status = StateNodeStatus.SUCCESS;
+            }
+        }
+
+        public class LogSomething<T> : ABehaviorNode<T> {
+            public static IBehaviorNodeFactory<T> Of(string message) =>
+                new BehaviorNodeFactory<T>(transform => new LogSomething<T>(transform, message));
+
+            private readonly string message;
+
+            protected LogSomething(Transform transform, string message) : base(transform) {
+                this.message = message;
+            }
+
+            protected override void Continue(T details) {
+                Debug.Log(message);
                 status = StateNodeStatus.SUCCESS;
             }
         }

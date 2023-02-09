@@ -1,15 +1,24 @@
 using OSCore.System.Interfaces.Controllers;
-using OSCore.Utils;
+using OSCore.System.Interfaces.Pooling;
 using UnityEngine;
 
 namespace OSFE.Scripts {
-    public class Bullet : MonoBehaviour {
+    public class Bullet : MonoBehaviour, IPooled {
         private Rigidbody rb;
+        private bool isActive;
+
+        public void Go() {
+            rb.velocity = Vector3.zero;
+            rb.AddRelativeForce(Vector3.forward * 150f);
+            isActive = true;
+        }
 
         private void OnCollisionEnter(Collision collision) {
-            IDamage dmg = collision.gameObject.GetComponent<IDamage>();
-            if (dmg != null) dmg.OnAttack(0f);
-            Destroy(gameObject);
+            if (isActive) {
+                IDamage dmg = collision.gameObject.GetComponent<IDamage>();
+                if (dmg != null) dmg.OnAttack(0f);
+                isActive = false;
+            }
         }
 
         /*
@@ -18,8 +27,6 @@ namespace OSFE.Scripts {
 
         private void Start() {
             rb = GetComponent<Rigidbody>();
-            rb.AddRelativeForce(Vector3.forward * 150f);
-            StartCoroutine(Monos.After(5f, () => Destroy(gameObject)));
         }
     }
 }

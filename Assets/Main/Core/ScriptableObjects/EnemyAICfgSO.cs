@@ -55,10 +55,14 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.suspicion >= curiousToInvestigating, investigating);
             investigating
                 .To(state => state.suspicion >= maxSuspicion, aggressive)
-                .To(state => state.suspicion < 0.1f && IsFinished(state.status), return_passive);
+                .To(state =>
+                        (state.suspicion < curiousToInvestigating || state.suspicionChange <= 0)
+                        && IsFinished(state), return_passive);
             return_passive
-                .To(state => state.suspicion >= passiveToCurious, curious)
-                .To(state => IsFinished(state.status), passive);
+                .To(state => state.suspicion >= passiveToCurious
+                        && state.suspicionChange > 0,
+                    curious)
+                .To(state => IsFinished(state), passive);
 
             alert
                 .To(state => state.suspicion >= passiveToCurious, alert_curious);
@@ -68,10 +72,14 @@ namespace OSCore.ScriptableObjects {
                 .To(state => state.suspicion >= curiousToInvestigating, alert_investigating);
             alert_investigating
                 .To(state => state.suspicion >= maxSuspicion, aggressive)
-                .To(state => state.suspicion < 0.1f && IsFinished(state.status), return_alert);
+                .To(state =>
+                        (state.suspicion < passiveToCurious || state.suspicionChange <= 0)
+                        && IsFinished(state), return_alert);
             return_alert
-                .To(state => state.suspicion >= passiveToCurious, alert_curious)
-                .To(state => IsFinished(state.status), alert);
+                .To(state => state.suspicion >= passiveToCurious
+                        && state.suspicionChange > 0,
+                    alert_curious)
+                .To(state => IsFinished(state), alert);
 
             aggressive
                 .To(state => state.suspicion <= 0.1f
@@ -90,8 +98,9 @@ namespace OSCore.ScriptableObjects {
             return passive;
         }
 
-        private static bool IsFinished(StateNodeStatus status) =>
-            status == StateNodeStatus.SUCCESS
-                || status == StateNodeStatus.FAILURE;
+        private static bool IsFinished(EnemyAIStateDetails details) =>
+            details.timeInState >= 0.25f
+                && (details.status == StateNodeStatus.SUCCESS
+                    || details.status == StateNodeStatus.FAILURE);
     }
 }

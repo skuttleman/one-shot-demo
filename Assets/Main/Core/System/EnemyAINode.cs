@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 
 namespace OSCore.System {
+    public enum EnemyAwarenessLevel { LOW, MED, HIGH }
     public enum Visibility { NONE, LOW, MED, HIGH }
     public enum ViewDistance { OOV, NEAR, MED, FAR }
     public enum ViewAngle { OOV, PERIPHERY, BROAD, MAIN }
@@ -23,6 +24,7 @@ namespace OSCore.System {
         public float unMovedElapsed { get; init; }
 
         public float suspicion { get; init; }
+        public int suspicionChange { get; init; }
     }
 
     public class EnemyAINode : APredicativeStateNode<EnemyAwareness, EnemyAIStateDetails> {

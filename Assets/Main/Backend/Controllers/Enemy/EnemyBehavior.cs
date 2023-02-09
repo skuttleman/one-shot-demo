@@ -8,18 +8,16 @@ using OSCore.System.Interfaces;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSBE.Controllers.Enemy {
     public class EnemyBehavior :
-        ASystemInitializer<MovementChanged, StanceChanged>,
+        ASystemInitializer,
         IStateReceiver<EnemyAnim> {
 
         [SerializeField] private EnemyAICfgSO cfg;
         public EnemyAwareness state => ai.state;
         public EnemyAIStateDetails details => ai.details;
 
-        [SerializeField] private EnemyAwareness awareness;
         private EnemyAwareness prevAwareness = EnemyAwareness.PASSIVE;
 
         private EnemyAI ai;
@@ -33,28 +31,65 @@ namespace OSBE.Controllers.Enemy {
         }
 
         public void SetInterruptState(EnemyAwareness prev, EnemyAwareness curr) {
-            Debug.Log($"AI transtition from {prev} to {curr}");
-        }
-
-        protected override void OnEvent(MovementChanged e) {
-            UpdateState(state => state with {
-                playerSpeed = e.speed,
-                unMovedElapsed = e.speed != PlayerSpeed.STOPPED
-                    ? 0f
-                    : state.unMovedElapsed,
-            });
-        }
-
-        protected override void OnEvent(StanceChanged e) {
-            UpdateState(state => state with { playerStance = e.stance });
+            //Debug.Log($"AI transtition from {prev} to {curr}");
         }
 
         private float CalculateSuspicion(EnemyAIStateDetails details, bool isVisible) {
             BehaviorConfig config = cfg.ActiveCfg(ai.state);
-            float increase = -10f;
+            float increase = ai.state switch {
+                EnemyAwareness.PASSIVE => -10f,
+                EnemyAwareness.CURIOUS => -10f,
+                EnemyAwareness.RETURN_PASSIVE => -10f,
+                EnemyAwareness.ALERT => -8f,
+                EnemyAwareness.ALERT_CURIOUS => -8f,
+                EnemyAwareness.RETURN_ALERT => -8f,
+                EnemyAwareness.AGGRESIVE => -5f,
+                EnemyAwareness.SEARCHING => -5f,
+                _ => 0f
+            };
 
             if (isVisible) {
                 increase = config.baseSuspicion;
+
+                increase *= details.playerVisibility switch {
+                    Visibility.NONE => 0f,
+                    Visibility.LOW => details.playerStance switch {
+                        PlayerStance.STANDING => config.vis_MED,
+                        PlayerStance.CROUCHING => config.vis_LOW,
+                        PlayerStance.CRAWLING => 0f,
+                        _=> 1f,
+                    },
+                    Visibility.MED => (details.playerStance, details.playerSpeed) switch {
+                        (PlayerStance.STANDING, _) => 1f,
+                        (PlayerStance.CROUCHING, PlayerSpeed.STOPPED) => config.vis_LOW,
+                        (PlayerStance.CROUCHING, _) => config.vis_MED,
+                        _ => config.vis_LOW,
+                    },
+                    _ => 1f,
+                };
+
+                increase *= details.playerDistance switch {
+                    ViewDistance.FAR =>
+                        (details.playerStance == PlayerStance.CRAWLING && details.playerSpeed == PlayerSpeed.STOPPED)
+                        ? 0f
+                        : config.dist_FAR,
+                    ViewDistance.MED => config.dist_MED,
+                    _ => config.dist_NEAR,
+                };
+
+                increase *= details.playerAngle switch {
+                    ViewAngle.PERIPHERY => (details.playerDistance, details.playerSpeed) switch {
+                        (ViewDistance.FAR, PlayerSpeed.STOPPED) => 0f,
+                        (ViewDistance.MED, PlayerSpeed.STOPPED) => 0f,
+                        _ => config.angle_PERIPHERY,
+                    },
+                    ViewAngle.BROAD =>
+                        (details.playerDistance == ViewDistance.FAR
+                         || details.playerSpeed == PlayerSpeed.STOPPED)
+                            ? 0f
+                            : config.angle_BROAD,
+                    _ => config.angle_MAIN,
+                };
 
                 increase *= details.playerSpeed switch {
                     PlayerSpeed.FAST => config.speed_FAST,
@@ -67,26 +102,6 @@ namespace OSBE.Controllers.Enemy {
                     PlayerStance.CROUCHING => config.stance_CROUCHING,
                     _ => 1f,
                 };
-
-                increase *= details.playerVisibility switch {
-                    Visibility.LOW => config.vis_LOW,
-                    Visibility.MED => config.vis_MED,
-                    _ => 1f,
-                };
-
-                increase *= details.playerDistance switch {
-                    ViewDistance.NEAR => config.dist_NEAR,
-                    ViewDistance.MED => config.dist_MED,
-                    ViewDistance.FAR => config.dist_FAR,
-                    _ => 1f,
-                };
-
-                increase *= details.playerAngle switch {
-                    ViewAngle.MAIN => 1f,
-                    ViewAngle.BROAD => 0.5f,
-                    ViewAngle.PERIPHERY => 0.25f,
-                    _ => 1f,
-                };
             }
 
             return Mathf.Clamp(details.suspicion + increase * Time.fixedDeltaTime, 0f, cfg.maxSuspicion);
@@ -97,12 +112,16 @@ namespace OSBE.Controllers.Enemy {
                 && details.playerDistance != ViewDistance.OOV
                 && details.playerAngle != ViewAngle.OOV;
 
+            float currSuspicion = details.suspicion;
+            float nextSuspicion = CalculateSuspicion(details, isVisible);
+            int suspicionChange = nextSuspicion.CompareTo(currSuspicion);
+
             return details with {
-                lastKnownPosition = isVisible
+                lastKnownPosition = isVisible && suspicionChange >= 0
                     ? player.transform.position
                     : details.lastKnownPosition,
-                //lastKnownPosition = player.transform.position,
-                suspicion = CalculateSuspicion(details, isVisible),
+                suspicion = nextSuspicion,
+                suspicionChange = suspicionChange,
             };
         }
 
@@ -127,23 +146,6 @@ namespace OSBE.Controllers.Enemy {
 
                 { EnemyAwareness.AGGRESIVE, EnemyBehaviors.Harrass().Create(transform) },
                 { EnemyAwareness.SEARCHING, EnemyBehaviors.SearchHalfHeartedly().Create(transform) }
-
-
-
-
-                //{ EnemyAwareness.PASSIVE, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.CURIOUS, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.INVESTIGATING, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.RETURN_PASSIVE, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.RETURN_PASSIVE_GIVE_UP, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-
-                //{ EnemyAwareness.ALERT, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.ALERT_CURIOUS, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.ALERT_INVESTIGATING, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.RETURN_ALERT, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-
-                //{ EnemyAwareness.AGGRESIVE, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop },
-                //{ EnemyAwareness.SEARCHING, EnemyBehaviors.Noop<EnemyAIStateDetails>.noop }
             };
         }
 

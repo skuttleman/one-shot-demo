@@ -51,4 +51,14 @@ namespace OSCore.System.Interfaces {
             public void OnAttack(float damage);
         }
     }
+
+    namespace Pooling {
+        public interface IPool {
+            public GameObject Instantiate(Vector3 position, Quaternion rotation);
+        }
+
+        public interface IPooled {
+            public void Go();
+        }
+    }
 }

@@ -4,16 +4,21 @@ using OSCore.System.Interfaces.Controllers;
 using OSCore.System;
 using OSCore.Utils;
 using UnityEngine;
+using OSCore.Data.Enums;
 using static OSCore.Data.Controllers.EnemyControllerInput;
+using static OSCore.Data.Events.Controllers.Player.AnimationEmittedEvent;
 
 namespace OSFE.Scripts {
-    public class EnemyVision : ASystemInitializer {
+    public class EnemyVision : ASystemInitializer<MovementChanged, StanceChanged> {
         [SerializeField] private EnemyAICfgSO cfg;
 
         private IController<EnemyControllerInput> controller;
         private Transform player;
         private SpriteRenderer rdr;
         private CapsuleCollider coll;
+
+        private PlayerStance stance;
+        private PlayerSpeed speed;
         private float timeSinceSeeable = 0f;
 
         protected override void OnEnable() {
@@ -52,10 +57,20 @@ namespace OSFE.Scripts {
             CapsuleCollider playerColl = player.GetComponentInChildren<CapsuleCollider>();
 
             return new PlayerLOS(
+                stance,
+                speed,
                 Transforms.VisibilityFrom(eyes, playerColl),
                 distance,
                 angle2Player,
                 player.position);
+        }
+
+        protected override void OnEvent(MovementChanged e) {
+            speed = e.speed;
+        }
+
+        protected override void OnEvent(StanceChanged e) {
+            stance = e.stance;
         }
     }
 }
