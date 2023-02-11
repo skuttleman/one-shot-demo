@@ -22,7 +22,7 @@ MonoBehaviour:
     <stance_CROUCHING>k__BackingField: 1.25
     <vis_LOW>k__BackingField: 0.33
     <vis_MED>k__BackingField: 0.66
-    <dist_NEAR>k__BackingField: 5
+    <dist_NEAR>k__BackingField: 10
     <dist_MED>k__BackingField: 1
     <dist_FAR>k__BackingField: 0.5
     <angle_MAIN>k__BackingField: 1
@@ -50,7 +50,7 @@ MonoBehaviour:
     <stance_CROUCHING>k__BackingField: 3
     <vis_LOW>k__BackingField: 0.33
     <vis_MED>k__BackingField: 0.66
-    <dist_NEAR>k__BackingField: 5
+    <dist_NEAR>k__BackingField: 10
     <dist_MED>k__BackingField: 1.25
     <dist_FAR>k__BackingField: 1
     <angle_MAIN>k__BackingField: 1
@@ -98,7 +98,7 @@ MonoBehaviour:
       <highThresh>k__BackingField: 60
   <speechSpeed>k__BackingField: 0.2
   <maxSuspicion>k__BackingField: 15
-  <passiveToCurious>k__BackingField: 0.2
-  <curiousToInvestigating>k__BackingField: 3
+  <passiveToCurious>k__BackingField: 0.1
+  <curiousToInvestigating>k__BackingField: 2.75
   <aggressiveSeconds>k__BackingField: 5
-  <searchingSeconds>k__BackingField: 20
+  <searchingSeconds>k__BackingField: 35

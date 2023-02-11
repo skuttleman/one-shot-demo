@@ -120,8 +120,16 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
         public static IBehaviorNodeFactory<EnemyAIStateDetails> GiveUp() =>
                 BNodeSpeak.Of("¯\\_(  )_/¯");
 
-        public static IBehaviorNodeFactory<EnemyAIStateDetails> SearchHalfHeartedly() =>
-            BNodeParallelAll<EnemyAIStateDetails>.Of(
+        public static IBehaviorNodeFactory<EnemyAIStateDetails> SearchHalfHeartedly() {
+            Vector3[] quads = new Vector3[]{
+                new(2f, 0f, 2f),
+                new(-2f, 0f, 2f),
+                new(2f, 0f, -2f),
+                new(-2f, 0f, -2f)
+            };
+            int quadIdx = Random.Range(0, 3);
+
+            return BNodeParallelAll<EnemyAIStateDetails>.Of(
                 BNodeRepeat<EnemyAIStateDetails>.Of(
                     BNodeAnd<EnemyAIStateDetails>.Of(
                         BNodeSpeak.Of("***"),
@@ -129,12 +137,13 @@ namespace OSBE.Controllers.Enemy.Behaviors.Flows {
                 BNodeRepeat<EnemyAIStateDetails>.Of(
                     BNodeAnd<EnemyAIStateDetails>.Of(
                         BNodeOptional<EnemyAIStateDetails>.Of(
-                            BNodeGoto.Of(
+                            BNodeGotoStatic.Of(
                                 (_, details) => Vectors.RandomPointWithinDistance(
                                     details.lastKnownPosition,
-                                    new(2f, 0f, 2f),
+                                    quads[quadIdx = (quadIdx + 1) % quads.Length],
                                     -1))),
                         ScanAround())));
+        }
 
         public class Noop<T> : ABehaviorNode<T> {
             public static readonly Noop<T> noop = new();

@@ -104,9 +104,9 @@ namespace OSCore.Utils {
 
         public static Vector3 RandomPointWithinDistance(Vector3 origin, Vector3 dist, int layermask) {
             Vector3 point = origin + new Vector3(
-                dist.x * Random.insideUnitSphere.x,
-                dist.y * Random.insideUnitSphere.y,
-                dist.z * Random.insideUnitSphere.z);
+                dist.x * Random.Range(0.25f, 1f),
+                dist.y * Random.Range(0.25f, 1f),
+                dist.z * Random.Range(0.25f, 1f));
 
             if (NavMesh.SamplePosition(point, out NavMeshHit navHit, 0.75f, layermask)) {
                 return navHit.position;

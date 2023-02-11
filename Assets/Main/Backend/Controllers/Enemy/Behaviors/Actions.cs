@@ -87,6 +87,11 @@ namespace OSBE.Controllers.Enemy.Behaviors.Actions {
             this.toLocation = toLocation;
         }
 
+        protected override void Stop() {
+            base.Stop();
+            destination = Vector3.negativeInfinity;
+        }
+
         protected override Vector3 ToLocation(EnemyAIStateDetails details) =>
             destination.IsNegativeInfinity()
                 ? destination = toLocation(transform, details)

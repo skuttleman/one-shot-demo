@@ -57,7 +57,7 @@ namespace OSBE.Controllers.Enemy {
                         PlayerStance.STANDING => config.vis_MED,
                         PlayerStance.CROUCHING => config.vis_LOW,
                         PlayerStance.CRAWLING => 0f,
-                        _=> 1f,
+                        _ => 1f,
                     },
                     Visibility.MED => (details.playerStance, details.playerSpeed) switch {
                         (PlayerStance.STANDING, _) => 1f,
