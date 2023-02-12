@@ -19,6 +19,7 @@ namespace OSBE.Controllers.Enemy {
         private Vector3 prevMovement;
         private float turnStartTime;
         private float buffer;
+        private float acceleration;
 
         public bool Goto(Vector3 location, BehaviorConfig cfg) {
             NavMeshPath path = new();
@@ -27,13 +28,14 @@ namespace OSBE.Controllers.Enemy {
                     && nav.CalculatePath(location, path)
                     && Vector3.Distance(location, nav.pathEndPosition) > 0.025f
             ) {
-                anim.Transition(state => state with { isMoving = true });
+                AnimateMove(true);
                 anim.SetSpeed(cfg.moveSpeed / 2.5f);
 
                 this.cfg = cfg;
                 isMoving = true;
                 buffer = -0.25f;
 
+                nav.acceleration = acceleration;
                 nav.SetPath(path);
                 nav.speed = cfg.moveSpeed;
 
@@ -45,7 +47,7 @@ namespace OSBE.Controllers.Enemy {
         public void Stop() {
             if (nav != null) nav.ResetPath();
             if (anim != null) {
-                anim.Transition(state => state with { isMoving = false });
+                AnimateMove(false);
             }
 
             isMoving = false;
@@ -84,20 +86,23 @@ namespace OSBE.Controllers.Enemy {
 
                 if (diff >= 30f) {
                     nav.isStopped = true;
-                    anim.Transition(state => state with { isMoving = false });
+                    AnimateMove(false);
                 } else {
                     nav.isStopped = false;
-                    anim.Transition(state => state with { isMoving = true });
+                    AnimateMove(true);
                 }
 
                 DoTurn(toward);
             }
 
-            if (isMoving && buffer > 0f && nav.remainingDistance < 0.025f) {
-                anim.Transition(state => state with { isMoving = false });
+            if (isMoving && buffer > 0f && (nav.remainingDistance - Mathf.Abs(nav.baseOffset)) < 0.025f) {
+                nav.acceleration = 75f;
                 isMoving = false;
                 nav.isStopped = true;
+                nav.velocity = Vector3.zero;
                 prevMovement = Vector3.zero;
+
+                AnimateMove(false);
                 nav.ResetPath();
             }
         }
@@ -110,6 +115,10 @@ namespace OSBE.Controllers.Enemy {
                 * (isTurning ? (Time.time - turnStartTime) : Time.deltaTime));
         }
 
+        private void AnimateMove(bool isMoving) {
+            anim.Transition(state => state with { isMoving = isMoving });
+        }
+
         /*
          * Lifecycle Methods
          */
@@ -119,6 +128,7 @@ namespace OSBE.Controllers.Enemy {
             nav = GetComponent<NavMeshAgent>();
             nav.updateRotation = false;
             prevPos = transform.position;
+            acceleration = nav.acceleration;
         }
 
         private void Update() {

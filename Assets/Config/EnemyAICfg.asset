@@ -17,12 +17,12 @@ MonoBehaviour:
     <rotationSpeed>k__BackingField: 2.9
     <baseSuspicion>k__BackingField: 5
     <speed_FAST>k__BackingField: 1.2
-    <speed_STOPPED>k__BackingField: 0.2
+    <speed_STOPPED>k__BackingField: 0.8
     <stance_STANDING>k__BackingField: 5
     <stance_CROUCHING>k__BackingField: 1.25
     <vis_LOW>k__BackingField: 0.33
     <vis_MED>k__BackingField: 0.66
-    <dist_NEAR>k__BackingField: 10
+    <dist_NEAR>k__BackingField: 100
     <dist_MED>k__BackingField: 1
     <dist_FAR>k__BackingField: 0.5
     <angle_MAIN>k__BackingField: 1
@@ -43,14 +43,14 @@ MonoBehaviour:
   <alertCfg>k__BackingField:
     <moveSpeed>k__BackingField: 1.75
     <rotationSpeed>k__BackingField: 3.2
-    <baseSuspicion>k__BackingField: 9
+    <baseSuspicion>k__BackingField: 7.5
     <speed_FAST>k__BackingField: 2
     <speed_STOPPED>k__BackingField: 0.9
     <stance_STANDING>k__BackingField: 6
     <stance_CROUCHING>k__BackingField: 3
     <vis_LOW>k__BackingField: 0.33
     <vis_MED>k__BackingField: 0.66
-    <dist_NEAR>k__BackingField: 10
+    <dist_NEAR>k__BackingField: 100
     <dist_MED>k__BackingField: 1.25
     <dist_FAR>k__BackingField: 1
     <angle_MAIN>k__BackingField: 1
