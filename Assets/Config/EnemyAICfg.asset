@@ -101,4 +101,4 @@ MonoBehaviour:
   <passiveToCurious>k__BackingField: 0.1
   <curiousToInvestigating>k__BackingField: 2.75
   <aggressiveSeconds>k__BackingField: 5
-  <searchingSeconds>k__BackingField: 35
+  <searchingSeconds>k__BackingField: 20

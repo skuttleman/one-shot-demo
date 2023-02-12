@@ -110,30 +110,30 @@ namespace OSBE.Controllers.Enemy {
 
             footstepPool = new SlidingPool(footstep);
 
-            debug = FindObjectOfType<TMP_Text>();
-            debug.text = "";
+            //debug = FindObjectOfType<TMP_Text>();
+            // && debug.text = "";
         }
 
         private void Update() {
-            debug.text = $@"
+//            debug.text = $@"
 
 
-playerSpeed               = {behavior.details.playerSpeed}
-playerVisibility          = {behavior.details.playerVisibility}
-playerDistance            = {behavior.details.playerDistance}
-playerAngle               = {behavior.details.playerAngle}
+//playerSpeed               = {behavior.details.playerSpeed}
+//playerVisibility          = {behavior.details.playerVisibility}
+//playerDistance            = {behavior.details.playerDistance}
+//playerAngle               = {behavior.details.playerAngle}
 
 
 
 
-state                     = {GetComponent<EnemyAI>().state}
-suspicion                 = {behavior.details.suspicion}
-lastKnownPosition         = {behavior.details.lastKnownPosition}
-distance                  = {Vector3.Distance(
-                                 behavior.details.lastKnownPosition,
-                                 transform.position)}
+//state                     = {GetComponent<EnemyAI>().state}
+//suspicion                 = {behavior.details.suspicion}
+//lastKnownPosition         = {behavior.details.lastKnownPosition}
+//distance                  = {Vector3.Distance(
+//                                 behavior.details.lastKnownPosition,
+//                                 transform.position)}
 
-            ".Trim();
+//            ".Trim();
         }
     }
 }

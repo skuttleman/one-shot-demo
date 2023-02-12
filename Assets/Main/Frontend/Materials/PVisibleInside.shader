@@ -56,11 +56,24 @@ Shader "Custom/PVisibleInside"
             };
  
             half4 _Color;
+
+            inline float4 UnityPixelSnap (float4 pos) {
+                float2 hpc = _ScreenParams.xy * 0.5f;
+                #if  SHADER_API_PSSL
+                    // An old sdk used to implement round() as floor(x+0.5) current sdks use the round to even method so we manually use the old method here for compatabilty.
+                    float2 temp = ((pos.xy / pos.w) * hpc) + float2(0.5f,0.5f);
+                    float2 pixelPos = float2(floor(temp.x), floor(temp.y));
+                #else
+                    float2 pixelPos = round ((pos.xy / pos.w) * hpc);
+                #endif
+                pos.xy = pixelPos / hpc * pos.w;
+                return pos;
+            }
  
             v2f vert(appdata_t IN)
             {
                 v2f OUT;
-                OUT.vertex = TransformObjectToHClip(IN.vertex);
+                OUT.vertex = TransformObjectToHClip(IN.vertex.xyz);
                 OUT.texcoord = IN.texcoord;
                 OUT.color = IN.color * _Color;
                 #ifdef PIXELSNAP_ON

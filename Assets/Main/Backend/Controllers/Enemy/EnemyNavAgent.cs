@@ -15,8 +15,9 @@ namespace OSBE.Controllers.Enemy {
 
         private Vector3 turnPos;
         private Quaternion faceTarget;
-        private float turnStartTime;
         private Vector3 prevPos;
+        private Vector3 prevMovement;
+        private float turnStartTime;
         private float buffer;
 
         public bool Goto(Vector3 location, BehaviorConfig cfg) {
@@ -74,13 +75,29 @@ namespace OSBE.Controllers.Enemy {
         private void UpdateMove() {
             Vector3 movement = transform.position - prevPos;
             if (Vectors.NonZero(movement)) {
-                DoTurn(Quaternion.LookRotation(transform.position - prevPos));
+                prevMovement = movement;
             }
 
-            if (isMoving && buffer > 0f && (nav.isStopped || nav.remainingDistance < 0.025f)) {
+            if (nav.isStopped ? Vectors.NonZero(prevMovement) : Vectors.NonZero(movement)) {
+                Quaternion toward = Quaternion.LookRotation(prevMovement);
+                float diff = Maths.AngleDiff(transform.rotation.eulerAngles.y, toward.eulerAngles.y);
+
+                if (diff >= 30f) {
+                    nav.isStopped = true;
+                    anim.Transition(state => state with { isMoving = false });
+                } else {
+                    nav.isStopped = false;
+                    anim.Transition(state => state with { isMoving = true });
+                }
+
+                DoTurn(toward);
+            }
+
+            if (isMoving && buffer > 0f && nav.remainingDistance < 0.025f) {
                 anim.Transition(state => state with { isMoving = false });
                 isMoving = false;
                 nav.isStopped = true;
+                prevMovement = Vector3.zero;
                 nav.ResetPath();
             }
         }
